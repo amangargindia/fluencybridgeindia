@@ -3,58 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fluency Bridge Home</title>
+    <title>Fluency Bridge</title>
+
+    <!-- Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Serif font similar to logo -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
 </head>
 
-<body class="bg-slate-100 text-slate-800 min-h-screen font-sans p-6">
+<body class="bg-gradient-to-b from-slate-900 via-blue-950 to-slate-950 text-white min-h-screen font-sans p-6">
 
-    <div class="max-w-3xl mx-auto mt-10">
+    <div class="max-w-4xl mx-auto mt-12">
 
-        <!-- Header -->
-        <header class="text-center mb-10">
-            <h1 class="text-3xl font-bold tracking-tight text-slate-900 mb-2">
-                Fluency Bridge Home Page
+        <!-- HERO -->
+        <header class="text-center mb-12">
+
+            <h1 class="text-4xl md:text-5xl tracking-wide">
+                <span class="block text-white/90 font-semibold tracking-widest">
+                    FLUENCY
+                </span>
+
+                <span class="block text-white mt-2 text-5xl md:text-6xl"
+                      style="font-family: 'Playfair Display', serif; font-style: italic;">
+                    bridge
+                </span>
             </h1>
 
-            <span class="inline-block text-xs font-medium text-amber-700 bg-amber-100 px-3 py-1 rounded-full border border-amber-200">
-                In Development
-            </span>
+            <p class="text-sm text-blue-300 mt-4">
+                Build precision. Eliminate confusion.
+            </p>
+
         </header>
 
-        <!-- Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- MAIN BUTTON -->
+        <div class="text-center mb-10">
+
+            <a href="presentcontinuoustest.html"
+               class="inline-block bg-blue-600 hover:bg-blue-700 transition-all 
+                      text-white font-semibold px-6 py-3 rounded-xl shadow-lg 
+                      hover:shadow-blue-500/30">
+
+                Start Present Continuous Test →
+            </a>
+
+        </div>
+
+        <!-- TOOLS -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
             <!-- DOCX TOOL -->
             <a href="docxtopdf.html"
-               class="block p-6 bg-white border border-slate-200 rounded-xl shadow-sm 
-                      hover:shadow-md hover:border-blue-500 transition-all group">
+               class="block p-6 bg-slate-800/60 backdrop-blur border border-slate-700 rounded-xl 
+                      hover:border-blue-500 hover:shadow-lg hover:shadow-blue-500/20 transition-all group">
 
-                <h2 class="text-lg font-semibold text-blue-600 mb-2 group-hover:text-blue-700">
+                <h2 class="text-lg font-semibold text-blue-400 mb-2 group-hover:text-blue-300">
                     DOCX to PDF Exporter
                 </h2>
 
-                <p class="text-sm text-slate-600">
-                    Convert your documents into beautifully branded, dark-themed files.
+                <p class="text-sm text-slate-300">
+                    Convert your documents into clean, branded outputs.
                 </p>
 
-                <div class="mt-4 text-xs font-bold text-blue-500 uppercase tracking-widest">
-                    Open Tool →
-                </div>
             </a>
 
             <!-- COMING SOON -->
-            <div class="block p-6 bg-slate-50 border border-dashed border-slate-300 rounded-xl">
+            <div class="block p-6 bg-slate-800/40 border border-dashed border-slate-600 rounded-xl">
 
-                <h2 class="text-lg font-semibold text-slate-500 mb-2">
-                    Fluency Bridge Noun Test
+                <h2 class="text-lg font-semibold text-slate-400 mb-2">
+                    Advanced Grammar Modules
                 </h2>
 
-                <p class="text-sm text-slate-400">
-                    Interactive grammar testing module.
+                <p class="text-sm text-slate-500">
+                    Structured testing and training tools.
                 </p>
 
-                <p class="text-xs font-bold text-slate-400 uppercase mt-3 tracking-wider">
+                <p class="text-xs font-bold text-slate-500 uppercase mt-3 tracking-wider">
                     Coming Soon
                 </p>
 
