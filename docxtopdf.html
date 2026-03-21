@@ -3,39 +3,461 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fluency Bridge Home page (in development)</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-slate-100 text-slate-800 h-screen font-sans p-6">
+    <title>FB Internal Tools - Class Notes Creator</title>
+    
+    <!-- Tailwind CSS with Typography Plugin -->
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { 50: '#eff6ff', 100: '#dbeafe', 400: '#60a5fa', 500: '#3b82f6', 600: '#2563eb', 900: '#1e3a8a' },
+                        fluency: { 
+                            base: '#030712', /* Deepest navy/black */
+                            panel: '#0f172a', /* Slightly lighter for sidebars */
+                            border: '#1e293b'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
 
-    <div class="max-w-3xl mx-auto mt-10">
-        <header class="text-center mb-10">
-            <h1 class="text-3xl font-bold tracking-tight text-slate-900 mb-2">
-                Fluency Bridge Home page
-            </h1>
-            <span class="inline-block text-xs font-medium text-amber-700 bg-amber-100 px-3 py-1 rounded-full mt-1 border border-amber-200">
-                (in development)
-            </span>
-        </header>
+    <!-- Mammoth.js for converting DOCX to clean HTML -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <style>
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        /* Themed Dark Paper Styling for Preview */
+        .paper-container {
+            width: 100%; max-width: 210mm; min-height: 297mm;
+            margin: 0 auto; 
             
-            <a href="docstopdf.html" class="block p-6 bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md hover:border-blue-500 transition-all group">
-                <div class="flex items-center gap-2 mb-2">
-                    <h2 class="text-lg font-semibold text-blue-600 group-hover:text-blue-700">DOCX to PDF Exporter</h2>
+            /* Fluency Bridge Dark Theme */
+            background-color: #030712;
+            background-image: radial-gradient(ellipse 100% 30% at 50% 0%, rgba(37, 99, 235, 0.15) 0%, #030712 100%);
+            color: #f8fafc;
+            
+            border: 1px solid #1e293b;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            padding: 20mm; transition: all 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .paper-container { padding: 1.5rem; min-height: auto; }
+        }
+
+        /* Tables styled for Dark Mode */
+        .prose table { width: 100%; border-collapse: collapse; margin-top: 1rem; margin-bottom: 1rem; }
+        .prose th, .prose td { border: 1px solid #334155; padding: 0.5rem; }
+        .prose th { background-color: #0f172a; font-weight: 600; color: #f8fafc; }
+        
+        body { overflow: hidden; }
+        
+        .loader {
+            border: 4px solid #1e293b; border-top: 4px solid #3b82f6;
+            border-radius: 50%; width: 40px; height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="bg-fluency-base text-slate-300 h-screen flex flex-col font-sans selection:bg-brand-500 selection:text-white">
+
+    <!-- Top Header -->
+    <header class="bg-fluency-panel border-b border-fluency-border shadow-md flex-none z-20">
+        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3 text-white">
+                <div class="bg-brand-600/20 p-2 rounded-lg border border-brand-500/30">
+                    <i data-lucide="book-open" class="w-5 h-5 text-brand-400"></i>
                 </div>
-                <p class="text-sm text-slate-600">Convert your documents into beautifully branded, dark-themed files.</p>
-                <div class="mt-4 text-xs font-bold text-blue-500 uppercase tracking-widest">Open Tool →</div>
-            </a>
-
-            <div class="block p-6 bg-slate-50 border border-dashed border-slate-300 rounded-xl">
-                <h2 class="text-lg font-semibold text-slate-500 mb-2">Fluency Bridge Noun Test</h2>
-                <p class="text-sm text-slate-400">Interactive grammar testing module.</p>
-                <p class="text-xs font-bold text-slate-400 uppercase mt-3 tracking-wider">Coming Soon</p>
+                <div>
+                    <h1 class="text-lg font-bold tracking-tight leading-tight">FB Internal Tools</h1>
+                    <div class="text-xs text-brand-400 font-medium tracking-wide uppercase">Class Notes Creator</div>
+                </div>
             </div>
-
+            <div class="text-xs text-slate-500 hidden sm:flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                System Online
+            </div>
         </div>
+    </header>
+
+    <main class="flex-1 flex flex-col lg:flex-row overflow-hidden">
+        
+        <!-- Left Panel: Controls -->
+        <aside class="w-full lg:w-80 bg-fluency-panel border-r border-fluency-border flex flex-col flex-none overflow-y-auto z-10 shadow-xl">
+            <div class="p-6 space-y-8">
+                
+                <!-- Section 1: Upload -->
+                <section>
+                    <h2 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">1. Document Source</h2>
+                    <div id="drop-zone" class="border-2 border-dashed border-slate-700 bg-slate-800/30 rounded-xl p-6 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-slate-800/60 hover:border-brand-500 transition-colors group">
+                        <div class="w-12 h-12 bg-brand-900/50 text-brand-400 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform shadow-[0_0_15px_rgba(37,99,235,0.2)]">
+                            <i data-lucide="upload-cloud" class="w-6 h-6"></i>
+                        </div>
+                        <p class="text-sm font-medium text-slate-200 mb-1">Upload DOCX File</p>
+                        <p class="text-xs text-slate-500">Drag & drop your rough notes</p>
+                        <input type="file" id="file-input" accept=".docx" class="hidden">
+                    </div>
+                    
+                    <div id="file-info" class="hidden mt-3 p-3 bg-green-900/20 border border-green-800/50 rounded-lg flex items-center justify-between">
+                        <div class="flex items-center gap-2 truncate">
+                            <i data-lucide="check-circle-2" class="w-4 h-4 text-green-400 flex-none"></i>
+                            <span id="file-name" class="text-sm text-green-300 font-medium truncate">document.docx</span>
+                        </div>
+                        <button id="clear-file" class="text-green-500 hover:text-green-300 p-1 transition-colors" title="Remove file">
+                            <i data-lucide="x" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Section 2: Styling -->
+                <section id="styling-controls" class="opacity-50 pointer-events-none transition-opacity">
+                    <h2 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">2. Typography Settings</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-400 mb-1">Font Family</label>
+                            <select id="theme-select" class="w-full bg-slate-800 border border-slate-700 text-slate-200 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 block p-2.5 outline-none transition-shadow text-sm">
+                                <option value="font-sans">Brand Sans (Modern)</option>
+                                <option value="font-serif">Brand Serif (Elegant)</option>
+                                <option value="font-sans tracking-wide">Brand Spacious</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-400 mb-1">Base Font Size</label>
+                            <div class="grid grid-cols-3 gap-2">
+                                <button data-size="prose-sm" class="size-btn px-3 py-2 text-sm border border-slate-700 bg-slate-800/50 text-slate-300 rounded-md hover:bg-slate-700 focus:outline-none transition-colors">Small</button>
+                                <button data-size="prose-base" class="size-btn px-3 py-2 text-sm border border-brand-500 bg-brand-900/40 text-brand-300 rounded-md outline-none transition-colors">Normal</button>
+                                <button data-size="prose-lg" class="size-btn px-3 py-2 text-sm border border-slate-700 bg-slate-800/50 text-slate-300 rounded-md hover:bg-slate-700 focus:outline-none transition-colors">Large</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 3: Export -->
+                <section id="export-controls" class="opacity-50 pointer-events-none transition-opacity pt-4 flex flex-col gap-3">
+                    <button id="export-btn" class="w-full bg-brand-600 hover:bg-brand-500 text-white font-medium py-3 px-4 rounded-xl shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_25px_rgba(37,99,235,0.5)] transition-all flex items-center justify-center gap-2 border border-brand-400/50">
+                        <i data-lucide="printer" class="w-5 h-5"></i>
+                        Generate Class Notes
+                    </button>
+                    <div id="export-help" class="text-xs text-slate-500 text-center leading-relaxed">
+                        Opens print engine. Ensure <strong class="text-slate-300">Background Graphics</strong> is enabled to apply the FB brand theme.
+                    </div>
+                    <div id="fallback-container"></div>
+                </section>
+
+            </div>
+        </aside>
+
+        <!-- Right Panel: Preview -->
+        <section class="flex-1 bg-fluency-base overflow-y-auto relative" id="preview-scroll-container">
+            
+            <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center text-slate-500 p-8 text-center">
+                <div class="relative mb-6">
+                    <div class="absolute inset-0 bg-brand-500 blur-[40px] opacity-20 rounded-full"></div>
+                    <i data-lucide="file-text" class="w-20 h-20 text-slate-700 relative z-10"></i>
+                </div>
+                <h3 class="text-xl font-medium text-slate-300 mb-2">Awaiting Source Document</h3>
+                <p class="max-w-md text-sm text-slate-500 leading-relaxed">Upload a raw DOCX file. The system will extract the structure and automatically apply the Fluency Bridge visual identity.</p>
+            </div>
+            
+            <!-- The dark paper preview wrapper -->
+            <div id="preview-wrapper" class="hidden p-4 md:p-10">
+                <div class="paper-container relative group">
+                    <div id="pdf-content" class="w-full"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="fixed inset-0 bg-fluency-base/90 backdrop-blur-sm z-50 flex flex-col items-center justify-center hidden">
+        <div class="loader mb-6 shadow-[0_0_15px_rgba(59,130,246,0.5)]"></div>
+        <p id="loading-text" class="text-white font-medium tracking-wide">Processing Document...</p>
     </div>
 
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-4 right-4 bg-slate-800 border border-slate-700 text-white px-4 py-3 rounded-lg shadow-2xl transform translate-y-20 opacity-0 transition-all duration-300 flex items-center gap-3 z-50">
+        <span id="toast-icon-wrapper"><i data-lucide="info" class="w-5 h-5 text-brand-400"></i></span>
+        <span id="toast-message" class="text-sm font-medium">Notification</span>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        let currentFileName = "FB_Class_Notes";
+        let currentThemeClass = "font-sans";
+        let currentSizeClass = "prose-base";
+        let isFileLoaded = false;
+
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const fileInfo = document.getElementById('file-info');
+        const fileNameEl = document.getElementById('file-name');
+        const clearFileBtn = document.getElementById('clear-file');
+        
+        const stylingControls = document.getElementById('styling-controls');
+        const exportControls = document.getElementById('export-controls');
+        const themeSelect = document.getElementById('theme-select');
+        const sizeBtns = document.querySelectorAll('.size-btn');
+        const exportBtn = document.getElementById('export-btn');
+        const fallbackContainer = document.getElementById('fallback-container');
+        
+        const emptyState = document.getElementById('empty-state');
+        const previewWrapper = document.getElementById('preview-wrapper');
+        const pdfContent = document.getElementById('pdf-content');
+        
+        const loadingOverlay = document.getElementById('loading-overlay');
+        const loadingText = document.getElementById('loading-text');
+        const toast = document.getElementById('toast');
+        const toastMessage = document.getElementById('toast-message');
+        const toastIconWrapper = document.getElementById('toast-icon-wrapper');
+
+        // Events
+        dropZone.addEventListener('click', () => fileInput.click());
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('bg-slate-800', 'border-brand-500'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('bg-slate-800', 'border-brand-500'));
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault(); dropZone.classList.remove('bg-slate-800', 'border-brand-500');
+            if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+        });
+        fileInput.addEventListener('change', (e) => { if (e.target.files.length) handleFile(e.target.files[0]); });
+        clearFileBtn.addEventListener('click', resetApp);
+
+        themeSelect.addEventListener('change', (e) => { currentThemeClass = e.target.value; applyStyles(); });
+        
+        sizeBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                // Reset all buttons to inactive state
+                sizeBtns.forEach(b => { 
+                    b.classList.remove('border-brand-500', 'bg-brand-900/40', 'text-brand-300'); 
+                    b.classList.add('border-slate-700', 'bg-slate-800/50', 'text-slate-300'); 
+                });
+                // Set clicked button to active state
+                e.target.classList.remove('border-slate-700', 'bg-slate-800/50', 'text-slate-300'); 
+                e.target.classList.add('border-brand-500', 'bg-brand-900/40', 'text-brand-300');
+                
+                currentSizeClass = e.target.dataset.size; applyStyles();
+            });
+        });
+
+        exportBtn.addEventListener('click', generatePDFView);
+
+        function showToast(message, isError = false) {
+            toastMessage.textContent = message;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            if(isError) {
+                toast.classList.replace('border-slate-700', 'border-red-900');
+                toastIconWrapper.innerHTML = '<i data-lucide="alert-triangle" class="w-5 h-5 text-red-400"></i>';
+            } else {
+                toast.classList.replace('border-red-900', 'border-slate-700');
+                toastIconWrapper.innerHTML = '<i data-lucide="check-circle-2" class="w-5 h-5 text-brand-400"></i>';
+            }
+            lucide.createIcons();
+            setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 4000);
+        }
+
+        function toggleLoading(show, text = 'Processing...') {
+            loadingText.textContent = text;
+            show ? loadingOverlay.classList.remove('hidden') : loadingOverlay.classList.add('hidden');
+        }
+
+        function resetApp() {
+            fileInput.value = ""; currentFileName = "FB_Class_Notes"; isFileLoaded = false;
+            dropZone.classList.remove('hidden'); fileInfo.classList.add('hidden');
+            stylingControls.classList.add('opacity-50', 'pointer-events-none');
+            exportControls.classList.add('opacity-50', 'pointer-events-none');
+            emptyState.classList.remove('hidden'); previewWrapper.classList.add('hidden');
+            pdfContent.innerHTML = ""; fallbackContainer.innerHTML = "";
+        }
+
+        function handleFile(file) {
+            if (!file.name.toLowerCase().endsWith('.docx')) { showToast("Invalid format. Please select a .docx file", true); return; }
+            currentFileName = "FB_ClassNotes_" + file.name.replace('.docx', '');
+            fileNameEl.textContent = file.name;
+            dropZone.classList.add('hidden'); fileInfo.classList.remove('hidden');
+            toggleLoading(true, 'Extracting semantics...');
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                mammoth.convertToHtml({ arrayBuffer: event.target.result })
+                    .then(function(result) {
+                        if (result.value.trim() === "") { showToast("Document is empty.", true); resetApp(); }
+                        else {
+                            pdfContent.innerHTML = result.value;
+                            isFileLoaded = true;
+                            stylingControls.classList.remove('opacity-50', 'pointer-events-none');
+                            exportControls.classList.remove('opacity-50', 'pointer-events-none');
+                            emptyState.classList.add('hidden'); previewWrapper.classList.remove('hidden');
+                            applyStyles();
+                            showToast("Notes processed successfully.");
+                        }
+                    })
+                    .catch(err => { console.error(err); showToast("Failed to parse DOCX structure.", true); resetApp(); })
+                    .finally(() => toggleLoading(false));
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function applyStyles() {
+            if (!isFileLoaded) return;
+            // Apply Tailwind Typography with invert (dark mode) and brand accents
+            pdfContent.className = `prose prose-invert prose-headings:text-brand-400 prose-a:text-brand-400 prose-strong:text-slate-200 max-w-none w-full transition-all duration-300 ${currentThemeClass} ${currentSizeClass}`;
+        }
+
+        function generatePDFView() {
+            if (!isFileLoaded) return;
+            
+            toggleLoading(true, 'Compiling for Print Engine...');
+            fallbackContainer.innerHTML = ''; 
+
+            // EXTREMELY AGGRESSIVE CSS BACKGROUND HACKS for Android/Mobile Printing
+            const printHTML = `
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>${currentFileName}</title>
+                    <script src="https://cdn.tailwindcss.com?plugins=typography"><\/script>
+                    <style>
+                        /* 1. Force all color graphics globally */
+                        *, ::before, ::after {
+                            -webkit-print-color-adjust: exact !important;
+                            print-color-adjust: exact !important;
+                            color-adjust: exact !important;
+                        }
+
+                        /* 2. Destroy default browser margins */
+                        @page { 
+                            size: auto;
+                            margin: 0mm !important; 
+                        }
+                        
+                        /* 3. Force dark body */
+                        body, html { 
+                            margin: 0 !important; 
+                            padding: 0 !important;
+                            background-color: #030712 !important;
+                            min-height: 100vh;
+                        }
+
+                        /* 4. Giant wrapper that covers everything - Creates the Fluency theme */
+                        .master-container {
+                            background-color: #030712 !important;
+                            background-image: radial-gradient(ellipse 100% 30% at 50% 0%, rgba(37, 99, 235, 0.15) 0%, #030712 100%) !important;
+                            min-height: 100vh;
+                            width: 100vw;
+                            display: block;
+                        }
+                        
+                        /* 5. Re-apply margins internally so text doesn't hit the edge */
+                        .content-wrapper { 
+                            max-width: 210mm; 
+                            margin: 0 auto; 
+                            padding: 20mm; 
+                            color: #f8fafc !important;
+                        }
+
+                        /* Dark mode tables */
+                        .prose table { width: 100%; border-collapse: collapse; margin: 1em 0; }
+                        .prose th, .prose td { border: 1px solid #1e293b; padding: 8px; }
+                        .prose th { background: #0f172a !important; color: #f8fafc !important; border-bottom: 2px solid #3b82f6 !important; }
+                        .prose tr:nth-child(even) { background-color: rgba(15, 23, 42, 0.3) !important; }
+                        
+                        /* Header Banner for Internal Docs */
+                        .internal-header {
+                            border-bottom: 1px solid #1e293b;
+                            padding-bottom: 15px;
+                            margin-bottom: 30px;
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: flex-end;
+                        }
+                        .internal-header .title { font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; }
+                        .internal-header .brand { font-size: 14px; color: #3b82f6; font-weight: bold; }
+
+                        /* Print Instructions UI */
+                        .print-instructions {
+                            background: #0f172a; border: 1px solid #1e293b; border-radius: 8px;
+                            padding: 25px; margin-bottom: 40px; text-align: center;
+                            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.5);
+                        }
+                        .print-btn {
+                            display: inline-block; background: #2563eb; color: white;
+                            padding: 12px 24px; border-radius: 6px; font-weight: bold;
+                            text-decoration: none; cursor: pointer; border: 1px solid #60a5fa; font-size: 16px;
+                            margin-top: 15px; box-shadow: 0 0 15px rgba(37, 99, 235, 0.4);
+                        }
+                        
+                        @media print {
+                            .no-print { display: none !important; }
+                            .prose h1, .prose h2, .prose h3 { page-break-after: avoid; }
+                            .prose img, .prose table { page-break-inside: avoid; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="master-container">
+                        <div class="content-wrapper">
+                            
+                            <!-- On-screen Print Instructions -->
+                            <div class="no-print print-instructions">
+                                <h2 style="margin-top: 0; color: #f8fafc; font-size: 24px;">FB Class Notes Ready</h2>
+                                <p style="color: #94a3b8; font-size: 14px; margin-bottom: 10px;">Select "Save as PDF". <strong style="color:#ef4444;">Ensure "Background graphics" is checked</strong> to apply the dark theme.</p>
+                                <button class="print-btn" onclick="window.print()">🖨️ Launch Print Dialog</button>
+                            </div>
+                            
+                            <!-- Document Header -->
+                            <div class="internal-header">
+                                <div class="title">Internal Document // Class Notes</div>
+                                <div class="brand">FLUENCY Bridge</div>
+                            </div>
+
+                            <!-- Document Content -->
+                            <div class="prose prose-invert prose-headings:text-blue-400 prose-a:text-blue-400 prose-strong:text-slate-200 ${currentThemeClass} ${currentSizeClass}">
+                                ${pdfContent.innerHTML}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <script>
+                        window.onload = function() {
+                            setTimeout(() => { window.print(); }, 1200);
+                        };
+                    <\/script>
+                </body>
+                </html>
+            `;
+
+            const blob = new Blob([printHTML], { type: 'text/html;charset=utf-8' });
+            const blobUrl = URL.createObjectURL(blob);
+
+            const newWindow = window.open(blobUrl, '_blank');
+            toggleLoading(false);
+
+            if (!newWindow || newWindow.closed || typeof newWindow.closed == 'undefined') {
+                showToast("Popup blocked! Click the button below to open.", true);
+                fallbackContainer.innerHTML = `
+                    <a href="${blobUrl}" target="_blank" class="w-full bg-slate-800 border border-slate-700 hover:bg-slate-700 text-white font-medium py-3 px-4 rounded-xl shadow-sm transition-all flex items-center justify-center gap-2 mt-2 decoration-transparent">
+                        <svg class="w-5 h-5 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                        Launch PDF Exporter
+                    </a>
+                `;
+            } else {
+                showToast("Export engine launched.");
+            }
+        }
+    </script>
 </body>
 </html>
+
+
