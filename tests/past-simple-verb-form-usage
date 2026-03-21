@@ -1,0 +1,334 @@
+import React, { useState, useEffect } from 'react';
+import { Check, X, RefreshCw, ArrowRight, Clock, Zap, Target, BarChart2 } from 'lucide-react';
+
+// Utility to shuffle an array (Fisher-Yates)
+const shuffleArray = (array) => {
+  const newArray = [...array];
+  for (let i = newArray.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+  }
+  return newArray;
+};
+
+// 50 Questions targeting Past Simple Negative and Question base verb rules
+const rawQuestionBank = [
+  { text: "Did she ____ the quarterly report on time?", options: ["submitted", "submit"], correctAnswer: 1, explanation: "In Past Simple questions, 'did' is followed by the base form of the verb ('submit'), not the past form." },
+  { text: "Where did they ____ the new equipment?", options: ["install", "installed"], correctAnswer: 0, explanation: "The auxiliary verb 'did' already indicates the past tense. The main verb must remain in its base form ('install')." },
+  { text: "Why did the client ____ the initial proposal?", options: ["rejected", "reject"], correctAnswer: 1, explanation: "Questions using 'did' require the base form of the verb ('reject')." },
+  { text: "Did you ____ the meeting minutes to the team?", options: ["send", "sent"], correctAnswer: 0, explanation: "The base form 'send' is required after 'did'. 'Sent' is the past form and cannot be used here." },
+  { text: "How much did the software license ____?", options: ["cost", "costed"], correctAnswer: 0, explanation: "'Cost' is the base form (and past form) of the verb. 'Costed' is incorrect in this context." },
+  { text: "Did the manager ____ the new policy?", options: ["approve", "approved"], correctAnswer: 0, explanation: "Use the base verb 'approve' following 'did'." },
+  { text: "When did the flight ____?", options: ["arrived", "arrive"], correctAnswer: 1, explanation: "The correct structure is 'did + subject + base verb'. Therefore, 'arrive' is correct." },
+  { text: "What time did you ____ the office yesterday?", options: ["leave", "left"], correctAnswer: 0, explanation: "The auxiliary 'did' takes the past tense marker, leaving the main verb in its base form ('leave')." },
+  { text: "Did the committee ____ a final decision?", options: ["reach", "reached"], correctAnswer: 0, explanation: "The base verb 'reach' is grammatically required after 'did'." },
+  { text: "Who did you ____ at the conference?", options: ["saw", "see"], correctAnswer: 1, explanation: "'See' is the base form. Using 'saw' is a double past tense error." },
+  { text: "We didn't ____ the budget for the upcoming quarter.", options: ["exceed", "exceeded"], correctAnswer: 0, explanation: "In negative past simple sentences, 'didn't' is followed by the base form ('exceed')." },
+  { text: "The system didn't ____ the transaction properly.", options: ["processed", "process"], correctAnswer: 1, explanation: "The auxiliary 'didn't' handles the past tense. The main verb must be 'process'." },
+  { text: "I didn't ____ the error until this morning.", options: ["notice", "noticed"], correctAnswer: 0, explanation: "Use the base form 'notice' after 'didn't'." },
+  { text: "They didn't ____ the contract before the deadline.", options: ["signed", "sign"], correctAnswer: 1, explanation: "'Didn't' requires the base form 'sign'. 'Signed' creates an incorrect double past tense." },
+  { text: "The marketing campaign didn't ____ the expected results.", options: ["generate", "generated"], correctAnswer: 0, explanation: "The base verb 'generate' must be used with 'didn't'." },
+  { text: "He didn't ____ the instructions clearly.", options: ["understood", "understand"], correctAnswer: 1, explanation: "The correct form is 'didn't understand'. 'Understood' is the past form and is incorrect here." },
+  { text: "We didn't ____ any hardware issues during the test.", options: ["encounter", "encountered"], correctAnswer: 0, explanation: "The base form 'encounter' is required after the negative auxiliary 'didn't'." },
+  { text: "The delivery didn't ____ on schedule.", options: ["arrive", "arrived"], correctAnswer: 0, explanation: "'Didn't arrive' is correct. The past form 'arrived' should only be used in positive sentences." },
+  { text: "She didn't ____ the document to the email.", options: ["attached", "attach"], correctAnswer: 1, explanation: "The base verb 'attach' is necessary following 'didn't'." },
+  { text: "The application didn't ____ properly on the older operating system.", options: ["run", "ran"], correctAnswer: 0, explanation: "The base form of the verb is 'run'. 'Ran' is the past form." },
+  { text: "Select the grammatically correct sentence.", options: ["Did you reviewed the code?", "Did you review the code?"], correctAnswer: 1, explanation: "Questions in the past simple use 'did + subject + base verb'. 'Review' is the correct base form." },
+  { text: "Select the grammatically correct sentence.", options: ["They didn't completed the survey.", "They didn't complete the survey."], correctAnswer: 1, explanation: "Negative past simple sentences use 'didn't + base verb'. 'Complete' is correct." },
+  { text: "Select the grammatically correct sentence.", options: ["Where did the incident occur?", "Where did the incident occurred?"], correctAnswer: 0, explanation: "The auxiliary 'did' takes the past tense, so the main verb must remain 'occur'." },
+  { text: "Select the grammatically correct sentence.", options: ["I didn't brought my laptop.", "I didn't bring my laptop."], correctAnswer: 1, explanation: "The base form 'bring' is required. 'Brought' is the past form." },
+  { text: "Select the grammatically correct sentence.", options: ["Why did she resign?", "Why did she resigned?"], correctAnswer: 0, explanation: "'Resign' is the correct base form to follow 'did'." },
+  { text: "Select the grammatically correct sentence.", options: ["The server didn't respond in time.", "The server didn't responded in time."], correctAnswer: 0, explanation: "Use the base verb 'respond' after 'didn't'." },
+  { text: "Select the grammatically correct sentence.", options: ["How did you fix the bug?", "How did you fixed the bug?"], correctAnswer: 0, explanation: "The verb 'fix' must remain in its base form in a 'did' question." },
+  { text: "Select the grammatically correct sentence.", options: ["We didn't knew the policy changed.", "We didn't know the policy changed."], correctAnswer: 1, explanation: "The base form 'know' follows 'didn't'. 'Knew' is the past form." },
+  { text: "Select the grammatically correct sentence.", options: ["Did the package arrive?", "Did the package arrived?"], correctAnswer: 0, explanation: "The question requires the base verb 'arrive'." },
+  { text: "Select the grammatically correct sentence.", options: ["He didn't spoke during the meeting.", "He didn't speak during the meeting."], correctAnswer: 1, explanation: "The base form 'speak' must follow 'didn't'. 'Spoke' is the past form." },
+  { text: "Which sentence contains a grammatical error?", options: ["Did they implement the changes?", "Did they implemented the changes?"], correctAnswer: 1, explanation: "The second sentence is incorrect because it uses the past form 'implemented' instead of the base form 'implement'." },
+  { text: "Which sentence contains a grammatical error?", options: ["I didn't check the data.", "I didn't checked the data."], correctAnswer: 1, explanation: "The second sentence incorrectly uses 'checked'. It should be the base form 'check'." },
+  { text: "Which sentence contains a grammatical error?", options: ["Why did the program crashed?", "Why did the program crash?"], correctAnswer: 0, explanation: "The first sentence incorrectly uses 'crashed'. Questions require the base form 'crash'." },
+  { text: "Which sentence contains a grammatical error?", options: ["She didn't write the report.", "She didn't wrote the report."], correctAnswer: 1, explanation: "The second sentence uses 'wrote' (past form) instead of 'write' (base form)." },
+  { text: "Which sentence contains a grammatical error?", options: ["Did you find the missing file?", "Did you found the missing file?"], correctAnswer: 1, explanation: "The second sentence uses the past form 'found' instead of the required base form 'find'." },
+  { text: "Which sentence contains a grammatical error?", options: ["We didn't paid the invoice yet.", "We didn't pay the invoice yet."], correctAnswer: 0, explanation: "The first sentence incorrectly uses 'paid'. It must be the base form 'pay'." },
+  { text: "Which sentence contains a grammatical error?", options: ["How did they build the framework?", "How did they built the framework?"], correctAnswer: 1, explanation: "The second sentence incorrectly uses 'built'. The base form 'build' is required." },
+  { text: "Which sentence contains a grammatical error?", options: ["He didn't tell me the details.", "He didn't told me the details."], correctAnswer: 1, explanation: "The second sentence uses 'told' rather than the necessary base form 'tell'." },
+  { text: "Which sentence contains a grammatical error?", options: ["Did the stock price dropped?", "Did the stock price drop?"], correctAnswer: 0, explanation: "The first sentence is incorrect. The main verb must be the base form 'drop'." },
+  { text: "Which sentence contains a grammatical error?", options: ["I didn't forgot the password.", "I didn't forget the password."], correctAnswer: 0, explanation: "The first sentence incorrectly uses 'forgot'. The base form is 'forget'." },
+  { text: "Did you ____ to the client about the delay?", options: ["speak", "spoke"], correctAnswer: 0, explanation: "'Speak' is the base form required after 'did'." },
+  { text: "The committee didn't ____ the proposal seriously.", options: ["take", "took"], correctAnswer: 0, explanation: "The base form 'take' follows 'didn't'." },
+  { text: "When did the company ____ its operations?", options: ["began", "begin"], correctAnswer: 1, explanation: "The base form 'begin' is required in past simple questions." },
+  { text: "I didn't ____ any changes to the core module.", options: ["made", "make"], correctAnswer: 1, explanation: "Use the base form 'make' after 'didn't'." },
+  { text: "Did the legal team ____ over the document?", options: ["look", "looked"], correctAnswer: 0, explanation: "The base verb 'look' is necessary following 'did'." },
+  { text: "We didn't ____ the implications of the new law.", options: ["understand", "understood"], correctAnswer: 0, explanation: "The base form is 'understand'." },
+  { text: "Why did the sensor ____ failing?", options: ["keep", "kept"], correctAnswer: 0, explanation: "The base form 'keep' is correct after 'did'." },
+  { text: "They didn't ____ the guidelines during the audit.", options: ["follow", "followed"], correctAnswer: 0, explanation: "The base verb 'follow' is required." },
+  { text: "Did the board ____ the merger?", options: ["approve", "approved"], correctAnswer: 0, explanation: "Questions require the base form 'approve'." },
+  { text: "The analysis didn't ____ a clear correlation.", options: ["showed", "show"], correctAnswer: 1, explanation: "The base form 'show' must follow 'didn't'." }
+];
+
+// Reusable Logo Component
+const Logo = () => (
+  <div className="flex flex-col items-center justify-center py-10 z-10 relative select-none">
+    <span className="text-white tracking-[0.35em] text-[13px] font-bold uppercase ml-2">Fluency</span>
+    <span className="text-white font-serif italic text-5xl lowercase -mt-4 pr-2">bridge</span>
+  </div>
+);
+
+export default function App() {
+  const [screen, setScreen] = useState('start'); // 'start', 'quiz', 'end'
+  const [userName, setUserName] = useState('');
+  const [questions, setQuestions] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  
+  // Performance Stats
+  const [score, setScore] = useState(0);
+  const [currentStreak, setCurrentStreak] = useState(0);
+  const [bestStreak, setBestStreak] = useState(0);
+  const [startTime, setStartTime] = useState(null);
+  const [endTime, setEndTime] = useState(null);
+
+  // Question State
+  const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const [isAnswered, setIsAnswered] = useState(false);
+
+  const startQuiz = () => {
+    setQuestions(shuffleArray(rawQuestionBank));
+    setCurrentIndex(0);
+    setScore(0);
+    setCurrentStreak(0);
+    setBestStreak(0);
+    setSelectedAnswer(null);
+    setIsAnswered(false);
+    setStartTime(Date.now());
+    setScreen('quiz');
+  };
+
+  const handleSelectOption = (index) => {
+    if (isAnswered) return;
+    
+    setSelectedAnswer(index);
+    setIsAnswered(true);
+    
+    if (index === questions[currentIndex].correctAnswer) {
+      setScore(prev => prev + 1);
+      setCurrentStreak(prev => {
+        const newStreak = prev + 1;
+        if (newStreak > bestStreak) setBestStreak(newStreak);
+        return newStreak;
+      });
+    } else {
+      setCurrentStreak(0);
+    }
+  };
+
+  const handleNext = () => {
+    if (currentIndex < questions.length - 1) {
+      setCurrentIndex(prev => prev + 1);
+      setSelectedAnswer(null);
+      setIsAnswered(false);
+    } else {
+      setEndTime(Date.now());
+      setScreen('end');
+    }
+  };
+
+  const formatTime = (ms) => {
+    if (!ms) return "0m 0s";
+    const totalSeconds = Math.floor(ms / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${minutes}m ${seconds}s`;
+  };
+
+  return (
+    <div className="min-h-screen bg-[#02050D] text-white flex flex-col font-sans selection:bg-[#3B82F6]/30 overflow-x-hidden">
+      
+      {/* Start Screen */}
+      {screen === 'start' && (
+        <div className="flex-1 flex flex-col items-center relative animate-in fade-in duration-700 w-full max-w-md mx-auto">
+          
+          <Logo />
+          
+          {/* Main Bottom-Sheet Card */}
+          <div className="w-full flex-1 bg-[#090E17] rounded-t-[40px] mt-4 relative flex flex-col px-6 py-10">
+            {/* The signature blue top glow */}
+            <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-[#3B82F6] to-transparent shadow-[0_-15px_60px_25px_rgba(59,130,246,0.35)] rounded-t-[40px]"></div>
+
+            <div className="flex-1 flex flex-col relative z-10">
+              <div className="text-center mb-10">
+                <h1 className="text-[22px] font-bold text-white mb-4 tracking-tight">
+                  Past Simple Mastery
+                </h1>
+                <p className="text-[15px] text-[#8A93A6] leading-relaxed px-2 font-medium">
+                  Prove your fluency with our specialized grammar assessment. Score at least 80% to earn your Fluency Bridge certificate.
+                </p>
+              </div>
+
+              <div className="mb-8 w-full">
+                <label className="block text-xs font-semibold text-[#8A93A6] mb-2.5 ml-1 tracking-wide">
+                  Enter Your Name
+                </label>
+                <input
+                  type="text"
+                  placeholder="John Doe"
+                  value={userName}
+                  onChange={(e) => setUserName(e.target.value)}
+                  className="w-full bg-[#02050D] border border-white/5 rounded-2xl p-4 text-white placeholder:text-[#4B5563] focus:outline-none focus:border-[#3B82F6]/50 transition-colors"
+                />
+              </div>
+
+              <div className="mt-auto pt-4">
+                <button
+                  onClick={startQuiz}
+                  className="w-full bg-[#3178F6] hover:bg-[#2563EB] active:scale-[0.98] text-white py-4 rounded-2xl font-semibold text-[15px] transition-all"
+                >
+                  Start Assessment
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Quiz Screen */}
+      {screen === 'quiz' && (
+        <div className="flex-1 flex flex-col items-center relative animate-in slide-in-from-bottom-8 duration-500 w-full max-w-md mx-auto">
+          
+          <div className="w-full flex justify-between items-center px-6 py-4 relative z-20">
+            <span className="text-white font-serif italic text-2xl lowercase">bridge</span>
+            <div className="flex items-center gap-2">
+              <div className="text-right">
+                <p className="text-sm font-semibold text-white">
+                  {currentIndex + 1} <span className="text-[#8A93A6] font-medium">/ {questions.length}</span>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="w-full h-1 bg-[#090E17] relative z-20">
+            <div 
+              className="h-full bg-[#3178F6] transition-all duration-300 ease-out shadow-[0_0_10px_rgba(49,120,246,0.5)]"
+              style={{ width: `${((currentIndex) / questions.length) * 100}%` }}
+            />
+          </div>
+
+          <div className="w-full flex-1 bg-[#090E17] rounded-t-[40px] mt-6 relative flex flex-col px-6 py-8">
+            <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-[#3B82F6] to-transparent shadow-[0_-15px_60px_20px_rgba(59,130,246,0.25)] rounded-t-[40px]"></div>
+
+            <div className="relative z-10 flex-1 flex flex-col">
+              <h3 className="text-xl font-bold mb-8 text-white leading-relaxed">
+                {questions[currentIndex].text}
+              </h3>
+
+              <div className="space-y-4">
+                {questions[currentIndex].options.map((option, index) => {
+                  let buttonStateClass = "bg-[#02050D] border-white/5 text-white hover:border-[#3B82F6]/50";
+                  
+                  if (isAnswered) {
+                    if (index === questions[currentIndex].correctAnswer) {
+                      buttonStateClass = "bg-[#10B981]/10 border-[#10B981] text-white"; 
+                    } else if (index === selectedAnswer) {
+                      buttonStateClass = "bg-[#EF4444]/10 border-[#EF4444] text-white";
+                    } else {
+                      buttonStateClass = "bg-[#02050D] border-transparent text-[#8A93A6]/40 opacity-50";
+                    }
+                  }
+
+                  return (
+                    <button
+                      key={index}
+                      onClick={() => handleSelectOption(index)}
+                      disabled={isAnswered}
+                      className={`w-full text-left px-5 py-4 rounded-2xl border-[1.5px] transition-all duration-200 flex items-center justify-between group ${buttonStateClass}`}
+                    >
+                      <span className="text-base font-semibold">{option}</span>
+                      {isAnswered && index === questions[currentIndex].correctAnswer && (
+                        <Check className="w-5 h-5 text-[#10B981]" />
+                      )}
+                      {isAnswered && index === selectedAnswer && index !== questions[currentIndex].correctAnswer && (
+                        <X className="w-5 h-5 text-[#EF4444]" />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {isAnswered && (
+                <div className="mt-auto pt-6 animate-in fade-in duration-300">
+                  <div className="mb-6">
+                    <p className="text-[14px] text-[#8A93A6] leading-relaxed">
+                      <span className={`font-bold mr-2 ${selectedAnswer === questions[currentIndex].correctAnswer ? 'text-[#10B981]' : 'text-[#EF4444]'}`}>
+                        {selectedAnswer === questions[currentIndex].correctAnswer ? 'Correct.' : 'Incorrect.'}
+                      </span>
+                      {questions[currentIndex].explanation}
+                    </p>
+                  </div>
+                  
+                  <button
+                    onClick={handleNext}
+                    className="w-full bg-[#3178F6] hover:bg-[#2563EB] active:scale-[0.98] text-white py-4 rounded-2xl font-semibold text-[15px] transition-all flex items-center justify-center gap-2"
+                  >
+                    {currentIndex === questions.length - 1 ? 'View Results' : 'Next Question'}
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* End Screen */}
+      {screen === 'end' && (
+        <div className="flex-1 flex flex-col items-center relative animate-in fade-in duration-700 w-full max-w-md mx-auto">
+          
+          <Logo />
+
+          <div className="w-full flex-1 bg-[#090E17] rounded-t-[40px] mt-4 relative flex flex-col px-6 py-10">
+            <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-[#3B82F6] to-transparent shadow-[0_-15px_60px_25px_rgba(59,130,246,0.35)] rounded-t-[40px]"></div>
+
+            <div className="relative z-10 flex flex-col h-full">
+              <div className="text-center mb-8">
+                <h2 className="text-2xl font-bold mb-2 text-white">
+                  {userName ? `${userName}'s Results` : 'Assessment Complete'}
+                </h2>
+                <p className="text-[#8A93A6] font-medium text-[15px]">Here is how you performed.</p>
+              </div>
+
+              <div className="bg-[#02050D] border border-white/5 rounded-3xl p-8 text-center mb-6">
+                <div className="text-[64px] font-bold text-white leading-none mb-2">
+                  {Math.round((score / questions.length) * 100)}<span className="text-3xl text-[#3178F6]">%</span>
+                </div>
+                <p className="text-[#8A93A6] font-medium uppercase tracking-wider text-xs">Overall Accuracy</p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 mb-8">
+                <div className="bg-[#02050D] border border-white/5 rounded-2xl p-4 flex flex-col items-center justify-center">
+                  <Target className="w-5 h-5 text-[#3178F6] mb-2" />
+                  <p className="text-lg font-bold text-white">{score}<span className="text-sm text-[#8A93A6]">/{questions.length}</span></p>
+                  <p className="text-[#8A93A6] text-[10px] uppercase tracking-wider font-semibold mt-1">Raw Score</p>
+                </div>
+                <div className="bg-[#02050D] border border-white/5 rounded-2xl p-4 flex flex-col items-center justify-center">
+                  <Clock className="w-5 h-5 text-[#3178F6] mb-2" />
+                  <p className="text-lg font-bold text-white">{formatTime(endTime - startTime)}</p>
+                  <p className="text-[#8A93A6] text-[10px] uppercase tracking-wider font-semibold mt-1">Time Elapsed</p>
+                </div>
+              </div>
+
+              <div className="mt-auto">
+                <button
+                  onClick={startQuiz}
+                  className="w-full bg-transparent border-[1.5px] border-[#3178F6] text-[#3178F6] hover:bg-[#3178F6]/10 active:scale-[0.98] py-4 rounded-2xl font-semibold text-[15px] transition-all flex items-center justify-center gap-2"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                  Retake Assessment
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+    </div>
+  );
+}
+
+
