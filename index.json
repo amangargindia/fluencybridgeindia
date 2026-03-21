@@ -1,14 +1,12 @@
 [
   {
     "title": "Present Continuous Test",
-    "slug": "presentcontinoustest"
+    "slug": "presentcontinuoustest",
+    "folder": "tests"
   },
   {
     "title": "Notes Creator - Internal Tool",
-    "slug": "docxtopdf"
-  },
-  {
-    "title": "Home",
-    "slug": "index"
+    "slug": "docxtopdf",
+    "folder": "tools"
   }
 ]
