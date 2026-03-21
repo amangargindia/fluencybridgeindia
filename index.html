@@ -51,49 +51,40 @@
 
     <!-- SCRIPT -->
     <script>
-        const repo = "amangargindia/fluencybridgeindia";
+        const BASE_PATH = "articles/";
+        const EXTENSION = ".html";
 
-        fetch(`https://api.github.com/repos/${repo}/contents/`)
+        fetch('./index.json')
             .then(res => res.json())
-            .then(files => {
+            .then(data => {
 
                 const container = document.getElementById("tools");
 
-                files
-                    .filter(file => file.name.endsWith(".html") && file.name !== "index.html")
-                    .forEach(file => {
+                data.forEach(item => {
 
-                        // Convert filename → readable title
-                        let name = file.name
-                            .replace(".html", "")
-                            .replace(/[-_]/g, " ")
-                            .replace(/([A-Z])/g, " $1")
-                            .replace(/\b\w/g, l => l.toUpperCase());
+                    const url = BASE_PATH + item.slug + EXTENSION;
 
-                        // Special cleanup (optional refinement)
-                        name = name.replace("Docxtopdf", "DOCX to PDF Exporter");
+                    const card = document.createElement("a");
+                    card.href = url;
+                    card.className = `
+                        block p-6 bg-slate-800/60 backdrop-blur border border-slate-700 rounded-xl 
+                        hover:border-blue-500 hover:shadow-lg hover:shadow-blue-500/20 transition-all group
+                    `;
 
-                        const card = document.createElement("a");
-                        card.href = file.name;
-                        card.className = `
-                            block p-6 bg-slate-800/60 backdrop-blur border border-slate-700 rounded-xl 
-                            hover:border-blue-500 hover:shadow-lg hover:shadow-blue-500/20 transition-all group
-                        `;
+                    card.innerHTML = `
+                        <h2 class="text-lg font-semibold text-blue-400 mb-2 group-hover:text-blue-300">
+                            ${item.title}
+                        </h2>
+                        <p class="text-sm text-slate-300">
+                            Open →
+                        </p>
+                    `;
 
-                        card.innerHTML = `
-                            <h2 class="text-lg font-semibold text-blue-400 mb-2 group-hover:text-blue-300">
-                                ${name}
-                            </h2>
-                            <p class="text-sm text-slate-300">
-                                Open tool →
-                            </p>
-                        `;
-
-                        container.appendChild(card);
-                    });
+                    container.appendChild(card);
+                });
             })
             .catch(err => {
-                console.error("Error loading tools:", err);
+                console.error("Error loading JSON:", err);
             });
     </script>
 
