@@ -3,35 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fluency Bridge Home page (in development)</title>
+    <title>Fluency Bridge Home</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-100 text-slate-800 h-screen font-sans p-6">
+
+<body class="bg-slate-100 text-slate-800 min-h-screen font-sans p-6">
 
     <div class="max-w-3xl mx-auto mt-10">
+
+        <!-- Header -->
         <header class="text-center mb-10">
             <h1 class="text-3xl font-bold tracking-tight text-slate-900 mb-2">
-                Fluency Bridge Home page
+                Fluency Bridge Home Page
             </h1>
-            <span class="inline-block text-xs font-medium text-amber-700 bg-amber-100 px-3 py-1 rounded-full mt-1 border border-amber-200">
-                (in development)
+
+            <span class="inline-block text-xs font-medium text-amber-700 bg-amber-100 px-3 py-1 rounded-full border border-amber-200">
+                In Development
             </span>
         </header>
 
+        <!-- Cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            
-            <a href="docstohtml.html" class="block p-6 bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md hover:border-blue-500 transition-all group">
-                <h2 class="text-lg font-semibold text-blue-600 mb-2 group-hover:text-blue-700">DOCX Exporter</h2>
-                <p class="text-sm text-slate-600">Convert your documents into beautifully branded, dark-themed files.</p>
+
+            <!-- DOCX TOOL -->
+            <a href="docxtopdf.html"
+               class="block p-6 bg-white border border-slate-200 rounded-xl shadow-sm 
+                      hover:shadow-md hover:border-blue-500 transition-all group">
+
+                <h2 class="text-lg font-semibold text-blue-600 mb-2 group-hover:text-blue-700">
+                    DOCX to PDF Exporter
+                </h2>
+
+                <p class="text-sm text-slate-600">
+                    Convert your documents into beautifully branded, dark-themed files.
+                </p>
+
+                <div class="mt-4 text-xs font-bold text-blue-500 uppercase tracking-widest">
+                    Open Tool →
+                </div>
             </a>
 
+            <!-- COMING SOON -->
             <div class="block p-6 bg-slate-50 border border-dashed border-slate-300 rounded-xl">
-                <h2 class="text-lg font-semibold text-slate-500 mb-2">Fluency Bridge Noun Test</h2>
-                <p class="text-sm text-slate-400">Interactive grammar testing module.</p>
-                <p class="text-xs font-bold text-slate-400 uppercase mt-3 tracking-wider">Coming Soon</p>
+
+                <h2 class="text-lg font-semibold text-slate-500 mb-2">
+                    Fluency Bridge Noun Test
+                </h2>
+
+                <p class="text-sm text-slate-400">
+                    Interactive grammar testing module.
+                </p>
+
+                <p class="text-xs font-bold text-slate-400 uppercase mt-3 tracking-wider">
+                    Coming Soon
+                </p>
+
             </div>
 
         </div>
+
     </div>
 
 </body>
