@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fluency Bridge - English Mastery</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Playfair+Display:italic,wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #050a14;
+            --bridge-blue: #3b82f6;
+            --bridge-glow: rgba(59, 130, 246, 0.5);
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: white;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .logo-font-top {
+            font-family: 'Inter', sans-serif;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+        }
+
+        .logo-font-bottom {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+        }
+
+        .bridge-arc {
+            position: absolute;
+            width: 150%;
+            height: 200px;
+            border-top: 2px solid var(--bridge-blue);
+            border-radius: 50% 50% 0 0;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 -10px 30px var(--bridge-glow);
+            z-index: -1;
+            opacity: 0.6;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        .option-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.2s ease;
+        }
+
+        .option-btn:hover {
+            background: rgba(59, 130, 246, 0.1);
+            border-color: var(--bridge-blue);
+        }
+
+        .option-btn.selected {
+            background: var(--bridge-blue);
+            color: white;
+            border-color: var(--bridge-blue);
+        }
+
+        #certificate {
+            width: 800px;
+            height: 600px;
+            background: white;
+            color: #050a14;
+            padding: 40px;
+            position: relative;
+            display: none;
+            border: 20px solid #050a14;
+        }
+
+        .cert-border {
+            border: 2px solid #3b82f6;
+            height: 100%;
+            width: 100%;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            text-align: center;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--bridge-blue);
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+
+    <!-- Background Decoration -->
+    <div class="bridge-arc"></div>
+
+    <!-- App Container -->
+    <div id="app" class="w-full max-w-2xl">
+        <!-- Start Screen -->
+        <div id="start-screen" class="text-center space-y-8">
+            <div class="mb-12">
+                <h1 class="logo-font-top text-2xl font-bold">Fluency</h1>
+                <h2 class="logo-font-bottom text-6xl -mt-4">bridge</h2>
+            </div>
+            
+            <div class="glass-card p-8 space-y-6">
+                <h3 class="text-2xl font-semibold">Present Continuous Mastery</h3>
+                <p class="text-gray-400">Prove your fluency with our specialized grammar assessment. Score at least 80% to earn your Fluency Bridge certificate.</p>
+                
+                <div class="text-left space-y-2">
+                    <label class="text-sm font-medium text-gray-400">Enter Your Name</label>
+                    <input type="text" id="user-name" placeholder="John Doe" class="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <button onclick="startQuiz()" class="w-full btn-primary py-4 rounded-xl font-bold text-lg">Start Assessment</button>
+            </div>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div id="quiz-screen" class="hidden">
+            <div class="flex justify-between items-center mb-4">
+                <span class="logo-font-bottom text-2xl">bridge</span>
+                <span id="timer" class="font-mono text-blue-400">00:00</span>
+            </div>
+            
+            <div class="progress-bar mb-8">
+                <div id="progress-fill" class="progress-fill" style="width: 0%"></div>
+            </div>
+
+            <div class="glass-card p-8">
+                <div id="question-container" class="space-y-6">
+                    <p id="question-text" class="text-xl font-medium leading-relaxed"></p>
+                    <div id="options-container" class="grid grid-cols-1 gap-4">
+                        <!-- Options will be injected here -->
+                    </div>
+                </div>
+                
+                <div class="mt-8 flex justify-between">
+                    <span class="text-gray-400">Question <span id="current-q-num">1</span> of 10</span>
+                    <button id="next-btn" onclick="nextQuestion()" disabled class="opacity-50 btn-primary px-8 py-2 rounded-lg font-bold">Next</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Screen -->
+        <div id="results-screen" class="hidden text-center space-y-6">
+            <div class="glass-card p-10">
+                <div id="result-icon" class="mb-4"></div>
+                <h2 class="text-4xl font-bold mb-2" id="result-title">Calculating...</h2>
+                <p id="result-subtitle" class="text-gray-400 mb-8"></p>
+                
+                <div class="grid grid-cols-2 gap-4 mb-8">
+                    <div class="bg-white/5 p-4 rounded-xl">
+                        <span class="block text-gray-400 text-sm">Score</span>
+                        <span id="final-score" class="text-2xl font-bold text-blue-400">0%</span>
+                    </div>
+                    <div class="bg-white/5 p-4 rounded-xl">
+                        <span class="block text-gray-400 text-sm">Time Taken</span>
+                        <span id="final-time" class="text-2xl font-bold text-blue-400">0:00</span>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <button id="cert-btn" onclick="showCertificate()" class="hidden w-full btn-primary py-4 rounded-xl font-bold">View My Certificate</button>
+                    <button onclick="location.reload()" class="w-full border border-white/20 py-4 rounded-xl font-bold hover:bg-white/5">Retake Quiz</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden Certificate for Capture -->
+    <div id="certificate">
+        <div class="cert-border">
+            <div class="space-y-2">
+                <div style="font-family: 'Inter'; text-transform: uppercase; letter-spacing: 0.2em; font-weight: bold; font-size: 14px;">Fluency</div>
+                <div style="font-family: 'Playfair Display'; font-style: italic; font-weight: bold; font-size: 32px; color: #3b82f6;">bridge</div>
+            </div>
+            
+            <div class="space-y-4">
+                <h1 style="font-size: 42px; font-weight: bold;">Certificate of Completion</h1>
+                <p style="font-size: 18px; color: #666;">This is to certify that</p>
+                <h2 id="cert-name" style="font-size: 36px; font-family: 'Playfair Display'; font-weight: bold; border-bottom: 2px solid #3b82f6; display: inline-block; padding: 0 40px;"></h2>
+                <p style="font-size: 18px; color: #666;">has successfully mastered the</p>
+                <h3 style="font-size: 24px; font-weight: bold;">Present Continuous Tense</h3>
+            </div>
+
+            <div style="width: 100%; display: flex; justify-content: space-around; margin-top: 40px;">
+                <div>
+                    <div id="cert-date" style="font-weight: bold;"></div>
+                    <div style="font-size: 12px; color: #999;">Date Issued</div>
+                </div>
+                <div>
+                    <div id="cert-id" style="font-weight: bold; font-family: monospace;"></div>
+                    <div style="font-size: 12px; color: #999;">Certificate ID</div>
+                </div>
+                <div>
+                    <div style="font-weight: bold;">Fluency Bridge Academic</div>
+                    <div style="font-size: 12px; color: #999;">Verification Authority</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- UI Feedback Message Box -->
+    <div id="msg-box" class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-blue-600 text-white px-6 py-3 rounded-full shadow-2xl transition-all opacity-0 pointer-events-none transform translate-y-4">
+    </div>
+
+    <script>
+        const questions = [
+            {
+                q: "Look! The children ________ in the garden right now.",
+                o: ["play", "plays", "are playing", "is playing"],
+                a: 2
+            },
+            {
+                q: "Listen! Someone ________ the piano.",
+                o: ["plays", "is playing", "playing", "are playing"],
+                a: 1
+            },
+            {
+                q: "I can't talk to you now. I ________ a shower.",
+                o: ["am having", "have", "is having", "having"],
+                a: 0
+            },
+            {
+                q: "Why ________ (you/cry)? What happened?",
+                o: ["you are crying", "do you cry", "are you crying", "is you crying"],
+                a: 2
+            },
+            {
+                q: "Sarah ________ for her exams these days.",
+                o: ["studies", "is studying", "are studying", "study"],
+                a: 1
+            },
+            {
+                q: "Wait for me! I ________ (come) too!",
+                o: ["come", "comes", "am coming", "is coming"],
+                a: 2
+            },
+            {
+                q: "They ________ (not/watch) TV at the moment.",
+                o: ["isn't watching", "aren't watching", "not watching", "doesn't watch"],
+                a: 1
+            },
+            {
+                q: "What ________ (your sister/do) in the kitchen?",
+                o: ["is your sister doing", "does your sister do", "your sister is doing", "is doing your sister"],
+                a: 0
+            },
+            {
+                q: "Shhh! The baby ________.",
+                o: ["sleep", "is sleeping", "sleeps", "are sleeping"],
+                a: 1
+            },
+            {
+                q: "We ________ (have) a great time at the party!",
+                o: ["is having", "having", "are having", "have"],
+                a: 2
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let userName = "";
+        let startTime;
+        let timerInterval;
+        let selectedOption = null;
+
+        function showMessage(text) {
+            const box = document.getElementById('msg-box');
+            box.innerText = text;
+            box.classList.remove('opacity-0', 'translate-y-4');
+            box.classList.add('opacity-100', 'translate-y-0');
+            setTimeout(() => {
+                box.classList.add('opacity-0', 'translate-y-4');
+                box.classList.remove('opacity-100', 'translate-y-0');
+            }, 2000);
+        }
+
+        function startQuiz() {
+            userName = document.getElementById('user-name').value.trim();
+            if (!userName) {
+                showMessage("Please enter your name to start.");
+                return;
+            }
+
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('quiz-screen').classList.remove('hidden');
+            
+            startTime = new Date();
+            startTimer();
+            loadQuestion();
+        }
+
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                const now = new Date();
+                const diff = Math.floor((now - startTime) / 1000);
+                const mins = Math.floor(diff / 60).toString().padStart(2, '0');
+                const secs = (diff % 60).toString().padStart(2, '0');
+                document.getElementById('timer').innerText = `${mins}:${secs}`;
+            }, 1000);
+        }
+
+        function loadQuestion() {
+            selectedOption = null;
+            const q = questions[currentQuestion];
+            document.getElementById('question-text').innerText = q.q;
+            document.getElementById('current-q-num').innerText = currentQuestion + 1;
+            document.getElementById('progress-fill').style.width = `${(currentQuestion / questions.length) * 100}%`;
+            
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+            
+            q.o.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn w-full p-4 rounded-xl text-left font-medium text-lg flex items-center justify-between';
+                btn.innerHTML = `<span>${opt}</span> <div class="radio-indicator w-6 h-6 border-2 border-white/20 rounded-full"></div>`;
+                btn.onclick = () => selectOption(index, btn);
+                optionsContainer.appendChild(btn);
+            });
+
+            document.getElementById('next-btn').disabled = true;
+            document.getElementById('next-btn').classList.add('opacity-50');
+        }
+
+        function selectOption(index, element) {
+            const btns = document.querySelectorAll('.option-btn');
+            btns.forEach(b => {
+                b.classList.remove('selected');
+                b.querySelector('.radio-indicator').classList.remove('bg-white', 'border-blue-400');
+            });
+            
+            element.classList.add('selected');
+            element.querySelector('.radio-indicator').classList.add('bg-white', 'border-blue-400');
+            selectedOption = index;
+            
+            document.getElementById('next-btn').disabled = false;
+            document.getElementById('next-btn').classList.remove('opacity-50');
+        }
+
+        function nextQuestion() {
+            if (selectedOption === questions[currentQuestion].a) {
+                score++;
+            }
+
+            currentQuestion++;
+
+            if (currentQuestion < questions.length) {
+                loadQuestion();
+            } else {
+                finishQuiz();
+            }
+        }
+
+        function finishQuiz() {
+            clearInterval(timerInterval);
+            document.getElementById('quiz-screen').classList.add('hidden');
+            document.getElementById('results-screen').classList.remove('hidden');
+
+            const percentage = (score / questions.length) * 100;
+            const finalTime = document.getElementById('timer').innerText;
+
+            document.getElementById('final-score').innerText = `${percentage}%`;
+            document.getElementById('final-time').innerText = finalTime;
+
+            const title = document.getElementById('result-title');
+            const subtitle = document.getElementById('result-subtitle');
+            const icon = document.getElementById('result-icon');
+
+            if (percentage >= 80) {
+                title.innerText = "Fluent Bridge Master!";
+                subtitle.innerText = "Excellent work! You have shown a deep understanding of the Present Continuous tense.";
+                icon.innerHTML = `<div class="w-20 h-20 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                </div>`;
+                document.getElementById('cert-btn').classList.remove('hidden');
+            } else {
+                title.innerText = "Keep Practicing";
+                subtitle.innerText = "You're building your bridge to fluency, but you need a bit more stability in this tense.";
+                icon.innerHTML = `<div class="w-20 h-20 bg-gray-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>`;
+            }
+        }
+
+        function showCertificate() {
+            const cert = document.getElementById('certificate');
+            document.getElementById('cert-name').innerText = userName;
+            document.getElementById('cert-date').innerText = new Date().toLocaleDateString();
+            document.getElementById('cert-id').innerText = 'FB-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+            
+            // In a real browser environment, we might use html2canvas or just a printable div
+            // For this immersive, we'll display it in a modal-like fashion
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4 overflow-auto';
+            modal.onclick = (e) => { if(e.target === modal) document.body.removeChild(modal); };
+
+            const certClone = cert.cloneNode(true);
+            certClone.style.display = 'block';
+            certClone.style.transform = 'scale(0.8)';
+            certClone.style.maxWidth = '100%';
+            certClone.style.borderRadius = '8px';
+            
+            const closeBtn = document.createElement('button');
+            closeBtn.className = 'absolute top-4 right-4 text-white text-xl p-2 bg-white/10 rounded-full w-12 h-12';
+            closeBtn.innerText = '×';
+            closeBtn.onclick = () => document.body.removeChild(modal);
+
+            const downloadHint = document.createElement('div');
+            downloadHint.className = 'absolute bottom-4 left-1/2 -translate-x-1/2 text-gray-400 text-sm';
+            downloadHint.innerText = 'Fluency Bridge Certificate of Achievement';
+
+            modal.appendChild(certClone);
+            modal.appendChild(closeBtn);
+            modal.appendChild(downloadHint);
+            document.body.appendChild(modal);
+        }
+    </script>
+</body>
+</html>
+
