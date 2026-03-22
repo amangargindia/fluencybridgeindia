@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fluency Bridge | Connect</title>
+
+<!-- Tailwind -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- Font -->
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
+
+<style>
+/* Simple tap animation */
+.btn {
+    transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.2s ease;
+}
+
+.btn:active {
+    transform: scale(0.96);
+    box-shadow: 0 0 18px rgba(59,130,246,0.4);
+    opacity: 0.9;
+}
+</style>
+
+</head>
+
+<body class="bg-gradient-to-b from-slate-900 via-blue-950 to-slate-950 text-white min-h-screen flex items-center justify-center p-6">
+
+<div class="w-full max-w-md text-center">
+
+    <!-- TITLE -->
+    <div class="mb-8">
+        <h1 class="text-3xl tracking-wide">
+            <span class="block text-white/90 font-semibold tracking-widest">
+                FLUENCY
+            </span>
+
+            <span class="block text-white mt-2 text-4xl"
+                  style="font-family: 'Playfair Display', serif; font-style: italic;">
+                bridge
+            </span>
+        </h1>
+
+        <p class="text-blue-300 text-sm mt-3">
+            Build precision. Eliminate confusion.
+        </p>
+    </div>
+
+    <!-- CARD -->
+    <div class="bg-slate-800/50 backdrop-blur border border-slate-700 rounded-2xl p-6 shadow-xl">
+
+        <h2 class="text-xl font-semibold mb-6 text-blue-300">
+            Connect
+        </h2>
+
+        <!-- LINKS -->
+        <div class="flex flex-col gap-4">
+
+            <!-- INSTAGRAM -->
+            <a href="https://www.instagram.com/fluency.bridge?igsh=NW9seDBtMm5qdHF5" target="_blank"
+               class="btn block w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:opacity-90 text-white font-semibold py-3 rounded-xl shadow-lg">
+                Instagram
+            </a>
+
+            <!-- YOUTUBE -->
+            <a href="https://youtube.com/@1000sieverts?si=Fw88YrDtZEUtohe6" target="_blank"
+               class="btn block w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-xl shadow-lg">
+                YouTube
+            </a>
+
+            <!-- WHATSAPP -->
+            <a href="https://wa.me/6267454456" target="_blank"
+               class="btn block w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-xl shadow-lg">
+                WhatsApp
+            </a>
+
+            <!-- EMAIL -->
+            <a href="mailto:shukaman5@gmail.com"
+               class="btn block w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl shadow-lg">
+                Email
+            </a>
+
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <p class="text-xs text-slate-400 mt-6">
+        © Fluency Bridge
+    </p>
+
+</div>
+
+</body>
+</html>
