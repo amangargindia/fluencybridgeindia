@@ -17,12 +17,11 @@
     <div class="max-w-4xl mx-auto mt-12">
 
         <!-- HERO -->
-        <header class="text-center mb-12">
+        <header class="text-center mb-10">
             <h1 class="text-4xl md:text-5xl tracking-wide">
                 <span class="block text-white/90 font-semibold tracking-widest">
                     FLUENCY
                 </span>
-
                 <span class="block text-white mt-2 text-5xl md:text-6xl"
                       style="font-family: 'Playfair Display', serif; font-style: italic;">
                     bridge
@@ -34,6 +33,22 @@
             </p>
         </header>
 
+        <!-- CONTROLS -->
+        <div class="mb-6 flex flex-col md:flex-row gap-4">
+
+            <!-- SEARCH -->
+            <input id="search" type="text" placeholder="Search..."
+                class="flex-1 p-2 rounded bg-slate-800 border border-slate-600">
+
+            <!-- SORT -->
+            <select id="sort" class="p-2 rounded bg-slate-800 border border-slate-600">
+                <option value="default">Sort: Default</option>
+                <option value="az">A → Z</option>
+                <option value="za">Z → A</option>
+            </select>
+
+        </div>
+
         <!-- MAIN BUTTON -->
         <div class="text-center mb-10">
             <a href="tests/presentcontinuoustest.html"
@@ -44,7 +59,7 @@
             </a>
         </div>
 
-        <!-- AUTO GENERATED CONTENT -->
+        <!-- CONTENT -->
         <div id="tools"></div>
 
     </div>
@@ -53,74 +68,112 @@
     <script>
         const EXTENSION = ".html";
 
+        const container = document.getElementById("tools");
+        const searchInput = document.getElementById("search");
+        const sortSelect = document.getElementById("sort");
+
+        let originalData = [];
+
+        // MAIN RENDER FUNCTION
+        function render(data) {
+            container.innerHTML = "";
+
+            const grouped = {};
+
+            data.forEach(item => {
+                const category = item.category || "Other";
+                if (!grouped[category]) grouped[category] = [];
+                grouped[category].push(item);
+            });
+
+            Object.keys(grouped).forEach(category => {
+
+                const section = document.createElement("div");
+                section.className = "mb-12";
+
+                // HEADER (COLLAPSIBLE)
+                const heading = document.createElement("button");
+                heading.className = "w-full text-left text-xl font-bold text-blue-300 mb-4 uppercase tracking-wide flex justify-between items-center";
+
+                heading.innerHTML = `
+                    <span>${category}</span>
+                    <span class="text-sm">▼</span>
+                `;
+
+                // GRID
+                const grid = document.createElement("div");
+                grid.className = "grid grid-cols-1 md:grid-cols-2 gap-6";
+
+                // TOGGLE
+                heading.addEventListener("click", () => {
+                    grid.classList.toggle("hidden");
+                });
+
+                // CARDS
+                grouped[category].forEach(item => {
+
+                    const url = (item.folder ? item.folder + "/" : "") + item.slug + EXTENSION;
+
+                    const card = document.createElement("a");
+                    card.href = url;
+                    card.className = `
+                        block p-6 bg-slate-800/60 backdrop-blur border border-slate-700 rounded-xl 
+                        hover:border-blue-500 hover:shadow-lg hover:shadow-blue-500/20 transition-all group
+                    `;
+
+                    card.innerHTML = `
+                        <h2 class="text-lg font-semibold text-blue-400 mb-2 group-hover:text-blue-300">
+                            ${item.title}
+                        </h2>
+                        <p class="text-sm text-slate-300">Open →</p>
+                    `;
+
+                    grid.appendChild(card);
+                });
+
+                section.appendChild(heading);
+                section.appendChild(grid);
+                container.appendChild(section);
+            });
+        }
+
+        // APPLY SEARCH + SORT
+        function applyFilters() {
+            let filtered = [...originalData];
+
+            // SEARCH
+            const query = searchInput.value.toLowerCase();
+            if (query) {
+                filtered = filtered.filter(item =>
+                    item.title.toLowerCase().includes(query)
+                );
+            }
+
+            // SORT
+            if (sortSelect.value === "az") {
+                filtered.sort((a, b) => a.title.localeCompare(b.title));
+            } else if (sortSelect.value === "za") {
+                filtered.sort((a, b) => b.title.localeCompare(a.title));
+            }
+
+            render(filtered);
+        }
+
+        // EVENTS
+        searchInput.addEventListener("input", applyFilters);
+        sortSelect.addEventListener("change", applyFilters);
+
+        // FETCH DATA
         fetch('./index.json')
             .then(res => res.json())
             .then(data => {
-
-                const container = document.getElementById("tools");
-
-                // GROUP BY CATEGORY
-                const grouped = {};
-
-                data.forEach(item => {
-                    const category = item.category || "Other";
-
-                    if (!grouped[category]) {
-                        grouped[category] = [];
-                    }
-
-                    grouped[category].push(item);
-                });
-
-                // RENDER EACH CATEGORY
-                Object.keys(grouped).forEach(category => {
-
-                    // SECTION WRAPPER
-                    const section = document.createElement("div");
-                    section.className = "mb-12";
-
-                    // CATEGORY TITLE
-                    const heading = document.createElement("h2");
-                    heading.className = "text-xl font-bold text-blue-300 mb-4 uppercase tracking-wide";
-                    heading.textContent = category;
-
-                    section.appendChild(heading);
-
-                    // GRID
-                    const grid = document.createElement("div");
-                    grid.className = "grid grid-cols-1 md:grid-cols-2 gap-6";
-
-                    // CARDS
-                    grouped[category].forEach(item => {
-
-                        const folder = item.folder ? item.folder + "/" : "";
-                        const url = folder + item.slug + EXTENSION;
-
-                        const card = document.createElement("a");
-                        card.href = url;
-                        card.className = `
-                            block p-6 bg-slate-800/60 backdrop-blur border border-slate-700 rounded-xl 
-                            hover:border-blue-500 hover:shadow-lg hover:shadow-blue-500/20 transition-all group
-                        `;
-
-                        card.innerHTML = `
-                            <h2 class="text-lg font-semibold text-blue-400 mb-2 group-hover:text-blue-300">
-                                ${item.title}
-                            </h2>
-                            <p class="text-sm text-slate-300">Open →</p>
-                        `;
-
-                        grid.appendChild(card);
-                    });
-
-                    section.appendChild(grid);
-                    container.appendChild(section);
-                });
-
+                originalData = data;
+                render(originalData);
             })
             .catch(err => {
                 console.error("Error loading JSON:", err);
             });
+
     </script>
 
 </body>
