@@ -44,8 +44,8 @@
             </a>
         </div>
 
-        <!-- AUTO GENERATED TOOLS -->
-        <div id="tools" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+        <!-- AUTO GENERATED CONTENT -->
+        <div id="tools"></div>
 
     </div>
 
@@ -59,30 +59,64 @@
 
                 const container = document.getElementById("tools");
 
+                // GROUP BY CATEGORY
+                const grouped = {};
+
                 data.forEach(item => {
+                    const category = item.category || "Other";
 
-                    // Build correct path using folder + slug
-                    const folder = item.folder ? item.folder + "/" : "";
-                    const url = folder + item.slug + EXTENSION;
+                    if (!grouped[category]) {
+                        grouped[category] = [];
+                    }
 
-                    const card = document.createElement("a");
-                    card.href = url;
-                    card.className = `
-                        block p-6 bg-slate-800/60 backdrop-blur border border-slate-700 rounded-xl 
-                        hover:border-blue-500 hover:shadow-lg hover:shadow-blue-500/20 transition-all group
-                    `;
-
-                    card.innerHTML = `
-                        <h2 class="text-lg font-semibold text-blue-400 mb-2 group-hover:text-blue-300">
-                            ${item.title}
-                        </h2>
-                        <p class="text-sm text-slate-300">
-                            Open →
-                        </p>
-                    `;
-
-                    container.appendChild(card);
+                    grouped[category].push(item);
                 });
+
+                // RENDER EACH CATEGORY
+                Object.keys(grouped).forEach(category => {
+
+                    // SECTION WRAPPER
+                    const section = document.createElement("div");
+                    section.className = "mb-12";
+
+                    // CATEGORY TITLE
+                    const heading = document.createElement("h2");
+                    heading.className = "text-xl font-bold text-blue-300 mb-4 uppercase tracking-wide";
+                    heading.textContent = category;
+
+                    section.appendChild(heading);
+
+                    // GRID
+                    const grid = document.createElement("div");
+                    grid.className = "grid grid-cols-1 md:grid-cols-2 gap-6";
+
+                    // CARDS
+                    grouped[category].forEach(item => {
+
+                        const folder = item.folder ? item.folder + "/" : "";
+                        const url = folder + item.slug + EXTENSION;
+
+                        const card = document.createElement("a");
+                        card.href = url;
+                        card.className = `
+                            block p-6 bg-slate-800/60 backdrop-blur border border-slate-700 rounded-xl 
+                            hover:border-blue-500 hover:shadow-lg hover:shadow-blue-500/20 transition-all group
+                        `;
+
+                        card.innerHTML = `
+                            <h2 class="text-lg font-semibold text-blue-400 mb-2 group-hover:text-blue-300">
+                                ${item.title}
+                            </h2>
+                            <p class="text-sm text-slate-300">Open →</p>
+                        `;
+
+                        grid.appendChild(card);
+                    });
+
+                    section.appendChild(grid);
+                    container.appendChild(section);
+                });
+
             })
             .catch(err => {
                 console.error("Error loading JSON:", err);
