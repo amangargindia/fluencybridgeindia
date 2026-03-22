@@ -2,16 +2,19 @@
   {
     "title": "Present Continuous Test",
     "slug": "presentcontinuoustest",
-    "folder": "tests"
+    "folder": "tests",
+    "category": "Tests"
   },
   {
     "title": "Notes Creator - Internal Tool",
     "slug": "docxtopdf",
-    "folder": "tools"
+    "folder": "tools",
+    "category": "Tools"
   },
   {
     "title": "Past Simple Test",
     "slug": "past-simple-verb-form-usage",
-    "folder": "tests"
+    "folder": "tests",
+    "category": "Tests"
   }
 ]
