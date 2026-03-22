@@ -16,5 +16,11 @@
     "slug": "past-simple-verb-form-usage",
     "folder": "tests",
     "category": "Tests"
+  },
+  {
+    "title": Mistakes in Past Simple Tense",
+    "slug": "mistakes-in-present-simple",
+    "folder": "mistakes",
+    "category": "mistakes"
   }
 ]
