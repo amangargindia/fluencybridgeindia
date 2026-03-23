@@ -17,6 +17,14 @@
     "folder": "tests",
     "category": "Tests"
   },
+  
+  {
+    "title": "PDF to EPUB",
+    "slug": "pdftoepub",
+    "folder": "tools",
+    "category": "Tools"
+  },
+  
   {
     "title": "Mistakes in Present Simple Tense",
     "slug": "mistakes-in-present-simple",
