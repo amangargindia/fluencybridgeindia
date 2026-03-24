@@ -3,224 +3,303 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Raw Audio Transcription - Fluency Bridge</title>
+    <title>FB Internal Tools - Transcription Engine</title>
     
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind CSS with Typography Plugin -->
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { 50: '#eff6ff', 100: '#dbeafe', 400: '#60a5fa', 500: '#3b82f6', 600: '#2563eb', 900: '#1e3a8a' },
+                        fluency: { 
+                            base: '#030712', /* Deepest navy/black */
+                            panel: '#0f172a', /* Slightly lighter for sidebars */
+                            border: '#1e293b'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700;800&display=swap" rel="stylesheet">
+    <!-- Marked.js for Markdown Rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
     
     <!-- PWA Configuration -->
     <script src="/pwa-setup.js"></script>
 
     <style>
-        .font-serif-brand { font-family: 'Playfair Display', serif; }
-        .glass-panel {
-            background: rgba(30, 41, 59, 0.4);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(148, 163, 184, 0.1);
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        /* Themed Dark Paper Styling for Preview */
+        .paper-container {
+            width: 100%; max-width: 210mm; min-height: 297mm;
+            margin: 0 auto; 
+            
+            /* Fluency Bridge Dark Theme */
+            background-color: #030712;
+            background-image: radial-gradient(ellipse 100% 30% at 50% 0%, rgba(37, 99, 235, 0.15) 0%, #030712 100%);
+            color: #f8fafc;
+            
+            border: 1px solid #1e293b;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            padding: 20mm; transition: all 0.3s ease;
         }
-        .glow-btn {
-            box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
-            transition: all 0.3s ease;
+
+        @media (max-width: 768px) {
+            .paper-container { padding: 1.5rem; min-height: auto; }
         }
-        .glow-btn:hover:not(:disabled) {
-            box-shadow: 0 0 30px rgba(59, 130, 246, 0.7);
-            transform: translateY(-2px);
-        }
-        .glow-btn:active:not(:disabled) {
-            transform: translateY(1px);
-        }
-        .glow-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            box-shadow: none;
-        }
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 8px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: rgba(15, 23, 42, 0.5); 
-            border-radius: 8px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: rgba(59, 130, 246, 0.5); 
-            border-radius: 8px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: rgba(59, 130, 246, 0.8); 
-        }
+
+        /* Tables styled for Dark Mode */
+        .prose table { width: 100%; border-collapse: collapse; margin-top: 1rem; margin-bottom: 1rem; }
+        .prose th, .prose td { border: 1px solid #334155; padding: 0.5rem; }
+        .prose th { background-color: #0f172a; font-weight: 600; color: #f8fafc; }
         
-        /* Drag & Drop Highlight */
-        .drag-over {
-            border-color: #3b82f6 !important;
-            background-color: rgba(59, 130, 246, 0.1) !important;
+        body { overflow: hidden; }
+        
+        .loader {
+            border: 4px solid #1e293b; border-top: 4px solid #3b82f6;
+            border-radius: 50%; width: 40px; height: 40px;
+            animation: spin 1s linear infinite;
         }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
-<body class="bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950 text-white min-h-screen font-sans flex flex-col p-4 md:p-8">
+<body class="bg-fluency-base text-slate-300 h-screen flex flex-col font-sans selection:bg-brand-500 selection:text-white">
 
-    <!-- Header Navigation (Simple Back Button) -->
-    <nav class="w-full max-w-5xl mx-auto mb-8">
-        <a href="/index.html" class="inline-flex items-center text-blue-400 hover:text-blue-300 transition-colors text-sm font-medium">
-            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-            Back to Dashboard
-        </a>
-    </nav>
-
-    <!-- Main App Container -->
-    <div class="glass-panel w-full max-w-5xl mx-auto rounded-3xl p-6 md:p-10 shadow-2xl relative overflow-hidden flex-grow flex flex-col">
-        
-        <!-- Ambient decorative blobs -->
-        <div class="absolute -top-32 -left-32 w-64 h-64 bg-blue-600 rounded-full mix-blend-screen filter blur-[100px] opacity-20 pointer-events-none"></div>
-        <div class="absolute -bottom-32 -right-32 w-64 h-64 bg-purple-600 rounded-full mix-blend-screen filter blur-[100px] opacity-20 pointer-events-none"></div>
-
-        <header class="text-center mb-10 relative z-10">
-            <h1 class="text-4xl md:text-5xl font-serif-brand font-bold text-white mb-3 tracking-wide">
-                Raw Transcription
-            </h1>
-            <p class="text-blue-300 text-sm md:text-base opacity-90 max-w-2xl mx-auto">
-                100% Secure & Client-Side. We use a browser-based AI to transcribe your audio without sending any files over the internet.
-            </p>
-        </header>
-
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 relative z-10 flex-grow">
-            
-            <!-- LEFT COLUMN: UPLOAD -->
-            <div class="lg:col-span-5 flex flex-col gap-6">
-                
-                <!-- Model Selection -->
+    <!-- Top Header -->
+    <header class="bg-fluency-panel border-b border-fluency-border shadow-md flex-none z-20">
+        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3 text-white">
+                <a href="/index.html" class="p-2 hover:bg-slate-800 rounded-lg transition-colors mr-1 cursor-pointer">
+                    <i data-lucide="arrow-left" class="w-5 h-5 text-slate-400"></i>
+                </a>
+                <div class="bg-brand-600/20 p-2 rounded-lg border border-brand-500/30">
+                    <i data-lucide="mic" class="w-5 h-5 text-brand-400"></i>
+                </div>
                 <div>
-                    <label class="block text-slate-400 text-xs font-semibold mb-2 uppercase tracking-wide">AI Engine (Select based on device capability)</label>
-                    <select id="modelSelector" class="w-full bg-slate-800/80 border border-slate-600 text-slate-200 text-sm rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all custom-scrollbar outline-none shadow-inner">
-                        <option value="Xenova/whisper-tiny.en">⚡ Fastest (Tiny, ~40MB, Best for Older Phones)</option>
-                        <option value="Xenova/whisper-base.en">📱 Balanced (Base, ~145MB, Mobile Safe)</option>
-                        <option value="Xenova/whisper-small.en" selected>🎯 Max Accuracy (Small, ~500MB, High RAM/PC Only)</option>
-                    </select>
-                </div>
-
-                <!-- Dropzone -->
-                <input type="file" id="fileInput" accept=".mp3, .wav, .m4a, .aac, .ogg, .flac, audio/*, video/mp4" class="hidden" multiple>
-                <div id="dropZone" class="border-2 border-dashed border-slate-600 bg-slate-800/30 rounded-2xl p-8 flex flex-col items-center justify-center text-center cursor-pointer hover:border-blue-500 hover:bg-slate-800/50 transition-all min-h-[12rem]">
-                    <div class="w-12 h-12 rounded-full bg-blue-900/50 flex items-center justify-center mb-4 text-blue-400">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path></svg>
-                    </div>
-                    <p class="text-slate-300 font-medium mb-1">Click or drag audio files here</p>
-                    <p class="text-slate-500 text-xs">Supports multiple .mp3, .wav, .m4a</p>
-                    <div id="fileNameDisplay" class="text-blue-400 text-sm mt-3 font-semibold break-all hidden w-full max-h-32 overflow-y-auto custom-scrollbar flex flex-col gap-1 text-left bg-slate-900/50 p-3 rounded-lg border border-slate-700"></div>
-                </div>
-
-                <!-- Action Button -->
-                <button id="transcribeBtn" disabled class="glow-btn w-full py-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-lg flex items-center justify-center gap-2 transition-all">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    Start Transcription
-                </button>
-
-                <!-- Status Monitor -->
-                <div class="bg-slate-900/60 rounded-xl p-5 border border-slate-700/50 flex-grow max-h-48 overflow-y-auto custom-scrollbar" id="statusConsole">
-                    <p class="text-slate-400 text-xs font-mono uppercase tracking-wider mb-2">System Status</p>
-                    <p class="text-blue-300 text-sm font-mono leading-relaxed" id="statusMessage">Waiting for audio files...</p>
-                    <div id="progressContainer" class="w-full bg-slate-800 rounded-full h-1.5 mt-3 hidden relative overflow-hidden">
-                        <div id="progressBar" class="bg-blue-500 h-1.5 rounded-full transition-all duration-300 ease-out absolute left-0 top-0" style="width: 0%"></div>
-                    </div>
+                    <h1 class="text-lg font-bold tracking-tight leading-tight">FB Internal Tools</h1>
+                    <div class="text-xs text-brand-400 font-medium tracking-wide uppercase">Transcription Engine</div>
                 </div>
             </div>
+            <div class="text-xs text-slate-500 hidden sm:flex items-center gap-2" id="system-status">
+                <span class="w-2 h-2 rounded-full bg-slate-500" id="status-dot"></span>
+                <span id="status-text">System Offline (Awaiting Init)</span>
+            </div>
+        </div>
+    </header>
 
-            <!-- RIGHT COLUMN: OUTPUT -->
-            <div class="lg:col-span-7 flex flex-col h-full min-h-[400px]">
-                <div class="flex-grow flex flex-col bg-slate-900/40 rounded-2xl border border-slate-700/50 p-1 relative">
+    <main class="flex-1 flex flex-col lg:flex-row overflow-hidden">
+        
+        <!-- Left Panel: Controls -->
+        <aside class="w-full lg:w-80 bg-fluency-panel border-r border-fluency-border flex flex-col flex-none overflow-y-auto z-10 shadow-xl custom-scrollbar">
+            <div class="p-6 space-y-8">
+                
+                <!-- Section 1: Upload -->
+                <section>
+                    <h2 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">1. Audio Source</h2>
                     
-                    <!-- Actions Bar (Top) -->
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center px-4 py-3 border-b border-slate-700/50 gap-3">
-                        <div class="flex items-center gap-3">
-                            <h2 class="text-slate-300 font-semibold text-sm">Recognized Speech</h2>
-                            <div id="aiStatusBadge" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-800/80 border border-slate-700 text-[10px] font-semibold text-slate-400" title="Source: HuggingFace CDN">
-                                <span id="aiStatusDot" class="w-2 h-2 rounded-full bg-slate-500"></span>
-                                <span id="aiStatusText">AI Offline</span>
-                            </div>
+                    <div id="drop-zone" class="border-2 border-dashed border-slate-700 bg-slate-800/30 rounded-xl p-6 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-slate-800/60 hover:border-brand-500 transition-colors group">
+                        <div class="w-12 h-12 bg-brand-900/50 text-brand-400 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform shadow-[0_0_15px_rgba(37,99,235,0.2)]">
+                            <i data-lucide="upload-cloud" class="w-6 h-6"></i>
                         </div>
-                        <div class="flex gap-2">
-                            <button id="copyBtn" class="p-1.5 text-slate-400 hover:text-white hover:bg-slate-700 rounded transition-colors" title="Copy to Clipboard">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-                            </button>
-                            <button id="downloadTxtBtn" class="p-1.5 text-slate-400 hover:text-white hover:bg-slate-700 rounded transition-colors" title="Download .txt">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                            </button>
-                            <button id="downloadMdBtn" class="p-1.5 text-slate-400 hover:text-white hover:bg-slate-700 rounded transition-colors text-xs font-bold font-mono px-2" title="Download .md">
-                                MD
-                            </button>
-                        </div>
+                        <p class="text-sm font-medium text-slate-200 mb-1">Select Audio Files</p>
+                        <p class="text-xs text-slate-500">Supports .mp3, .wav, .m4a</p>
+                        <input type="file" id="file-input" accept=".mp3, .wav, .m4a, .aac, .ogg, .flac, audio/*, video/mp4" class="hidden" multiple>
                     </div>
 
-                    <!-- Text Area -->
-                    <textarea id="outputArea" class="w-full flex-grow bg-transparent text-slate-100 p-5 rounded-b-xl resize-none focus:outline-none custom-scrollbar text-lg leading-relaxed placeholder-slate-600" placeholder="Raw transcript will appear here exactly as recognized..."></textarea>
+                    <div id="file-queue-container" class="hidden mt-3 max-h-32 overflow-y-auto custom-scrollbar flex flex-col gap-2 p-2 bg-slate-900/50 rounded-lg border border-slate-700"></div>
+                </section>
+
+                <!-- Section 2: Model Configuration -->
+                <section>
+                    <h2 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">2. Engine Settings</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-400 mb-1">Model Precision Layer</label>
+                            <select id="modelSelector" class="w-full bg-slate-800 border border-slate-700 text-slate-200 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 block p-2.5 outline-none transition-shadow text-sm">
+                                <option value="Xenova/whisper-tiny.en">Tiny Layer (~40MB, Fastest)</option>
+                                <option value="Xenova/whisper-base.en">Base Layer (~145MB, Mobile Safe)</option>
+                                <option value="Xenova/whisper-small.en" selected>Small Layer (~500MB, Max DB Accuracy)</option>
+                            </select>
+                            <p class="text-[10px] text-slate-500 mt-2">Mobile users should select Base Layer to prevent out-of-memory errors on large transcriptions.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 3: Execution -->
+                <section class="flex flex-col gap-3 pt-2">
+                    <button id="transcribeBtn" disabled class="w-full bg-brand-600 hover:bg-brand-500 text-white font-medium py-3 px-4 rounded-xl shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_25px_rgba(37,99,235,0.5)] transition-all flex items-center justify-center gap-2 border border-brand-400/50 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none">
+                        <i data-lucide="play-circle" class="w-5 h-5"></i>
+                        Invoke Engine
+                    </button>
+                    
+                    <div id="progressContainer" class="hidden flex-col gap-2 bg-slate-900 border border-slate-700 rounded-lg p-3">
+                        <div class="flex justify-between items-center text-xs text-slate-400">
+                            <span id="progressText">Initializing Node...</span>
+                            <span id="progressPct">0%</span>
+                        </div>
+                        <div class="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                            <div id="progressBar" class="bg-brand-500 h-1.5 rounded-full transition-all duration-300 ease-out" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </aside>
+
+        <!-- Right Panel: Preview -->
+        <section class="flex-1 bg-fluency-base overflow-y-auto relative custom-scrollbar" id="preview-scroll-container">
+            
+            <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center text-slate-500 p-8 text-center">
+                <div class="relative mb-6">
+                    <div class="absolute inset-0 bg-brand-500 blur-[40px] opacity-20 rounded-full"></div>
+                    <i data-lucide="mic" class="w-20 h-20 text-slate-700 relative z-10"></i>
                 </div>
+                <h3 class="text-xl font-medium text-slate-300 mb-2">Awaiting Audio Source</h3>
+                <p class="max-w-md text-sm text-slate-500 leading-relaxed">Upload raw audio files. The engine will extract speech content and automatically compile it into structured documentation.</p>
             </div>
             
-        </div>
+            <!-- The dark paper preview wrapper -->
+            <div id="preview-wrapper" class="hidden p-4 md:p-10">
+                <!-- Actions Bar for Export -->
+                <div class="flex justify-end mb-4 gap-2 sticky top-0 z-20">
+                    <button id="copyBtn" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 flex items-center gap-2 text-sm transition-colors shadow-lg">
+                        <i data-lucide="copy" class="w-4 h-4"></i> Copy Markdown
+                    </button>
+                    <button id="downloadBtn" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 flex items-center gap-2 text-sm transition-colors shadow-lg">
+                        <i data-lucide="download" class="w-4 h-4"></i> Save .md
+                    </button>
+                </div>
+
+                <div class="paper-container relative group">
+                    <div id="markdown-content" class="w-full prose prose-invert prose-headings:text-brand-400 prose-a:text-brand-400 prose-strong:text-slate-200 prose-blockquote:border-l-brand-500 prose-blockquote:bg-slate-800/20 prose-blockquote:px-4 prose-blockquote:py-1 max-w-none transition-all duration-300 font-sans tracking-wide">
+                        <!-- Marked.js will inject formatted HTML here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-4 right-4 bg-slate-800 border border-slate-700 text-white px-4 py-3 rounded-lg shadow-2xl transform translate-y-20 opacity-0 transition-all duration-300 flex items-center gap-3 z-50">
+        <span id="toast-icon-wrapper"><i data-lucide="info" class="w-5 h-5 text-brand-400"></i></span>
+        <span id="toast-message" class="text-sm font-medium">Notification</span>
     </div>
 
     <!-- Application Logic -->
     <script>
-        const dropZone = document.getElementById('dropZone');
-        const fileInput = document.getElementById('fileInput');
-        const fileNameDisplay = document.getElementById('fileNameDisplay');
-        const transcribeBtn = document.getElementById('transcribeBtn');
-        const statusMessage = document.getElementById('statusMessage');
-        const progressContainer = document.getElementById('progressContainer');
-        const progressBar = document.getElementById('progressBar');
-        const outputArea = document.getElementById('outputArea');
-        const modelSelector = document.getElementById('modelSelector');
-
-        const aiStatusDot = document.getElementById('aiStatusDot');
-        const aiStatusText = document.getElementById('aiStatusText');
+        lucide.createIcons();
 
         let selectedFiles = [];
         let worker = null;
         let isWorkerLoaded = false;
         let currentFileIndex = 0;
         let currentLoadedModel = '';
+        let cumulativeMarkdown = ''; // master string that holds all appended transcriptions
 
-        // --- UI Interactions ---
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const fileQueueContainer = document.getElementById('file-queue-container');
+        const transcribeBtn = document.getElementById('transcribeBtn');
+        const modelSelector = document.getElementById('modelSelector');
 
-        function updateAIStatus(status, text) {
-            aiStatusDot.className = 'w-2 h-2 rounded-full ' + (status === 'offline' ? 'bg-slate-500' : status === 'downloading' ? 'bg-yellow-400 animate-pulse shadow-[0_0_8px_rgba(250,204,21,0.6)]' : status === 'ready' ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]' : 'bg-blue-500 animate-pulse');
-            aiStatusText.innerText = text;
+        const progressContainer = document.getElementById('progressContainer');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        const progressPct = document.getElementById('progressPct');
+
+        const statusDot = document.getElementById('status-dot');
+        const statusText = document.getElementById('status-text');
+
+        const emptyState = document.getElementById('empty-state');
+        const previewWrapper = document.getElementById('preview-wrapper');
+        const markdownContent = document.getElementById('markdown-content');
+        const toast = document.getElementById('toast');
+        const toastMessage = document.getElementById('toast-message');
+
+        function showToast(message, isError = false) {
+            toastMessage.textContent = message;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            if(isError) {
+                toast.classList.replace('border-slate-700', 'border-red-900');
+                document.getElementById('toast-icon-wrapper').innerHTML = '<i data-lucide="alert-triangle" class="w-5 h-5 text-red-400"></i>';
+            } else {
+                toast.classList.replace('border-red-900', 'border-slate-700');
+                document.getElementById('toast-icon-wrapper').innerHTML = '<i data-lucide="check-circle-2" class="w-5 h-5 text-brand-400"></i>';
+            }
+            lucide.createIcons();
+            setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 4000);
         }
 
-        function updateStatus(message, isProgress = false, percentage = 0) {
-            statusMessage.innerText = message;
-            if (isProgress) {
+        function updateSystemStatus(state, message) {
+            statusText.textContent = message;
+            statusDot.className = 'w-2 h-2 rounded-full ' + (
+                state === 'offline' ? 'bg-slate-500' :
+                state === 'downloading' ? 'bg-yellow-400 animate-pulse box-shadow-[0_0_8px_rgba(250,204,21,0.6)]' :
+                state === 'ready' ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]' :
+                'bg-brand-500 animate-pulse'
+            );
+        }
+
+        function updateProgress(message, percentage, isVisible = true) {
+            if (isVisible) {
                 progressContainer.classList.remove('hidden');
+                progressContainer.classList.add('flex');
+                progressText.textContent = message;
+                progressPct.textContent = percentage + '%';
                 progressBar.style.width = percentage + '%';
             } else {
                 progressContainer.classList.add('hidden');
+                progressContainer.classList.remove('flex');
             }
+        }
+
+        function appendToDocument(markdownText) {
+            cumulativeMarkdown += markdownText + "\n\n";
+            emptyState.classList.add('hidden');
+            previewWrapper.classList.remove('hidden');
+            markdownContent.innerHTML = marked.parse(cumulativeMarkdown);
+            // Scroll right panel to bottom softly
+            document.getElementById('preview-scroll-container').scrollTo({
+                top: document.getElementById('preview-scroll-container').scrollHeight,
+                behavior: 'smooth'
+            });
         }
 
         const handleFileSelect = (files) => {
             if (files && files.length > 0) {
-                // Highly robust extension matching for audio files, specifically testing .m4a
-                selectedFiles = Array.from(files).filter(f => {
-                    const typeMatch = f.type.startsWith('audio/') || f.type.startsWith('video/mp4');
-                    const extMatch = f.name.match(/\.(mp3|wav|m4a|aac|ogg|flac|mp4)$/i);
-                    return typeMatch || extMatch;
+                const validFiles = Array.from(files).filter(f => {
+                    return f.type.startsWith('audio/') || f.type.startsWith('video/mp4') || f.name.match(/\.(mp3|wav|m4a|aac|ogg|flac|mp4)$/i);
                 });
                 
-                if (selectedFiles.length === 0) {
-                    updateStatus('Error: Please select valid audio files.');
-                    transcribeBtn.disabled = true;
+                if (validFiles.length === 0) {
+                    showToast('Error: Invalid file format.', true);
                     return;
                 }
                 
-                fileNameDisplay.innerHTML = selectedFiles.map(f => `<div class="truncate">🎵 ${f.name}</div>`).join('');
-                fileNameDisplay.classList.remove('hidden');
+                selectedFiles = validFiles;
                 
+                // Build visual queue
+                fileQueueContainer.innerHTML = selectedFiles.map(f => `
+                    <div class="flex items-center gap-2 p-2 bg-slate-800 rounded-md border border-slate-700">
+                        <i data-lucide="music" class="w-4 h-4 text-brand-400 flex-none"></i>
+                        <span class="text-xs text-slate-300 truncate">${f.name}</span>
+                    </div>
+                `).join('');
+                lucide.createIcons();
+                
+                fileQueueContainer.classList.remove('hidden');
                 transcribeBtn.disabled = false;
-                transcribeBtn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Transcribe ${selectedFiles.length} File${selectedFiles.length > 1 ? 's' : ''}`;
-                updateStatus(`${selectedFiles.length} audio file(s) loaded. Ready to start.`);
+                showToast(`${selectedFiles.length} file(s) queued for processing.`);
             }
         };
 
@@ -229,74 +308,59 @@
 
         dropZone.addEventListener('dragover', (e) => {
             e.preventDefault();
-            dropZone.classList.add('drag-over');
+            dropZone.classList.add('border-brand-500', 'bg-slate-800');
         });
 
-        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('border-brand-500', 'bg-slate-800'));
 
         dropZone.addEventListener('drop', (e) => {
             e.preventDefault();
-            dropZone.classList.remove('drag-over');
-            if (e.dataTransfer.files.length) {
-                fileInput.files = e.dataTransfer.files;
-                handleFileSelect(e.dataTransfer.files);
-            }
+            dropZone.classList.remove('border-brand-500', 'bg-slate-800');
+            if (e.dataTransfer.files.length) handleFileSelect(e.dataTransfer.files);
         });
-
-        // --- Model Selector Logic ---
 
         modelSelector.addEventListener('change', () => {
             if (isWorkerLoaded && worker && currentLoadedModel !== modelSelector.value) {
                 isWorkerLoaded = false;
-                updateAIStatus('offline', 'AI Offline (Model Changed)');
-                updateStatus('Model changed. Click Start to download and initialize.');
+                updateSystemStatus('offline', 'Model Changed - Needs Re-init');
             }
         });
 
-        // --- Export Functions ---
-
         document.getElementById('copyBtn').addEventListener('click', () => {
-            if (!outputArea.value) return;
-            navigator.clipboard.writeText(outputArea.value);
-            const originalStatus = statusMessage.innerText;
-            updateStatus('Copied to clipboard!');
-            setTimeout(() => updateStatus(originalStatus), 2000);
+            if (!cumulativeMarkdown) return;
+            navigator.clipboard.writeText(cumulativeMarkdown);
+            showToast('Markdown copied to clipboard!');
         });
 
-        function downloadFile(content, filename, type) {
-            if (!content) return;
-            const blob = new Blob([content], {type: type});
+        document.getElementById('downloadBtn').addEventListener('click', () => {
+            if (!cumulativeMarkdown) return;
+            const blob = new Blob([cumulativeMarkdown], {type: 'text/markdown'});
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = filename;
+            a.download = 'FB_Transcription_Notes.md';
             a.click();
             URL.revokeObjectURL(url);
-        }
+            showToast('Document saved.');
+        });
 
-        document.getElementById('downloadTxtBtn').addEventListener('click', () => downloadFile(outputArea.value, 'transcript.txt', 'text/plain'));
-        document.getElementById('downloadMdBtn').addEventListener('click', () => downloadFile(outputArea.value, 'transcript.md', 'text/markdown'));
-
-        // --- AI Worker Logic ---
+        // --- Core Audio Engine ---
 
         const initializeWorker = () => {
             const workerCode = `
                 import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2';
-                
                 env.allowLocalModels = false;
                 let transcriber = null;
                 let activeModelName = '';
 
                 self.onmessage = async (e) => {
-                    const data = e.data;
-                    
-                    if (data.type === 'load') {
+                    if (e.data.type === 'load') {
                         try {
-                            if (transcriber && activeModelName === data.model) {
+                            if (transcriber && activeModelName === e.data.model) {
                                 self.postMessage({ type: 'loaded' });
                                 return;
                             }
-                            activeModelName = data.model;
+                            activeModelName = e.data.model;
                             transcriber = await pipeline('automatic-speech-recognition', activeModelName, {
                                 progress_callback: (info) => {
                                     self.postMessage({ type: 'progress', info: info });
@@ -306,25 +370,20 @@
                         } catch (err) {
                             self.postMessage({ type: 'error', error: err.message });
                         }
-                    } else if (data.type === 'transcribe') {
+                    } else if (e.data.type === 'transcribe') {
                         try {
-                            const result = await transcriber(data.audioData, {
+                            const result = await transcriber(e.data.audioData, {
                                 chunk_length_s: 30,
                                 stride_length_s: 5
                             });
                             
-                            let finalString = "";
-                            if (result && result.text) {
-                                finalString = result.text;
-                            } else if (Array.isArray(result)) {
-                                finalString = result.map(r => r.text).join(' ');
-                            } else {
-                                finalString = JSON.stringify(result);
-                            }
+                            let text = "";
+                            if (result && result.text) text = result.text;
+                            else if (Array.isArray(result)) text = result.map(r => r.text).join(' ');
                             
-                            self.postMessage({ type: 'done', text: finalString, fileIndex: data.fileIndex });
+                            self.postMessage({ type: 'done', text: text, fileIndex: e.data.fileIndex });
                         } catch (err) {
-                            self.postMessage({ type: 'error', error: err.message, fileIndex: data.fileIndex });
+                            self.postMessage({ type: 'error', error: err.message, fileIndex: e.data.fileIndex });
                         }
                     }
                 };
@@ -339,35 +398,32 @@
                 if (msg.type === 'progress') {
                     if (msg.info.status === 'downloading') {
                         const pct = Math.round(msg.info.progress || 0);
-                        // Show progress properly
-                        updateStatus(`Downloading AI Model (${pct}%) from HuggingFace CDN...`, true, pct);
-                        updateAIStatus('downloading', `Downloading Model... ${pct}%`);
+                        updateSystemStatus('downloading', 'Syncing Knowledge Graph...');
+                        updateProgress('Downloading Layers', pct);
                     } else if (msg.info.status === 'init') {
-                        updateStatus(`Initializing model...`, true, 100);
-                        updateAIStatus('working', 'Initializing AI Engine');
+                        updateSystemStatus('working', 'Compiling Matrix...');
+                        updateProgress('Initializing Nodes', 100);
                     }
                 } else if (msg.type === 'loaded') {
                     isWorkerLoaded = true;
-                    updateAIStatus('ready', 'AI Engine Ready');
+                    updateSystemStatus('ready', 'Engine Online');
+                    updateProgress('Ready', 100, false);
                     processNextFile();
                 } else if (msg.type === 'done') {
                     const fileName = selectedFiles[msg.fileIndex].name;
-                    const finalOutput = (msg.text || "No speech detected in audio file.").trim();
+                    const finalOutput = (msg.text || "No speech detected.").trim();
+
+                    // Beautifully formatted markdown to append
+                    const mdBlock = `## 🎙️ Document: ${fileName}\n> **Analyzed:** ${new Date().toLocaleString()}\n\n${finalOutput}\n\n---`;
                     
-                    const header = `\n--- File: ${fileName} ---\n`;
-                    
-                    if (msg.fileIndex === 0 && outputArea.value === 'Processing...') outputArea.value = '';
-                    outputArea.value += (msg.fileIndex > 0 ? "\n" : "") + header + finalOutput + "\n";
-                    
+                    appendToDocument(mdBlock);
                     currentFileIndex++;
                     processNextFile();
                     
                 } else if (msg.type === 'error') {
-                    const fileName = selectedFiles[msg.fileIndex]?.name || 'Unknown Audio';
-                    if (msg.fileIndex === 0 && outputArea.value === 'Processing...') outputArea.value = '';
-                    
-                    const header = `\n--- File: ${fileName} ---\n`;
-                    outputArea.value += (msg.fileIndex > 0 ? "\n" : "") + header + `[Error: ${msg.error}]\n`;
+                    const fileName = selectedFiles[msg.fileIndex]?.name || 'Unknown';
+                    const mdBlock = `## ⚠️ Document: ${fileName}\n> **Analyzed:** ${new Date().toLocaleString()}\n\n**Engine Failure:** ${msg.error}\n\n---`;
+                    appendToDocument(mdBlock);
                     
                     currentFileIndex++;
                     processNextFile();
@@ -375,24 +431,26 @@
             };
         };
 
-        // --- Audio Processing ---
-
         const processNextFile = () => {
             if (currentFileIndex >= selectedFiles.length) {
-                // All files completed
                 transcribeBtn.disabled = false;
-                transcribeBtn.innerHTML = 'All Transcriptions Complete';
-                updateStatus('All files processed successfully!', false, 0);
-                updateAIStatus('ready', 'AI Engine Ready');
+                updateSystemStatus('ready', 'System Idle (Online)');
+                updateProgress('', 0, false);
+                transcribeBtn.innerHTML = '<i data-lucide="check" class="w-5 h-5"></i> Process Complete';
+                lucide.createIcons();
+                showToast("All documents compiled successfully.");
                 return;
             }
 
             const currentFile = selectedFiles[currentFileIndex];
-            updateStatus(`Processing File ${currentFileIndex + 1} of ${selectedFiles.length}: ${currentFile.name}...`, true, 100);
-            updateAIStatus('working', `Transcribing File ${currentFileIndex + 1}...`);
+            updateSystemStatus('working', `Compiling Audio (${currentFileIndex + 1}/${selectedFiles.length})`);
+            updateProgress(`Decoding ${currentFile.name}...`, 100);
             
+            // Re-disable button if it's mid-queue
+            transcribeBtn.disabled = true;
+            transcribeBtn.innerHTML = '<div class="loader !w-5 !h-5 !border-2 !border-brand-300 border-t-white mr-2"></div> Filtering Noise...';
+
             const fileReader = new FileReader();
-            
             fileReader.onload = async (e) => {
                 try {
                     const arrayBuffer = e.target.result;
@@ -407,36 +465,37 @@
                     }, [float32Data.buffer]);
                     
                 } catch (error) {
-                    const header = `\n--- File: ${currentFile.name} ---\n`;
-                    outputArea.value += (currentFileIndex > 0 ? "\n" : "") + header + `[Error Decoder: Failed to decode audio.]\n`;
-                    
+                    const mdBlock = `## ⚠️ Document: ${currentFile.name}\n\n**Decoder Error:** Failed to parse raw audio stream.\n\n---`;
+                    appendToDocument(mdBlock);
                     currentFileIndex++;
                     processNextFile();
                 }
             };
-            
             fileReader.readAsArrayBuffer(currentFile);
         };
-
-        // --- Execution Flow ---
 
         transcribeBtn.addEventListener('click', () => {
             if (!selectedFiles || selectedFiles.length === 0) return;
             
             currentFileIndex = 0;
             transcribeBtn.disabled = true;
-            transcribeBtn.innerHTML = `<svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Processing...`;
-            outputArea.value = 'Processing...';
+            transcribeBtn.innerHTML = '<div class="loader !w-5 !h-5 !border-2 !border-brand-300 border-t-white mr-2"></div> Engaging Engine...';
+            
+            // To provide true appending behavior, we do NOT clear the cumulativeMarkdown.
+            // But if it's completely empty, we add a header
+            if (cumulativeMarkdown === '') {
+                cumulativeMarkdown = '# FB Class Audio Extraction\n\n';
+            }
             
             if (!worker || currentLoadedModel !== modelSelector.value) {
                 currentLoadedModel = modelSelector.value;
                 if (!worker) initializeWorker();
                 
-                updateStatus('Starting High-Accuracy AI engine...', true, 0);
-                updateAIStatus('downloading', 'Connecting to Hub...');
+                updateSystemStatus('downloading', 'Requesting Node Assignment...');
+                updateProgress('Connecting...', 0);
                 worker.postMessage({ type: 'load', model: currentLoadedModel });
             } else if (!isWorkerLoaded) {
-                updateStatus('Still loading AI model...', true, 50);
+                updateProgress('Awaiting Knowledge Graph...', 50);
             } else {
                 processNextFile();
             }
