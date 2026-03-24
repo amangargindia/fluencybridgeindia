@@ -91,6 +91,16 @@
             <!-- LEFT COLUMN: UPLOAD -->
             <div class="lg:col-span-5 flex flex-col gap-6">
                 
+                <!-- Model Selection -->
+                <div>
+                    <label class="block text-slate-400 text-xs font-semibold mb-2 uppercase tracking-wide">AI Engine (Select based on device capability)</label>
+                    <select id="modelSelector" class="w-full bg-slate-800/80 border border-slate-600 text-slate-200 text-sm rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all custom-scrollbar outline-none shadow-inner">
+                        <option value="Xenova/whisper-tiny.en">⚡ Fastest (Tiny, ~40MB, Best for Older Phones)</option>
+                        <option value="Xenova/whisper-base.en">📱 Balanced (Base, ~145MB, Mobile Safe)</option>
+                        <option value="Xenova/whisper-small.en" selected>🎯 Max Accuracy (Small, ~500MB, High RAM/PC Only)</option>
+                    </select>
+                </div>
+
                 <!-- Dropzone -->
                 <input type="file" id="fileInput" accept=".mp3, .wav, .m4a, .aac, .ogg, .flac, audio/*, video/mp4" class="hidden" multiple>
                 <div id="dropZone" class="border-2 border-dashed border-slate-600 bg-slate-800/30 rounded-2xl p-8 flex flex-col items-center justify-center text-center cursor-pointer hover:border-blue-500 hover:bg-slate-800/50 transition-all min-h-[12rem]">
@@ -162,6 +172,7 @@
         const progressContainer = document.getElementById('progressContainer');
         const progressBar = document.getElementById('progressBar');
         const outputArea = document.getElementById('outputArea');
+        const modelSelector = document.getElementById('modelSelector');
 
         const aiStatusDot = document.getElementById('aiStatusDot');
         const aiStatusText = document.getElementById('aiStatusText');
@@ -170,6 +181,7 @@
         let worker = null;
         let isWorkerLoaded = false;
         let currentFileIndex = 0;
+        let currentLoadedModel = '';
 
         // --- UI Interactions ---
 
@@ -231,6 +243,16 @@
             }
         });
 
+        // --- Model Selector Logic ---
+
+        modelSelector.addEventListener('change', () => {
+            if (isWorkerLoaded && worker && currentLoadedModel !== modelSelector.value) {
+                isWorkerLoaded = false;
+                updateAIStatus('offline', 'AI Offline (Model Changed)');
+                updateStatus('Model changed. Click Start to download and initialize.');
+            }
+        });
+
         // --- Export Functions ---
 
         document.getElementById('copyBtn').addEventListener('click', () => {
@@ -263,14 +285,19 @@
                 
                 env.allowLocalModels = false;
                 let transcriber = null;
+                let activeModelName = '';
 
                 self.onmessage = async (e) => {
                     const data = e.data;
                     
                     if (data.type === 'load') {
                         try {
-                            // Upgrading to whisper-small for highly accurate transcription
-                            transcriber = await pipeline('automatic-speech-recognition', 'Xenova/whisper-small.en', {
+                            if (transcriber && activeModelName === data.model) {
+                                self.postMessage({ type: 'loaded' });
+                                return;
+                            }
+                            activeModelName = data.model;
+                            transcriber = await pipeline('automatic-speech-recognition', activeModelName, {
                                 progress_callback: (info) => {
                                     self.postMessage({ type: 'progress', info: info });
                                 }
@@ -401,11 +428,13 @@
             transcribeBtn.innerHTML = `<svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Processing...`;
             outputArea.value = 'Processing...';
             
-            if (!worker) {
-                initializeWorker();
+            if (!worker || currentLoadedModel !== modelSelector.value) {
+                currentLoadedModel = modelSelector.value;
+                if (!worker) initializeWorker();
+                
                 updateStatus('Starting High-Accuracy AI engine...', true, 0);
                 updateAIStatus('downloading', 'Connecting to Hub...');
-                worker.postMessage({ type: 'load' });
+                worker.postMessage({ type: 'load', model: currentLoadedModel });
             } else if (!isWorkerLoaded) {
                 updateStatus('Still loading AI model...', true, 50);
             } else {
