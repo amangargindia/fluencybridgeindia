@@ -62,7 +62,11 @@
         .prose table { width: 100%; border-collapse: collapse; margin-top: 1rem; margin-bottom: 1rem; }
         .prose th, .prose td { border: 1px solid #334155; padding: 0.5rem; }
         .prose th { background-color: #0f172a; font-weight: 600; color: #f8fafc; }
-        /* body { overflow: hidden; } Removed for mobile scrolling */
+        
+        /* Custom Audio Player Styling Hint */
+        audio.custom-audio::-webkit-media-controls-panel { background-color: #1e293b; }
+        audio.custom-audio::-webkit-media-controls-play-button, audio.custom-audio::-webkit-media-controls-mute-button { background-color: #3b82f6; border-radius: 50%; }
+        audio.custom-audio::-webkit-media-controls-current-time-display, audio.custom-audio::-webkit-media-controls-time-remaining-display { color: #f8fafc; }
         
         .loader {
             border: 4px solid #1e293b; border-top: 4px solid #3b82f6;
@@ -70,6 +74,10 @@
             animation: spin 1s linear infinite;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Recording Pulse */
+        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+        .recording-active { animation: pulse-red 2s infinite; border-color: #ef4444 !important; background-color: rgba(239, 68, 68, 0.1) !important; }
     </style>
 </head>
 <body class="bg-fluency-base text-slate-300 min-h-screen lg:h-screen lg:overflow-hidden flex flex-col font-sans selection:bg-brand-500 selection:text-white">
@@ -101,20 +109,31 @@
     <main class="flex-1 flex flex-col lg:flex-row lg:overflow-hidden">
         
         <!-- Left Panel: Controls -->
-        <aside class="w-full lg:w-80 bg-fluency-panel border-r border-fluency-border flex flex-col flex-none overflow-y-auto z-10 shadow-xl custom-scrollbar">
+        <aside class="w-full lg:w-80 bg-fluency-panel border-r border-fluency-border flex flex-col flex-none lg:overflow-y-auto z-10 shadow-xl custom-scrollbar">
             <div class="p-6 space-y-8">
                 
-                <!-- Section 1: Upload -->
+                <!-- Section 1: Upload & Record -->
                 <section>
                     <h2 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">1. Audio Source</h2>
                     
-                    <div id="drop-zone" class="border-2 border-dashed border-slate-700 bg-slate-800/30 rounded-xl p-6 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-slate-800/60 hover:border-brand-500 transition-colors group">
-                        <div class="w-12 h-12 bg-brand-900/50 text-brand-400 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform shadow-[0_0_15px_rgba(37,99,235,0.2)]">
-                            <i data-lucide="upload-cloud" class="w-6 h-6"></i>
+                    <div class="flex gap-2 h-[12rem]">
+                        <div id="drop-zone" class="flex-1 border-2 border-dashed border-slate-700 bg-slate-800/30 rounded-xl p-4 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-slate-800/60 hover:border-brand-500 transition-colors group">
+                            <div class="w-10 h-10 bg-brand-900/50 text-brand-400 rounded-full flex items-center justify-center mb-2 group-hover:scale-110 transition-transform shadow-[0_0_15px_rgba(37,99,235,0.2)]">
+                                <i data-lucide="upload-cloud" class="w-5 h-5"></i>
+                            </div>
+                            <p class="text-sm font-medium text-slate-200 mb-1">Upload Files</p>
+                            <p class="text-[10px] text-slate-500">.mp3, .wav, .m4a</p>
+                            <input type="file" id="file-input" accept=".mp3, .wav, .m4a, .aac, .ogg, .flac, audio/*, video/mp4" class="hidden" multiple>
                         </div>
-                        <p class="text-sm font-medium text-slate-200 mb-1">Select Audio Files</p>
-                        <p class="text-xs text-slate-500">Supports .mp3, .wav, .m4a</p>
-                        <input type="file" id="file-input" accept=".mp3, .wav, .m4a, .aac, .ogg, .flac, audio/*, video/mp4" class="hidden" multiple>
+
+                        <!-- Live Record Button -->
+                        <button id="recordBtn" class="w-20 border-2 border-slate-700 bg-slate-800/30 rounded-xl p-2 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-slate-800/60 hover:border-red-500 transition-colors group">
+                            <div id="recordIconBg" class="w-10 h-10 bg-slate-700/50 text-slate-400 rounded-full flex items-center justify-center mb-2 group-hover:text-red-400 transition-colors">
+                                <i data-lucide="mic" class="w-5 h-5"></i>
+                            </div>
+                            <p id="recordText" class="text-sm font-medium text-slate-300">Record</p>
+                            <p id="recordSubText" class="text-[10px] text-slate-500">Live Audio</p>
+                        </button>
                     </div>
 
                     <div id="file-queue-container" class="hidden mt-3 max-h-32 overflow-y-auto custom-scrollbar flex flex-col gap-2 p-2 bg-slate-900/50 rounded-lg border border-slate-700"></div>
@@ -158,7 +177,7 @@
         </aside>
 
         <!-- Right Panel: Preview -->
-        <section class="flex-1 bg-fluency-base overflow-y-auto relative custom-scrollbar" id="preview-scroll-container">
+        <section class="flex-1 bg-fluency-base lg:overflow-y-auto relative custom-scrollbar" id="preview-scroll-container">
             
             <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center text-slate-500 p-8 text-center">
                 <div class="relative mb-6">
@@ -166,7 +185,7 @@
                     <i data-lucide="mic" class="w-20 h-20 text-slate-700 relative z-10"></i>
                 </div>
                 <h3 class="text-xl font-medium text-slate-300 mb-2">Awaiting Audio Source</h3>
-                <p class="max-w-md text-sm text-slate-500 leading-relaxed">Upload raw audio files. The engine will extract speech content and automatically compile it into structured documentation.</p>
+                <p class="max-w-md text-sm text-slate-500 leading-relaxed">Upload audio files or Record Live. The engine will extract speech content and automatically compile it into structured documentation.</p>
             </div>
             
             <!-- The dark paper preview wrapper -->
@@ -174,16 +193,22 @@
                 <!-- Actions Bar for Export -->
                 <div class="flex justify-end mb-4 gap-2 sticky top-0 z-20">
                     <button id="copyBtn" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 flex items-center gap-2 text-sm transition-colors shadow-lg">
-                        <i data-lucide="copy" class="w-4 h-4"></i> Copy Markdown
-                    </button>
-                    <button id="downloadBtn" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 flex items-center gap-2 text-sm transition-colors shadow-lg">
-                        <i data-lucide="download" class="w-4 h-4"></i> Save .md
+                        <i data-lucide="copy" class="w-4 h-4"></i> Copy Text
                     </button>
                 </div>
 
                 <div class="paper-container relative group">
-                    <div id="markdown-content" class="w-full prose prose-invert prose-headings:text-brand-400 prose-a:text-brand-400 prose-strong:text-slate-200 prose-blockquote:border-l-brand-500 prose-blockquote:bg-slate-800/20 prose-blockquote:px-4 prose-blockquote:py-1 max-w-none transition-all duration-300 font-sans tracking-wide">
-                        <!-- Marked.js will inject formatted HTML here -->
+                    <div id="markdown-content" class="w-full max-w-none transition-all duration-300 font-sans tracking-wide">
+                        <!-- Raw HTML Blocks with Audio Players will be injected here -->
+                    </div>
+                    
+                    <!-- Active Typewriter Streaming UI -->
+                    <div id="active-transcription" class="hidden mt-8 p-6 border border-brand-500/50 bg-brand-900/10 rounded-xl relative shadow-inner">
+                        <div class="absolute -top-3 left-4 bg-brand-600 px-3 py-0.5 text-[10px] font-bold uppercase rounded text-white shadow shadow-brand-500/50 tracking-wider flex items-center gap-1.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+                            Live Transcription
+                        </div>
+                        <p id="active-text" class="text-slate-300 font-sans leading-relaxed text-lg animate-pulse min-h-[1.5rem]"></p>
                     </div>
                 </div>
             </div>
@@ -205,10 +230,22 @@
         let isWorkerLoaded = false;
         let currentFileIndex = 0;
         let currentLoadedModel = '';
-        let cumulativeMarkdown = ''; // master string that holds all appended transcriptions
+        let cumulativeText = ''; // Master string for clipboard copies
+
+        // Microphone Logic
+        let mediaRecorder;
+        let audioChunks = [];
+        let isRecording = false;
+        let recordingTimerInterval;
+        let recordingSeconds = 0;
 
         const dropZone = document.getElementById('drop-zone');
         const fileInput = document.getElementById('file-input');
+        const recordBtn = document.getElementById('recordBtn');
+        const recordIconBg = document.getElementById('recordIconBg');
+        const recordText = document.getElementById('recordText');
+        const recordSubText = document.getElementById('recordSubText');
+
         const fileQueueContainer = document.getElementById('file-queue-container');
         const transcribeBtn = document.getElementById('transcribeBtn');
         const modelSelector = document.getElementById('modelSelector');
@@ -224,6 +261,10 @@
         const emptyState = document.getElementById('empty-state');
         const previewWrapper = document.getElementById('preview-wrapper');
         const markdownContent = document.getElementById('markdown-content');
+        
+        const activeTranscriptionBox = document.getElementById('active-transcription');
+        const activeTextParagraph = document.getElementById('active-text');
+
         const toast = document.getElementById('toast');
         const toastMessage = document.getElementById('toast-message');
 
@@ -264,22 +305,105 @@
             }
         }
 
-        function appendToDocument(markdownText) {
-            cumulativeMarkdown += markdownText + "\n\n";
+        // Global function to play clicked timestamp
+        window.playAudio = function(id, time) {
+            const player = document.getElementById(id);
+            if (player) {
+                player.currentTime = time;
+                player.play();
+            }
+        };
+
+        function appendToDocumentRaw(htmlBlock, rawText) {
+            cumulativeText += rawText + "\n\n";
             emptyState.classList.add('hidden');
             previewWrapper.classList.remove('hidden');
-            markdownContent.innerHTML = marked.parse(cumulativeMarkdown);
+            
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = htmlBlock;
+            markdownContent.appendChild(tempDiv);
+            
             // Scroll right panel to bottom softly
             document.getElementById('preview-scroll-container').scrollTo({
                 top: document.getElementById('preview-scroll-container').scrollHeight,
                 behavior: 'smooth'
             });
+            lucide.createIcons();
         }
+
+        // --- Live Microphone Logic ---
+        
+        function formatTime(seconds) {
+            const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+            const s = (seconds % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
+        }
+
+        recordBtn.addEventListener('click', async () => {
+            if (!isRecording) {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    mediaRecorder = new MediaRecorder(stream);
+                    audioChunks = [];
+                    
+                    mediaRecorder.ondataavailable = e => {
+                        if (e.data.size > 0) audioChunks.push(e.data);
+                    };
+                    
+                    mediaRecorder.onstop = () => {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                        const file = new File([audioBlob], `Live_Recording_${new Date().getTime()}.webm`, { type: 'audio/webm' });
+                        handleFileSelect([file]); // Inject to queue
+                        
+                        // Stop all tracks to clear mic indicator
+                        stream.getTracks().forEach(track => track.stop());
+                    };
+                    
+                    mediaRecorder.start();
+                    isRecording = true;
+                    
+                    // Update UI internally
+                    recordBtn.classList.add('recording-active');
+                    recordIconBg.classList.replace('bg-slate-700/50', 'bg-red-500/20');
+                    recordIconBg.classList.replace('text-slate-400', 'text-red-500');
+                    recordIconBg.innerHTML = '<i data-lucide="square" class="w-4 h-4 fill-current"></i>';
+                    lucide.createIcons();
+                    
+                    recordText.textContent = "Recording";
+                    recordingSeconds = 0;
+                    recordSubText.textContent = formatTime(recordingSeconds);
+                    recordingTimerInterval = setInterval(() => {
+                        recordingSeconds++;
+                        recordSubText.textContent = formatTime(recordingSeconds);
+                    }, 1000);
+                    
+                } catch (err) {
+                    showToast('Microphone access denied or unavailable.', true);
+                }
+            } else {
+                // Stop Recording
+                mediaRecorder.stop();
+                isRecording = false;
+                clearInterval(recordingTimerInterval);
+                
+                // Reset UI
+                recordBtn.classList.remove('recording-active');
+                recordIconBg.classList.replace('bg-red-500/20', 'bg-slate-700/50');
+                recordIconBg.classList.replace('text-red-500', 'text-slate-400');
+                recordIconBg.innerHTML = '<i data-lucide="mic" class="w-5 h-5"></i>';
+                lucide.createIcons();
+                
+                recordText.textContent = "Record";
+                recordSubText.textContent = "Live Audio";
+            }
+        });
+
+        // --- File Queue Logic ---
 
         const handleFileSelect = (files) => {
             if (files && files.length > 0) {
                 const validFiles = Array.from(files).filter(f => {
-                    return f.type.startsWith('audio/') || f.type.startsWith('video/mp4') || f.name.match(/\.(mp3|wav|m4a|aac|ogg|flac|mp4)$/i);
+                    return f.type.startsWith('audio/') || f.type.startsWith('video/') || f.name.match(/\.(mp3|wav|m4a|aac|ogg|flac|mp4|webm)$/i);
                 });
                 
                 if (validFiles.length === 0) {
@@ -287,7 +411,8 @@
                     return;
                 }
                 
-                selectedFiles = validFiles;
+                // Append instead of replacing
+                selectedFiles = [...selectedFiles, ...validFiles];
                 
                 // Build visual queue
                 fileQueueContainer.innerHTML = selectedFiles.map(f => `
@@ -300,7 +425,7 @@
                 
                 fileQueueContainer.classList.remove('hidden');
                 transcribeBtn.disabled = false;
-                showToast(`${selectedFiles.length} file(s) queued for processing.`);
+                showToast(`${validFiles.length} file(s) added to processing queue.`);
             }
         };
 
@@ -328,24 +453,13 @@
         });
 
         document.getElementById('copyBtn').addEventListener('click', () => {
-            if (!cumulativeMarkdown) return;
-            navigator.clipboard.writeText(cumulativeMarkdown);
-            showToast('Markdown copied to clipboard!');
+            if (!cumulativeText) return;
+            navigator.clipboard.writeText(cumulativeText);
+            showToast('Text copied to clipboard!');
         });
 
-        document.getElementById('downloadBtn').addEventListener('click', () => {
-            if (!cumulativeMarkdown) return;
-            const blob = new Blob([cumulativeMarkdown], {type: 'text/markdown'});
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'FB_Transcription_Notes.md';
-            a.click();
-            URL.revokeObjectURL(url);
-            showToast('Document saved.');
-        });
 
-        // --- Core Audio Engine ---
+        // --- Core Audio Engine (Web Worker) ---
 
         const initializeWorker = () => {
             const workerCode = `
@@ -375,14 +489,14 @@
                         try {
                             const result = await transcriber(e.data.audioData, {
                                 chunk_length_s: 30,
-                                stride_length_s: 5
+                                stride_length_s: 5,
+                                return_timestamps: true,
+                                chunk_callback: (chunk) => {
+                                    self.postMessage({ type: 'partial', chunk: chunk, fileIndex: e.data.fileIndex });
+                                }
                             });
                             
-                            let text = "";
-                            if (result && result.text) text = result.text;
-                            else if (Array.isArray(result)) text = result.map(r => r.text).join(' ');
-                            
-                            self.postMessage({ type: 'done', text: text, fileIndex: e.data.fileIndex });
+                            self.postMessage({ type: 'done', result: result, fileIndex: e.data.fileIndex });
                         } catch (err) {
                             self.postMessage({ type: 'error', error: err.message, fileIndex: e.data.fileIndex });
                         }
@@ -410,21 +524,78 @@
                     updateSystemStatus('ready', 'Engine Online');
                     updateProgress('Ready', 100, false);
                     processNextFile();
-                } else if (msg.type === 'done') {
-                    const fileName = selectedFiles[msg.fileIndex].name;
-                    const finalOutput = (msg.text || "No speech detected.").trim();
-
-                    // Beautifully formatted markdown to append
-                    const mdBlock = `## 🎙️ Document: ${fileName}\n> **Analyzed:** ${new Date().toLocaleString()}\n\n${finalOutput}\n\n---`;
                     
-                    appendToDocument(mdBlock);
+                } else if (msg.type === 'partial') {
+                    // Typewriter Output Stream
+                    activeTranscriptionBox.classList.remove('hidden');
+                    if (msg.chunk && msg.chunk.text) {
+                        activeTextParagraph.textContent += msg.chunk.text;
+                        document.getElementById('preview-scroll-container').scrollTo({
+                            top: document.getElementById('preview-scroll-container').scrollHeight,
+                            behavior: 'smooth'
+                        });
+                    }
+
+                } else if (msg.type === 'done') {
+                    activeTranscriptionBox.classList.add('hidden');
+                    activeTextParagraph.textContent = ''; // Reset for next file.
+
+                    const fileName = selectedFiles[msg.fileIndex].name;
+                    const blobUrl = URL.createObjectURL(selectedFiles[msg.fileIndex]);
+                    const playerID = 'audio_player_' + msg.fileIndex;
+
+                    // Extract pure text for copying
+                    const rawText = msg.result.text || "No speech detected.";
+                    
+                    // Build Clickable Output
+                    let interactiveHtml = '';
+                    if (msg.result.chunks && msg.result.chunks.length > 0) {
+                        interactiveHtml = msg.result.chunks.map(c => {
+                            const start = c.timestamp[0];
+                            return `<span class="cursor-pointer hover:bg-brand-900/50 hover:text-brand-300 rounded px-1 transition-colors border-b border-transparent hover:border-brand-500" onclick="playAudio('${playerID}', ${start})">${c.text}</span>`;
+                        }).join('');
+                    } else {
+                        interactiveHtml = msg.result.text || "No speech detected.";
+                    }
+
+                    // Native HTML Injection Block
+                    const htmlBlock = `
+                        <div class="mb-10 relative group bg-fluency-panel p-6 rounded-2xl border border-fluency-border shadow-md">
+                            <div class="flex items-center justify-between mb-4 border-b border-slate-700/50 pb-3">
+                                <h2 class="text-brand-400 font-bold text-lg flex items-center gap-2"><i data-lucide="file-audio" class="w-5 h-5"></i> ${fileName}</h2>
+                                <span class="text-xs text-slate-500 font-medium tracking-wide border border-slate-700 py-1 px-2 rounded-lg bg-slate-800/50">Analyzed ${new Date().toLocaleString()}</span>
+                            </div>
+                            <!-- Native Embedded Audio Player -->
+                            <audio id="${playerID}" src="${blobUrl}" controls class="w-full h-[40px] mb-5 rounded-lg opacity-80 hover:opacity-100 transition-opacity outline-none custom-audio"></audio>
+                            
+                            <h3 class="text-xs uppercase tracking-wider text-slate-500 mb-2 font-bold">Transcription (Click to Listen)</h3>
+                            <div class="text-slate-200 leading-relaxed font-sans tracking-wide text-lg text-justify p-5 bg-fluency-base rounded-xl border border-fluency-border shadow-inner">
+                                ${interactiveHtml}
+                            </div>
+                            <div class="absolute -left-1.5 top-8 bottom-8 w-1 bg-brand-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        </div>
+                    `;
+                    
+                    const simpleTextForClipboard = `--- Document: ${fileName} ---\n${rawText}\n\n`;
+                    appendToDocumentRaw(htmlBlock, simpleTextForClipboard);
+                    
                     currentFileIndex++;
                     processNextFile();
                     
                 } else if (msg.type === 'error') {
+                    activeTranscriptionBox.classList.add('hidden');
+                    activeTextParagraph.textContent = '';
+
                     const fileName = selectedFiles[msg.fileIndex]?.name || 'Unknown';
-                    const mdBlock = `## ⚠️ Document: ${fileName}\n> **Analyzed:** ${new Date().toLocaleString()}\n\n**Engine Failure:** ${msg.error}\n\n---`;
-                    appendToDocument(mdBlock);
+                    const errorHtml = `
+                        <div class="mb-10 bg-fluency-panel p-6 rounded-2xl border border-red-900/50 shadow-md">
+                            <div class="flex items-center mb-4 border-b border-slate-700/50 pb-3">
+                                <h2 class="text-red-400 font-bold text-lg flex items-center gap-2"><i data-lucide="alert-triangle" class="w-5 h-5"></i> Error Processing ${fileName}</h2>
+                            </div>
+                            <div class="text-slate-300">Engine Failure: ${msg.error}</div>
+                        </div>
+                    `;
+                    appendToDocumentRaw(errorHtml, `Error Processing ${fileName}: ${msg.error}`);
                     
                     currentFileIndex++;
                     processNextFile();
@@ -444,12 +615,15 @@
             }
 
             const currentFile = selectedFiles[currentFileIndex];
-            updateSystemStatus('working', `Compiling Audio (${currentFileIndex + 1}/${selectedFiles.length})`);
+            updateSystemStatus('working', `Decoding Node (${currentFileIndex + 1}/${selectedFiles.length})`);
             updateProgress(`Decoding ${currentFile.name}...`, 100);
             
             // Re-disable button if it's mid-queue
             transcribeBtn.disabled = true;
-            transcribeBtn.innerHTML = '<div class="loader !w-5 !h-5 !border-2 !border-brand-300 border-t-white mr-2"></div> Filtering Noise...';
+            transcribeBtn.innerHTML = '<div class="loader !w-5 !h-5 !border-2 !border-brand-300 border-t-white mr-2"></div> Extracting Speech...';
+
+            activeTranscriptionBox.classList.remove('hidden');
+            activeTextParagraph.textContent = ''; // prepare for stream
 
             const fileReader = new FileReader();
             fileReader.onload = async (e) => {
@@ -466,8 +640,10 @@
                     }, [float32Data.buffer]);
                     
                 } catch (error) {
-                    const mdBlock = `## ⚠️ Document: ${currentFile.name}\n\n**Decoder Error:** Failed to parse raw audio stream.\n\n---`;
-                    appendToDocument(mdBlock);
+                    const mdBlock = `<div class="mb-10 text-red-400">Error Decoder: Failed to parse raw audio stream for ${currentFile.name}</div>`;
+                    appendToDocumentRaw(mdBlock, "Error Decoding Audio");
+                    
+                    activeTranscriptionBox.classList.add('hidden');
                     currentFileIndex++;
                     processNextFile();
                 }
@@ -478,15 +654,19 @@
         transcribeBtn.addEventListener('click', () => {
             if (!selectedFiles || selectedFiles.length === 0) return;
             
-            currentFileIndex = 0;
+            // We append. But we must only process files starting from currentFileIndex.
+            // If previous run finished, currentFileIndex might be equal to or less than selectedFiles.length.
+            // Wait, to process NEW files correctly:
+            if(currentFileIndex === selectedFiles.length) {
+                showToast("All current files already processed.", true);
+                transcribeBtn.disabled = false;
+                transcribeBtn.innerHTML = '<i data-lucide="check" class="w-5 h-5"></i> All Processed';
+                lucide.createIcons();
+                return; // or reset, but we shouldn't re-process old files.
+            }
+            
             transcribeBtn.disabled = true;
             transcribeBtn.innerHTML = '<div class="loader !w-5 !h-5 !border-2 !border-brand-300 border-t-white mr-2"></div> Engaging Engine...';
-            
-            // To provide true appending behavior, we do NOT clear the cumulativeMarkdown.
-            // But if it's completely empty, we add a header
-            if (cumulativeMarkdown === '') {
-                cumulativeMarkdown = '# FB Class Audio Extraction\n\n';
-            }
             
             if (!worker || currentLoadedModel !== modelSelector.value) {
                 currentLoadedModel = modelSelector.value;
