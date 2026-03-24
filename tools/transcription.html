@@ -335,17 +335,18 @@
         };
 
         function appendToDocumentRaw(htmlBlock, rawText) {
-            cumulativeText += rawText + "\n\n";
             emptyState.classList.add('hidden');
             previewWrapper.classList.remove('hidden');
             
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = htmlBlock;
-            markdownContent.appendChild(tempDiv);
             
-            // Scroll right panel to bottom softly
+            // Prepend new blocks to the top of the feed
+            markdownContent.insertBefore(tempDiv.firstElementChild, markdownContent.firstChild);
+            
+            // Scroll right panel to top softly
             document.getElementById('preview-scroll-container').scrollTo({
-                top: document.getElementById('preview-scroll-container').scrollHeight,
+                top: 0,
                 behavior: 'smooth'
             });
             lucide.createIcons();
@@ -473,8 +474,11 @@
         });
 
         document.getElementById('copyBtn').addEventListener('click', () => {
-            if (!cumulativeText) return;
-            navigator.clipboard.writeText(cumulativeText);
+            const cards = document.querySelectorAll('.transcript-card');
+            if (cards.length === 0) return;
+            
+            const fullText = Array.from(cards).map(card => decodeURIComponent(card.getAttribute('data-rawtext'))).join('\n');
+            navigator.clipboard.writeText(fullText);
             showToast('Text copied to clipboard!');
         });
 
@@ -596,10 +600,15 @@
 
                     // Native HTML Injection Block
                     const htmlBlock = `
-                        <div class="mb-10 relative group bg-fluency-panel p-6 rounded-2xl border border-fluency-border shadow-md">
+                        <div class="transcript-card mb-10 relative group bg-fluency-panel p-6 rounded-2xl border border-fluency-border shadow-md" data-rawtext="${encodeURIComponent(simpleTextForClipboard)}">
                             <div class="flex items-center justify-between mb-4 border-b border-slate-700/50 pb-3">
                                 <h2 class="text-brand-400 font-bold text-lg flex items-center gap-2"><i data-lucide="file-audio" class="w-5 h-5"></i> ${fileName}</h2>
-                                <span class="text-xs text-slate-500 font-medium tracking-wide border border-slate-700 py-1 px-2 rounded-lg bg-slate-800/50">Analyzed ${new Date().toLocaleString()}</span>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs text-slate-500 font-medium tracking-wide border border-slate-700 py-1 px-2 rounded-lg bg-slate-800/50 hidden sm:inline-block">Analyzed ${new Date().toLocaleString()}</span>
+                                    <button onclick="this.closest('.transcript-card').remove(); if(document.querySelectorAll('.transcript-card').length === 0) { document.getElementById('empty-state').classList.remove('hidden'); document.getElementById('preview-wrapper').classList.add('hidden'); }" class="text-red-400/50 hover:text-red-400 hover:bg-red-900/30 p-1.5 rounded-lg transition-colors border border-transparent hover:border-red-500/30" title="Delete Recording">
+                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                    </button>
+                                </div>
                             </div>
                             <!-- Native Embedded Audio Player -->
                             <audio id="${playerID}" src="${blobUrl}" controls class="w-full h-[40px] mb-5 rounded-lg opacity-80 hover:opacity-100 transition-opacity outline-none custom-audio"></audio>
