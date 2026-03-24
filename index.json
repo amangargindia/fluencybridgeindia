@@ -6,12 +6,6 @@
     "category": "Mistakes"
   },
   {
-    "title": "Mock Verification Test",
-    "slug": "mock-test",
-    "folder": "tests",
-    "category": "Tests"
-  },
-  {
     "title": "Fluency Bridge",
     "slug": "past-simple-verb-form-usage",
     "folder": "tests",
