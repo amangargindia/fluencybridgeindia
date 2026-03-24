@@ -418,8 +418,8 @@
                         const fileName = `Live_Dictation_${new Date().getTime()}.webm`;
                         const file = new File([audioBlob], fileName, { type: 'audio/webm' });
                         
-                        // Mark as done immediately since we transcribed it live
-                        file.status = 'done';
+                        // Mark as pending so we can invoke the engine if needed
+                        file.status = 'pending';
                         handleFileSelect([file]); 
                         
                         const blobUrl = URL.createObjectURL(file);
