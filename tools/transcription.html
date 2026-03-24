@@ -92,7 +92,7 @@
             <div class="lg:col-span-5 flex flex-col gap-6">
                 
                 <!-- Dropzone -->
-                <input type="file" id="fileInput" accept=".mp3, .wav, .m4a, audio/*" class="hidden" multiple>
+                <input type="file" id="fileInput" accept=".mp3, .wav, .m4a, .aac, .ogg, .flac, audio/*, video/mp4" class="hidden" multiple>
                 <div id="dropZone" class="border-2 border-dashed border-slate-600 bg-slate-800/30 rounded-2xl p-8 flex flex-col items-center justify-center text-center cursor-pointer hover:border-blue-500 hover:bg-slate-800/50 transition-all min-h-[12rem]">
                     <div class="w-12 h-12 rounded-full bg-blue-900/50 flex items-center justify-center mb-4 text-blue-400">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path></svg>
@@ -123,8 +123,14 @@
                 <div class="flex-grow flex flex-col bg-slate-900/40 rounded-2xl border border-slate-700/50 p-1 relative">
                     
                     <!-- Actions Bar (Top) -->
-                    <div class="flex justify-between items-center px-4 py-3 border-b border-slate-700/50">
-                        <h2 class="text-slate-300 font-semibold text-sm">Recognized Speech</h2>
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center px-4 py-3 border-b border-slate-700/50 gap-3">
+                        <div class="flex items-center gap-3">
+                            <h2 class="text-slate-300 font-semibold text-sm">Recognized Speech</h2>
+                            <div id="aiStatusBadge" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-800/80 border border-slate-700 text-[10px] font-semibold text-slate-400" title="Source: HuggingFace CDN">
+                                <span id="aiStatusDot" class="w-2 h-2 rounded-full bg-slate-500"></span>
+                                <span id="aiStatusText">AI Offline</span>
+                            </div>
+                        </div>
                         <div class="flex gap-2">
                             <button id="copyBtn" class="p-1.5 text-slate-400 hover:text-white hover:bg-slate-700 rounded transition-colors" title="Copy to Clipboard">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
@@ -157,12 +163,20 @@
         const progressBar = document.getElementById('progressBar');
         const outputArea = document.getElementById('outputArea');
 
+        const aiStatusDot = document.getElementById('aiStatusDot');
+        const aiStatusText = document.getElementById('aiStatusText');
+
         let selectedFiles = [];
         let worker = null;
         let isWorkerLoaded = false;
         let currentFileIndex = 0;
 
         // --- UI Interactions ---
+
+        function updateAIStatus(status, text) {
+            aiStatusDot.className = 'w-2 h-2 rounded-full ' + (status === 'offline' ? 'bg-slate-500' : status === 'downloading' ? 'bg-yellow-400 animate-pulse shadow-[0_0_8px_rgba(250,204,21,0.6)]' : status === 'ready' ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]' : 'bg-blue-500 animate-pulse');
+            aiStatusText.innerText = text;
+        }
 
         function updateStatus(message, isProgress = false, percentage = 0) {
             statusMessage.innerText = message;
@@ -176,7 +190,12 @@
 
         const handleFileSelect = (files) => {
             if (files && files.length > 0) {
-                selectedFiles = Array.from(files).filter(f => f.type.startsWith('audio/') || f.name.match(/\\.(mp3|wav|m4a|ogg|flac)$/i));
+                // Highly robust extension matching for audio files, specifically testing .m4a
+                selectedFiles = Array.from(files).filter(f => {
+                    const typeMatch = f.type.startsWith('audio/') || f.type.startsWith('video/mp4');
+                    const extMatch = f.name.match(/\.(mp3|wav|m4a|aac|ogg|flac|mp4)$/i);
+                    return typeMatch || extMatch;
+                });
                 
                 if (selectedFiles.length === 0) {
                     updateStatus('Error: Please select valid audio files.');
@@ -184,12 +203,12 @@
                     return;
                 }
                 
-                fileNameDisplay.innerHTML = selectedFiles.map(f => \`<div class="truncate">🎵 \${f.name}</div>\`).join('');
+                fileNameDisplay.innerHTML = selectedFiles.map(f => `<div class="truncate">🎵 ${f.name}</div>`).join('');
                 fileNameDisplay.classList.remove('hidden');
                 
                 transcribeBtn.disabled = false;
-                transcribeBtn.innerHTML = \`<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Transcribe \${selectedFiles.length} File\${selectedFiles.length > 1 ? 's' : ''}\`;
-                updateStatus(\`\${selectedFiles.length} audio file(s) loaded. Ready to start.\`);
+                transcribeBtn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Transcribe ${selectedFiles.length} File${selectedFiles.length > 1 ? 's' : ''}`;
+                updateStatus(`${selectedFiles.length} audio file(s) loaded. Ready to start.`);
             }
         };
 
@@ -250,8 +269,8 @@
                     
                     if (data.type === 'load') {
                         try {
-                            // Upgrading to whisper-base for radically improved accuracy
-                            transcriber = await pipeline('automatic-speech-recognition', 'Xenova/whisper-base.en', {
+                            // Upgrading to whisper-small for highly accurate transcription
+                            transcriber = await pipeline('automatic-speech-recognition', 'Xenova/whisper-small.en', {
                                 progress_callback: (info) => {
                                     self.postMessage({ type: 'progress', info: info });
                                 }
@@ -294,21 +313,24 @@
                     if (msg.info.status === 'downloading') {
                         const pct = Math.round(msg.info.progress || 0);
                         // Show progress properly
-                        updateStatus(\`Downloading High-Accuracy AI (\${msg.info.file}): \${pct}%\`, true, pct);
+                        updateStatus(`Downloading AI Model (${pct}%) from HuggingFace CDN...`, true, pct);
+                        updateAIStatus('downloading', `Downloading Model... ${pct}%`);
                     } else if (msg.info.status === 'init') {
-                        updateStatus(\`Initializing model...\`, true, 100);
+                        updateStatus(`Initializing model...`, true, 100);
+                        updateAIStatus('working', 'Initializing AI Engine');
                     }
                 } else if (msg.type === 'loaded') {
                     isWorkerLoaded = true;
+                    updateAIStatus('ready', 'AI Engine Ready');
                     processNextFile();
                 } else if (msg.type === 'done') {
                     const fileName = selectedFiles[msg.fileIndex].name;
                     const finalOutput = (msg.text || "No speech detected in audio file.").trim();
                     
-                    const header = \`\\n--- File: \${fileName} ---\\n\`;
+                    const header = `\n--- File: ${fileName} ---\n`;
                     
                     if (msg.fileIndex === 0 && outputArea.value === 'Processing...') outputArea.value = '';
-                    outputArea.value += (msg.fileIndex > 0 ? "\\n" : "") + header + finalOutput + "\\n";
+                    outputArea.value += (msg.fileIndex > 0 ? "\n" : "") + header + finalOutput + "\n";
                     
                     currentFileIndex++;
                     processNextFile();
@@ -317,8 +339,8 @@
                     const fileName = selectedFiles[msg.fileIndex]?.name || 'Unknown Audio';
                     if (msg.fileIndex === 0 && outputArea.value === 'Processing...') outputArea.value = '';
                     
-                    const header = \`\\n--- File: \${fileName} ---\\n\`;
-                    outputArea.value += (msg.fileIndex > 0 ? "\\n" : "") + header + \`[Error: \${msg.error}]\\n\`;
+                    const header = `\n--- File: ${fileName} ---\n`;
+                    outputArea.value += (msg.fileIndex > 0 ? "\n" : "") + header + `[Error: ${msg.error}]\n`;
                     
                     currentFileIndex++;
                     processNextFile();
@@ -334,11 +356,13 @@
                 transcribeBtn.disabled = false;
                 transcribeBtn.innerHTML = 'All Transcriptions Complete';
                 updateStatus('All files processed successfully!', false, 0);
+                updateAIStatus('ready', 'AI Engine Ready');
                 return;
             }
 
             const currentFile = selectedFiles[currentFileIndex];
-            updateStatus(\`Processing File \${currentFileIndex + 1} of \${selectedFiles.length}: \${currentFile.name}...\`, true, 100);
+            updateStatus(`Processing File ${currentFileIndex + 1} of ${selectedFiles.length}: ${currentFile.name}...`, true, 100);
+            updateAIStatus('working', `Transcribing File ${currentFileIndex + 1}...`);
             
             const fileReader = new FileReader();
             
@@ -356,8 +380,8 @@
                     }, [float32Data.buffer]);
                     
                 } catch (error) {
-                    const header = \`\\n--- File: \${currentFile.name} ---\\n\`;
-                    outputArea.value += (currentFileIndex > 0 ? "\\n" : "") + header + \`[Error Decoder: Failed to decode audio.]\\n\`;
+                    const header = `\n--- File: ${currentFile.name} ---\n`;
+                    outputArea.value += (currentFileIndex > 0 ? "\n" : "") + header + `[Error Decoder: Failed to decode audio.]\n`;
                     
                     currentFileIndex++;
                     processNextFile();
@@ -374,12 +398,13 @@
             
             currentFileIndex = 0;
             transcribeBtn.disabled = true;
-            transcribeBtn.innerHTML = \`<svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Processing...\`;
+            transcribeBtn.innerHTML = `<svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Processing...`;
             outputArea.value = 'Processing...';
             
             if (!worker) {
                 initializeWorker();
                 updateStatus('Starting High-Accuracy AI engine...', true, 0);
+                updateAIStatus('downloading', 'Connecting to Hub...');
                 worker.postMessage({ type: 'load' });
             } else if (!isWorkerLoaded) {
                 updateStatus('Still loading AI model...', true, 50);
