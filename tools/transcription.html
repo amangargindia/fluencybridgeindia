@@ -492,11 +492,15 @@
                                 stride_length_s: 5,
                                 return_timestamps: true,
                                 chunk_callback: (chunk) => {
-                                    self.postMessage({ type: 'partial', chunk: chunk, fileIndex: e.data.fileIndex });
+                                    self.postMessage({ type: 'partial', chunk: { text: chunk.text, timestamp: chunk.timestamp }, fileIndex: e.data.fileIndex });
                                 }
                             });
                             
-                            self.postMessage({ type: 'done', result: result, fileIndex: e.data.fileIndex });
+                            const safeResult = {
+                                text: result.text,
+                                chunks: result.chunks ? result.chunks.map(c => ({ text: c.text, timestamp: c.timestamp })) : []
+                            };
+                            self.postMessage({ type: 'done', result: safeResult, fileIndex: e.data.fileIndex });
                         } catch (err) {
                             self.postMessage({ type: 'error', error: err.message, fileIndex: e.data.fileIndex });
                         }
