@@ -258,14 +258,23 @@
                         }
                     } else if (data.type === 'transcribe') {
                         try {
+                            // Run the AI model (removed 'language' and 'task' parameters because whisper-tiny.en is english-only)
                             const result = await transcriber(data.audioData, {
                                 chunk_length_s: 30,
-                                stride_length_s: 5,
-                                language: 'english',
-                                task: 'transcribe',
-                                return_timestamps: false
+                                stride_length_s: 5
                             });
-                            self.postMessage({ type: 'done', text: result.text });
+                            
+                            // Safe extraction of text regardless of how Transformers.js structures the output
+                            let finalString = "";
+                            if (result && result.text) {
+                                finalString = result.text;
+                            } else if (Array.isArray(result)) {
+                                finalString = result.map(r => r.text).join(' ');
+                            } else {
+                                finalString = JSON.stringify(result);
+                            }
+                            
+                            self.postMessage({ type: 'done', text: finalString });
                         } catch (err) {
                             self.postMessage({ type: 'error', error: err.message });
                         }
@@ -298,7 +307,8 @@
                     updateStatus('Completed successfully!');
                     
                     // The generated output precisely preserves raw output without reformatting.
-                    outputArea.value = msg.text.trim();
+                    const finalOutput = (msg.text || "No speech detected in audio file.").trim();
+                    outputArea.value = finalOutput;
                 } else if (msg.type === 'error') {
                     transcribeBtn.disabled = false;
                     updateStatus('Error: ' + msg.error);
