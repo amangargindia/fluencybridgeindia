@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raw Audio Transcription - Fluency Bridge</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700;800&display=swap" rel="stylesheet">
+    
+    <!-- PWA Configuration -->
+    <script src="/pwa-setup.js"></script>
+
+    <style>
+        .font-serif-brand { font-family: 'Playfair Display', serif; }
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.4);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+        }
+        .glow-btn {
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+            transition: all 0.3s ease;
+        }
+        .glow-btn:hover:not(:disabled) {
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.7);
+            transform: translateY(-2px);
+        }
+        .glow-btn:active:not(:disabled) {
+            transform: translateY(1px);
+        }
+        .glow-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.5); 
+            border-radius: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(59, 130, 246, 0.5); 
+            border-radius: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(59, 130, 246, 0.8); 
+        }
+        
+        /* Drag & Drop Highlight */
+        .drag-over {
+            border-color: #3b82f6 !important;
+            background-color: rgba(59, 130, 246, 0.1) !important;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950 text-white min-h-screen font-sans flex flex-col p-4 md:p-8">
+
+    <!-- Header Navigation (Simple Back Button) -->
+    <nav class="w-full max-w-5xl mx-auto mb-8">
+        <a href="/index.html" class="inline-flex items-center text-blue-400 hover:text-blue-300 transition-colors text-sm font-medium">
+            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+            Back to Dashboard
+        </a>
+    </nav>
+
+    <!-- Main App Container -->
+    <div class="glass-panel w-full max-w-5xl mx-auto rounded-3xl p-6 md:p-10 shadow-2xl relative overflow-hidden flex-grow flex flex-col">
+        
+        <!-- Ambient decorative blobs -->
+        <div class="absolute -top-32 -left-32 w-64 h-64 bg-blue-600 rounded-full mix-blend-screen filter blur-[100px] opacity-20 pointer-events-none"></div>
+        <div class="absolute -bottom-32 -right-32 w-64 h-64 bg-purple-600 rounded-full mix-blend-screen filter blur-[100px] opacity-20 pointer-events-none"></div>
+
+        <header class="text-center mb-10 relative z-10">
+            <h1 class="text-4xl md:text-5xl font-serif-brand font-bold text-white mb-3 tracking-wide">
+                Raw Transcription
+            </h1>
+            <p class="text-blue-300 text-sm md:text-base opacity-90 max-w-2xl mx-auto">
+                100% Secure & Client-Side. We use a browser-based AI to transcribe your audio without sending any files over the internet.
+            </p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 relative z-10 flex-grow">
+            
+            <!-- LEFT COLUMN: UPLOAD -->
+            <div class="lg:col-span-5 flex flex-col gap-6">
+                
+                <!-- Dropzone -->
+                <input type="file" id="fileInput" accept=".mp3, .wav, .m4a, audio/*" class="hidden">
+                <div id="dropZone" class="border-2 border-dashed border-slate-600 bg-slate-800/30 rounded-2xl p-8 flex flex-col items-center justify-center text-center cursor-pointer hover:border-blue-500 hover:bg-slate-800/50 transition-all h-48">
+                    <div class="w-12 h-12 rounded-full bg-blue-900/50 flex items-center justify-center mb-4 text-blue-400">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path></svg>
+                    </div>
+                    <p class="text-slate-300 font-medium mb-1">Click or drag audio here</p>
+                    <p class="text-slate-500 text-xs">Supports .mp3, .wav, .m4a</p>
+                    <p id="fileNameDisplay" class="text-blue-400 text-sm mt-3 font-semibold break-all hidden"></p>
+                </div>
+
+                <!-- Action Button -->
+                <button id="transcribeBtn" disabled class="glow-btn w-full py-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-lg flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Start Transcription
+                </button>
+
+                <!-- Status Monitor -->
+                <div class="bg-slate-900/60 rounded-xl p-5 border border-slate-700/50 flex-grow max-h-48 overflow-y-auto custom-scrollbar" id="statusConsole">
+                    <p class="text-slate-400 text-xs font-mono uppercase tracking-wider mb-2">System Status</p>
+                    <p class="text-blue-300 text-sm font-mono leading-relaxed" id="statusMessage">Waiting for audio file...</p>
+                    <div id="progressContainer" class="w-full bg-slate-800 rounded-full h-1.5 mt-3 hidden">
+                        <div id="progressBar" class="bg-blue-500 h-1.5 rounded-full" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN: OUTPUT -->
+            <div class="lg:col-span-7 flex flex-col h-full min-h-[400px]">
+                <div class="flex-grow flex flex-col bg-slate-900/40 rounded-2xl border border-slate-700/50 p-1 relative">
+                    
+                    <!-- Actions Bar (Top) -->
+                    <div class="flex justify-between items-center px-4 py-3 border-b border-slate-700/50">
+                        <h2 class="text-slate-300 font-semibold text-sm">Recognized Speech</h2>
+                        <div class="flex gap-2">
+                            <button id="copyBtn" class="p-1.5 text-slate-400 hover:text-white hover:bg-slate-700 rounded transition-colors" title="Copy to Clipboard">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                            </button>
+                            <button id="downloadTxtBtn" class="p-1.5 text-slate-400 hover:text-white hover:bg-slate-700 rounded transition-colors" title="Download .txt">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                            </button>
+                            <button id="downloadMdBtn" class="p-1.5 text-slate-400 hover:text-white hover:bg-slate-700 rounded transition-colors text-xs font-bold font-mono px-2" title="Download .md">
+                                MD
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Text Area -->
+                    <textarea id="outputArea" class="w-full flex-grow bg-transparent text-slate-100 p-5 rounded-b-xl resize-none focus:outline-none custom-scrollbar text-lg leading-relaxed placeholder-slate-600" placeholder="Raw transcript will appear here exactly as recognized..."></textarea>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    <!-- Application Logic -->
+    <script>
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const fileNameDisplay = document.getElementById('fileNameDisplay');
+        const transcribeBtn = document.getElementById('transcribeBtn');
+        const statusMessage = document.getElementById('statusMessage');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressBar = document.getElementById('progressBar');
+        const outputArea = document.getElementById('outputArea');
+
+        let selectedFile = null;
+        let worker = null;
+        let isWorkerLoaded = false;
+
+        // --- UI Interactions ---
+
+        function updateStatus(message, isProgress = false, percentage = 0) {
+            statusMessage.innerText = message;
+            if (isProgress) {
+                progressContainer.classList.remove('hidden');
+                progressBar.style.width = percentage + '%';
+            } else {
+                progressContainer.classList.add('hidden');
+            }
+        }
+
+        const handleFileSelect = (file) => {
+            if (file && file.type.startsWith('audio/')) {
+                selectedFile = file;
+                fileNameDisplay.innerText = file.name;
+                fileNameDisplay.classList.remove('hidden');
+                transcribeBtn.disabled = false;
+                updateStatus('Audio file loaded. Ready to start.');
+            } else {
+                updateStatus('Error: Please select a valid audio file.');
+                transcribeBtn.disabled = true;
+            }
+        };
+
+        dropZone.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (e) => handleFileSelect(e.target.files[0]));
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('drag-over');
+        });
+
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('drag-over');
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                handleFileSelect(e.dataTransfer.files[0]);
+            }
+        });
+
+        // --- Export Functions ---
+
+        document.getElementById('copyBtn').addEventListener('click', () => {
+            if (!outputArea.value) return;
+            navigator.clipboard.writeText(outputArea.value);
+            const originalStatus = statusMessage.innerText;
+            updateStatus('Copied to clipboard!');
+            setTimeout(() => updateStatus(originalStatus), 2000);
+        });
+
+        function downloadFile(content, filename, type) {
+            if (!content) return;
+            const blob = new Blob([content], {type: type});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        document.getElementById('downloadTxtBtn').addEventListener('click', () => downloadFile(outputArea.value, 'transcript.txt', 'text/plain'));
+        document.getElementById('downloadMdBtn').addEventListener('click', () => downloadFile(outputArea.value, 'transcript.md', 'text/markdown'));
+
+        // --- AI Worker Logic ---
+
+        const initializeWorker = () => {
+            // Using a Blob to create an inline Web Worker so everything stays in a single file!
+            const workerCode = `
+                import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2';
+                
+                // Do not fetch models locally from the website, only from HuggingFace CDN
+                env.allowLocalModels = false;
+                
+                let transcriber = null;
+
+                self.onmessage = async (e) => {
+                    const data = e.data;
+                    
+                    if (data.type === 'load') {
+                        try {
+                            // Using whisper-tiny as it's small (~40MB) and fast for browser client-side
+                            transcriber = await pipeline('automatic-speech-recognition', 'Xenova/whisper-tiny.en', {
+                                progress_callback: (info) => {
+                                    self.postMessage({ type: 'progress', info: info });
+                                }
+                            });
+                            self.postMessage({ type: 'loaded' });
+                        } catch (err) {
+                            self.postMessage({ type: 'error', error: err.message });
+                        }
+                    } else if (data.type === 'transcribe') {
+                        try {
+                            const result = await transcriber(data.audioData, {
+                                chunk_length_s: 30,
+                                stride_length_s: 5,
+                                language: 'english',
+                                task: 'transcribe',
+                                return_timestamps: false
+                            });
+                            self.postMessage({ type: 'done', text: result.text });
+                        } catch (err) {
+                            self.postMessage({ type: 'error', error: err.message });
+                        }
+                    }
+                };
+            `;
+            
+            const blob = new Blob([workerCode], { type: 'application/javascript' });
+            // type: 'module' is heavily required for importing ESM packages in a worker
+            worker = new Worker(URL.createObjectURL(blob), { type: 'module' });
+
+            worker.onmessage = (e) => {
+                const msg = e.data;
+                
+                if (msg.type === 'progress') {
+                    // msg.info contains { file, status, progress, loaded, total }
+                    if (msg.info.status === 'downloading') {
+                        const pct = Math.round(msg.info.progress || 0);
+                        updateStatus(`Downloading AI Model (${msg.info.file}): ${pct}%`, true, pct);
+                    } else if (msg.info.status === 'init') {
+                        updateStatus(`Initializing model...`, true, 100);
+                    }
+                } else if (msg.type === 'loaded') {
+                    isWorkerLoaded = true;
+                    updateStatus('Model loaded. Transcribing...', true, 100);
+                    processAudioData();
+                } else if (msg.type === 'done') {
+                    transcribeBtn.disabled = false;
+                    transcribeBtn.innerHTML = 'Transcription Complete';
+                    updateStatus('Completed successfully!');
+                    
+                    // The generated output precisely preserves raw output without reformatting.
+                    outputArea.value = msg.text.trim();
+                } else if (msg.type === 'error') {
+                    transcribeBtn.disabled = false;
+                    updateStatus('Error: ' + msg.error);
+                }
+            };
+        };
+
+        // --- Audio Processing ---
+
+        const processAudioData = () => {
+            const fileReader = new FileReader();
+            
+            fileReader.onload = async (e) => {
+                try {
+                    updateStatus('Decoding audio format...', true, 100);
+                    const arrayBuffer = e.target.result;
+                    
+                    // Web Audio API to decode mp3/wav/m4a into raw PCM Data
+                    // Whisper explicitly requires 16000 Hz sample rate
+                    const audioContext = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
+                    const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+                    
+                    // Extract Mono channel
+                    const float32Data = audioBuffer.getChannelData(0);
+                    
+                    updateStatus('Transcribing speech...', true, 100);
+                    
+                    // Transfer ownership of buffer to worker to avoid memory duplication
+                    worker.postMessage({ type: 'transcribe', audioData: float32Data }, [float32Data.buffer]);
+                } catch (error) {
+                    updateStatus('Failed to decode audio. Check file format.');
+                    transcribeBtn.disabled = false;
+                }
+            };
+            
+            fileReader.readAsArrayBuffer(selectedFile);
+        };
+
+        // --- Execution Flow ---
+
+        transcribeBtn.addEventListener('click', () => {
+            if (!selectedFile) return;
+            
+            transcribeBtn.disabled = true;
+            transcribeBtn.innerHTML = 'Processing...';
+            outputArea.value = '';
+            
+            if (!worker) {
+                initializeWorker();
+                updateStatus('Starting AI engine...', true, 0);
+                worker.postMessage({ type: 'load' });
+            } else if (!isWorkerLoaded) {
+                updateStatus('Still loading AI model...', true, 50);
+            } else {
+                processAudioData();
+            }
+        });
+
+    </script>
+</body>
+</html>
