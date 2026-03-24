@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Raw Audio Transcription - Fluency Bridge</title>
-     
+    
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -92,18 +92,18 @@
             <div class="lg:col-span-5 flex flex-col gap-6">
                 
                 <!-- Dropzone -->
-                <input type="file" id="fileInput" accept=".mp3, .wav, .m4a, audio/*" class="hidden">
-                <div id="dropZone" class="border-2 border-dashed border-slate-600 bg-slate-800/30 rounded-2xl p-8 flex flex-col items-center justify-center text-center cursor-pointer hover:border-blue-500 hover:bg-slate-800/50 transition-all h-48">
+                <input type="file" id="fileInput" accept=".mp3, .wav, .m4a, audio/*" class="hidden" multiple>
+                <div id="dropZone" class="border-2 border-dashed border-slate-600 bg-slate-800/30 rounded-2xl p-8 flex flex-col items-center justify-center text-center cursor-pointer hover:border-blue-500 hover:bg-slate-800/50 transition-all min-h-[12rem]">
                     <div class="w-12 h-12 rounded-full bg-blue-900/50 flex items-center justify-center mb-4 text-blue-400">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path></svg>
                     </div>
-                    <p class="text-slate-300 font-medium mb-1">Click or drag audio here</p>
-                    <p class="text-slate-500 text-xs">Supports .mp3, .wav, .m4a</p>
-                    <p id="fileNameDisplay" class="text-blue-400 text-sm mt-3 font-semibold break-all hidden"></p>
+                    <p class="text-slate-300 font-medium mb-1">Click or drag audio files here</p>
+                    <p class="text-slate-500 text-xs">Supports multiple .mp3, .wav, .m4a</p>
+                    <div id="fileNameDisplay" class="text-blue-400 text-sm mt-3 font-semibold break-all hidden w-full max-h-32 overflow-y-auto custom-scrollbar flex flex-col gap-1 text-left bg-slate-900/50 p-3 rounded-lg border border-slate-700"></div>
                 </div>
 
                 <!-- Action Button -->
-                <button id="transcribeBtn" disabled class="glow-btn w-full py-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-lg flex items-center justify-center gap-2">
+                <button id="transcribeBtn" disabled class="glow-btn w-full py-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-lg flex items-center justify-center gap-2 transition-all">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     Start Transcription
                 </button>
@@ -111,9 +111,9 @@
                 <!-- Status Monitor -->
                 <div class="bg-slate-900/60 rounded-xl p-5 border border-slate-700/50 flex-grow max-h-48 overflow-y-auto custom-scrollbar" id="statusConsole">
                     <p class="text-slate-400 text-xs font-mono uppercase tracking-wider mb-2">System Status</p>
-                    <p class="text-blue-300 text-sm font-mono leading-relaxed" id="statusMessage">Waiting for audio file...</p>
-                    <div id="progressContainer" class="w-full bg-slate-800 rounded-full h-1.5 mt-3 hidden">
-                        <div id="progressBar" class="bg-blue-500 h-1.5 rounded-full" style="width: 0%"></div>
+                    <p class="text-blue-300 text-sm font-mono leading-relaxed" id="statusMessage">Waiting for audio files...</p>
+                    <div id="progressContainer" class="w-full bg-slate-800 rounded-full h-1.5 mt-3 hidden relative overflow-hidden">
+                        <div id="progressBar" class="bg-blue-500 h-1.5 rounded-full transition-all duration-300 ease-out absolute left-0 top-0" style="width: 0%"></div>
                     </div>
                 </div>
             </div>
@@ -157,9 +157,10 @@
         const progressBar = document.getElementById('progressBar');
         const outputArea = document.getElementById('outputArea');
 
-        let selectedFile = null;
+        let selectedFiles = [];
         let worker = null;
         let isWorkerLoaded = false;
+        let currentFileIndex = 0;
 
         // --- UI Interactions ---
 
@@ -173,21 +174,27 @@
             }
         }
 
-        const handleFileSelect = (file) => {
-            if (file && file.type.startsWith('audio/')) {
-                selectedFile = file;
-                fileNameDisplay.innerText = file.name;
+        const handleFileSelect = (files) => {
+            if (files && files.length > 0) {
+                selectedFiles = Array.from(files).filter(f => f.type.startsWith('audio/') || f.name.match(/\\.(mp3|wav|m4a|ogg|flac)$/i));
+                
+                if (selectedFiles.length === 0) {
+                    updateStatus('Error: Please select valid audio files.');
+                    transcribeBtn.disabled = true;
+                    return;
+                }
+                
+                fileNameDisplay.innerHTML = selectedFiles.map(f => \`<div class="truncate">🎵 \${f.name}</div>\`).join('');
                 fileNameDisplay.classList.remove('hidden');
+                
                 transcribeBtn.disabled = false;
-                updateStatus('Audio file loaded. Ready to start.');
-            } else {
-                updateStatus('Error: Please select a valid audio file.');
-                transcribeBtn.disabled = true;
+                transcribeBtn.innerHTML = \`<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Transcribe \${selectedFiles.length} File\${selectedFiles.length > 1 ? 's' : ''}\`;
+                updateStatus(\`\${selectedFiles.length} audio file(s) loaded. Ready to start.\`);
             }
         };
 
         dropZone.addEventListener('click', () => fileInput.click());
-        fileInput.addEventListener('change', (e) => handleFileSelect(e.target.files[0]));
+        fileInput.addEventListener('change', (e) => handleFileSelect(e.target.files));
 
         dropZone.addEventListener('dragover', (e) => {
             e.preventDefault();
@@ -201,7 +208,7 @@
             dropZone.classList.remove('drag-over');
             if (e.dataTransfer.files.length) {
                 fileInput.files = e.dataTransfer.files;
-                handleFileSelect(e.dataTransfer.files[0]);
+                handleFileSelect(e.dataTransfer.files);
             }
         });
 
@@ -232,13 +239,10 @@
         // --- AI Worker Logic ---
 
         const initializeWorker = () => {
-            // Using a Blob to create an inline Web Worker so everything stays in a single file!
             const workerCode = `
                 import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2';
                 
-                // Do not fetch models locally from the website, only from HuggingFace CDN
                 env.allowLocalModels = false;
-                
                 let transcriber = null;
 
                 self.onmessage = async (e) => {
@@ -246,8 +250,8 @@
                     
                     if (data.type === 'load') {
                         try {
-                            // Using whisper-tiny as it's small (~40MB) and fast for browser client-side
-                            transcriber = await pipeline('automatic-speech-recognition', 'Xenova/whisper-tiny.en', {
+                            // Upgrading to whisper-base for radically improved accuracy
+                            transcriber = await pipeline('automatic-speech-recognition', 'Xenova/whisper-base.en', {
                                 progress_callback: (info) => {
                                     self.postMessage({ type: 'progress', info: info });
                                 }
@@ -258,13 +262,11 @@
                         }
                     } else if (data.type === 'transcribe') {
                         try {
-                            // Run the AI model (removed 'language' and 'task' parameters because whisper-tiny.en is english-only)
                             const result = await transcriber(data.audioData, {
                                 chunk_length_s: 30,
                                 stride_length_s: 5
                             });
                             
-                            // Safe extraction of text regardless of how Transformers.js structures the output
                             let finalString = "";
                             if (result && result.text) {
                                 finalString = result.text;
@@ -274,99 +276,117 @@
                                 finalString = JSON.stringify(result);
                             }
                             
-                            self.postMessage({ type: 'done', text: finalString });
+                            self.postMessage({ type: 'done', text: finalString, fileIndex: data.fileIndex });
                         } catch (err) {
-                            self.postMessage({ type: 'error', error: err.message });
+                            self.postMessage({ type: 'error', error: err.message, fileIndex: data.fileIndex });
                         }
                     }
                 };
             `;
             
             const blob = new Blob([workerCode], { type: 'application/javascript' });
-            // type: 'module' is heavily required for importing ESM packages in a worker
             worker = new Worker(URL.createObjectURL(blob), { type: 'module' });
 
             worker.onmessage = (e) => {
                 const msg = e.data;
                 
                 if (msg.type === 'progress') {
-                    // msg.info contains { file, status, progress, loaded, total }
                     if (msg.info.status === 'downloading') {
                         const pct = Math.round(msg.info.progress || 0);
-                        updateStatus(`Downloading AI Model (${msg.info.file}): ${pct}%`, true, pct);
+                        // Show progress properly
+                        updateStatus(\`Downloading High-Accuracy AI (\${msg.info.file}): \${pct}%\`, true, pct);
                     } else if (msg.info.status === 'init') {
-                        updateStatus(`Initializing model...`, true, 100);
+                        updateStatus(\`Initializing model...\`, true, 100);
                     }
                 } else if (msg.type === 'loaded') {
                     isWorkerLoaded = true;
-                    updateStatus('Model loaded. Transcribing...', true, 100);
-                    processAudioData();
+                    processNextFile();
                 } else if (msg.type === 'done') {
-                    transcribeBtn.disabled = false;
-                    transcribeBtn.innerHTML = 'Transcription Complete';
-                    updateStatus('Completed successfully!');
-                    
-                    // The generated output precisely preserves raw output without reformatting.
+                    const fileName = selectedFiles[msg.fileIndex].name;
                     const finalOutput = (msg.text || "No speech detected in audio file.").trim();
-                    outputArea.value = finalOutput;
+                    
+                    const header = \`\\n--- File: \${fileName} ---\\n\`;
+                    
+                    if (msg.fileIndex === 0 && outputArea.value === 'Processing...') outputArea.value = '';
+                    outputArea.value += (msg.fileIndex > 0 ? "\\n" : "") + header + finalOutput + "\\n";
+                    
+                    currentFileIndex++;
+                    processNextFile();
+                    
                 } else if (msg.type === 'error') {
-                    transcribeBtn.disabled = false;
-                    updateStatus('Error: ' + msg.error);
+                    const fileName = selectedFiles[msg.fileIndex]?.name || 'Unknown Audio';
+                    if (msg.fileIndex === 0 && outputArea.value === 'Processing...') outputArea.value = '';
+                    
+                    const header = \`\\n--- File: \${fileName} ---\\n\`;
+                    outputArea.value += (msg.fileIndex > 0 ? "\\n" : "") + header + \`[Error: \${msg.error}]\\n\`;
+                    
+                    currentFileIndex++;
+                    processNextFile();
                 }
             };
         };
 
         // --- Audio Processing ---
 
-        const processAudioData = () => {
+        const processNextFile = () => {
+            if (currentFileIndex >= selectedFiles.length) {
+                // All files completed
+                transcribeBtn.disabled = false;
+                transcribeBtn.innerHTML = 'All Transcriptions Complete';
+                updateStatus('All files processed successfully!', false, 0);
+                return;
+            }
+
+            const currentFile = selectedFiles[currentFileIndex];
+            updateStatus(\`Processing File \${currentFileIndex + 1} of \${selectedFiles.length}: \${currentFile.name}...\`, true, 100);
+            
             const fileReader = new FileReader();
             
             fileReader.onload = async (e) => {
                 try {
-                    updateStatus('Decoding audio format...', true, 100);
                     const arrayBuffer = e.target.result;
-                    
-                    // Web Audio API to decode mp3/wav/m4a into raw PCM Data
-                    // Whisper explicitly requires 16000 Hz sample rate
                     const audioContext = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
                     const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-                    
-                    // Extract Mono channel
                     const float32Data = audioBuffer.getChannelData(0);
                     
-                    updateStatus('Transcribing speech...', true, 100);
+                    worker.postMessage({ 
+                        type: 'transcribe', 
+                        audioData: float32Data, 
+                        fileIndex: currentFileIndex 
+                    }, [float32Data.buffer]);
                     
-                    // Transfer ownership of buffer to worker to avoid memory duplication
-                    worker.postMessage({ type: 'transcribe', audioData: float32Data }, [float32Data.buffer]);
                 } catch (error) {
-                    updateStatus('Failed to decode audio. Check file format.');
-                    transcribeBtn.disabled = false;
+                    const header = \`\\n--- File: \${currentFile.name} ---\\n\`;
+                    outputArea.value += (currentFileIndex > 0 ? "\\n" : "") + header + \`[Error Decoder: Failed to decode audio.]\\n\`;
+                    
+                    currentFileIndex++;
+                    processNextFile();
                 }
             };
             
-            fileReader.readAsArrayBuffer(selectedFile);
+            fileReader.readAsArrayBuffer(currentFile);
         };
 
         // --- Execution Flow ---
 
         transcribeBtn.addEventListener('click', () => {
-            if (!selectedFile) return;
+            if (!selectedFiles || selectedFiles.length === 0) return;
             
+            currentFileIndex = 0;
             transcribeBtn.disabled = true;
-            transcribeBtn.innerHTML = 'Processing...';
-            outputArea.value = '';
+            transcribeBtn.innerHTML = \`<svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Processing...\`;
+            outputArea.value = 'Processing...';
             
             if (!worker) {
                 initializeWorker();
-                updateStatus('Starting AI engine...', true, 0);
+                updateStatus('Starting High-Accuracy AI engine...', true, 0);
                 worker.postMessage({ type: 'load' });
             } else if (!isWorkerLoaded) {
                 updateStatus('Still loading AI model...', true, 50);
             } else {
-                processAudioData();
+                processNextFile();
             }
         });
-
     </script>
 </body>
 </html>
