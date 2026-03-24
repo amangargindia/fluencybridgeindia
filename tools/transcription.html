@@ -680,25 +680,23 @@
                     activeTranscriptionBox.classList.remove('hidden');
                     if (msg.chunk && msg.chunk.text) {
                         activeTextParagraph.textContent += msg.chunk.text;
-                        document.getElementById('preview-scroll-container').scrollTo({
-                            top: document.getElementById('preview-scroll-container').scrollHeight,
-                            behavior: 'smooth'
-                        });
+                        const scrollCont = document.getElementById('preview-scroll-container');
+                        if(scrollCont) scrollCont.scrollTo({ top: scrollCont.scrollHeight, behavior: 'smooth' });
                     }
 
-                    // Find the file we were processing to mark it done
+                } else if (msg.type === 'done') {
+                    activeTranscriptionBox.classList.add('hidden');
+                    activeTextParagraph.textContent = ''; 
+
                     const processingFile = selectedFiles.find(f => f.status === 'processing');
                     if(processingFile) processingFile.status = 'done';
                     handleFileSelect([]); // Update UI queue icons
 
-                    const fileName = processingFile ? processingFile.name : 'Unknown';
+                    if (!processingFile) return;
+
+                    const fileName = processingFile.name;
                     const blobUrl = URL.createObjectURL(processingFile);
                     const playerID = 'audio_player_' + Math.random().toString(36).substr(2, 9);
-
-                    // ... rest of the HTML construction ...
-
-                    // Extract pure text for copying
-                    const rawText = msg.result.text || "No speech detected.";
                     
                     const formatFloatTime = (secs) => {
                         const m = Math.floor(secs / 60).toString().padStart(2, '0');
@@ -706,7 +704,6 @@
                         return `${m}:${s}`;
                     };
                     
-                    // Build Clickable Output with Visible Timestamps
                     let interactiveHtml = '';
                     let clipboardTextWithTimestamps = '';
                     
@@ -720,10 +717,10 @@
                         clipboardTextWithTimestamps = msg.result.chunks.map(c => `[${formatFloatTime(c.timestamp[0])}] ${c.text.trim()}`).join('\n');
                     } else {
                         interactiveHtml = msg.result.text || "No speech detected.";
-                        clipboardTextWithTimestamps = rawText;
+                        clipboardTextWithTimestamps = msg.result.text || "";
                     }
 
-                    // Native HTML Injection Block
+                    const simpleTextForClipboard = `${clipboardTextWithTimestamps}\n\n`;
                     const htmlBlock = `
                         <div class="transcript-card mb-10 relative group bg-fluency-panel p-6 rounded-2xl border border-fluency-border shadow-md" data-rawtext="${encodeURIComponent(simpleTextForClipboard)}">
                             <div class="flex items-center justify-between mb-4 border-b border-slate-700/50 pb-3">
@@ -735,9 +732,7 @@
                                     </button>
                                 </div>
                             </div>
-                            <!-- Native Embedded Audio Player -->
                             <audio id="${playerID}" src="${blobUrl}" controls class="w-full h-[40px] mb-5 rounded-lg opacity-80 hover:opacity-100 transition-opacity outline-none custom-audio"></audio>
-                            
                             <h3 class="text-xs uppercase tracking-wider text-slate-500 mb-2 font-bold">Transcription (Click to Listen)</h3>
                             <div class="text-slate-200 leading-relaxed font-sans tracking-wide text-lg text-justify p-5 bg-fluency-base rounded-xl border border-fluency-border shadow-inner">
                                 ${interactiveHtml}
@@ -746,18 +741,18 @@
                         </div>
                     `;
                     
-                    // Feed timestamped text to clipboard payload
-                    const simpleTextForClipboard = `${clipboardTextWithTimestamps}\n\n`;
                     appendToDocumentRaw(htmlBlock, simpleTextForClipboard);
-                    
-                    currentFileIndex++;
                     processNextFile();
                     
                 } else if (msg.type === 'error') {
                     activeTranscriptionBox.classList.add('hidden');
                     activeTextParagraph.textContent = '';
+                    
+                    const processingFile = selectedFiles.find(f => f.status === 'processing');
+                    if(processingFile) processingFile.status = 'error';
+                    handleFileSelect([]);
 
-                    const fileName = selectedFiles[msg.fileIndex]?.name || 'Unknown';
+                    const fileName = processingFile ? processingFile.name : 'Unknown';
                     const errorHtml = `
                         <div class="mb-10 bg-fluency-panel p-6 rounded-2xl border border-red-900/50 shadow-md">
                             <div class="flex items-center mb-4 border-b border-slate-700/50 pb-3">
@@ -767,8 +762,6 @@
                         </div>
                     `;
                     appendToDocumentRaw(errorHtml, `Error Processing ${fileName}: ${msg.error}`);
-                    
-                    currentFileIndex++;
                     processNextFile();
                 }
             };
