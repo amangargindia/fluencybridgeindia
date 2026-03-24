@@ -231,9 +231,9 @@
         let selectedFiles = [];
         let worker = null;
         let isWorkerLoaded = false;
-        let currentFileIndex = 0;
         let currentLoadedModel = '';
         let cumulativeText = ''; // Master string for clipboard copies
+        let isProcessing = false;
 
         // Microphone Logic
         let mediaRecorder;
@@ -417,7 +417,10 @@
                         const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
                         const fileName = `Live_Dictation_${new Date().getTime()}.webm`;
                         const file = new File([audioBlob], fileName, { type: 'audio/webm' });
-                        handleFileSelect([file]); // Inject to queue visually
+                        
+                        // Mark as done immediately since we transcribed it live
+                        file.status = 'done';
+                        handleFileSelect([file]); 
                         
                         const blobUrl = URL.createObjectURL(file);
                         const playerID = 'audio_live_' + new Date().getTime();
@@ -465,9 +468,6 @@
                             `;
                             
                             appendToDocumentRaw(htmlBlock, simpleTextForClipboard);
-                            
-                            // Artificially skip this file index for Offline Engine since it's already solved by Live!
-                            currentFileIndex++;
                         }
                         
                         // Stop all tracks to clear mic indicator
@@ -530,22 +530,38 @@
                     return;
                 }
                 
+                // Initialize status
+                validFiles.forEach(f => { if(!f.status) f.status = 'pending'; });
+                
                 // Append instead of replacing
                 selectedFiles = [...selectedFiles, ...validFiles];
                 
                 // Build visual queue
-                fileQueueContainer.innerHTML = selectedFiles.map(f => `
-                    <div class="flex items-center gap-2 p-2 bg-slate-800 rounded-md border border-slate-700">
-                        <i data-lucide="music" class="w-4 h-4 text-brand-400 flex-none"></i>
-                        <span class="text-xs text-slate-300 truncate">${f.name}</span>
+                fileQueueContainer.innerHTML = selectedFiles.map((f, i) => `
+                    <div class="flex items-center justify-between p-2 bg-slate-800 rounded-md border border-slate-700">
+                        <div class="flex items-center gap-2 truncate">
+                            <i data-lucide="${f.status === 'done' ? 'check-circle' : 'music'}" class="w-4 h-4 ${f.status === 'done' ? 'text-green-400' : 'text-brand-400'} flex-none"></i>
+                            <span class="text-xs text-slate-300 truncate">${f.name}</span>
+                        </div>
+                        ${f.status === 'pending' ? `
+                            <button onclick="window.removeFile(${i})" class="text-slate-500 hover:text-red-400 transition-colors">
+                                <i data-lucide="x" class="w-3 h-3"></i>
+                            </button>
+                        ` : ''}
                     </div>
                 `).join('');
                 lucide.createIcons();
                 
                 fileQueueContainer.classList.remove('hidden');
                 transcribeBtn.disabled = false;
-                showToast(`${validFiles.length} file(s) added to processing queue.`);
+                showToast(`${validFiles.length} item(s) in queue.`);
             }
+        };
+
+        window.removeFile = (index) => {
+            selectedFiles.splice(index, 1);
+            if(selectedFiles.length === 0) fileQueueContainer.classList.add('hidden');
+            handleFileSelect([]); // Re-render
         };
 
         dropZone.addEventListener('click', () => fileInput.click());
@@ -640,16 +656,24 @@
                     if (msg.info.status === 'downloading') {
                         const pct = Math.round(msg.info.progress || 0);
                         updateSystemStatus('downloading', 'Syncing Knowledge Graph...');
-                        updateProgress('Downloading Layers', pct);
+                        updateProgress(`Downloading Layers (${pct}%)`, pct);
                     } else if (msg.info.status === 'init') {
                         updateSystemStatus('working', 'Compiling Matrix...');
-                        updateProgress('Initializing Nodes', 100);
+                        updateProgress('Initializing Nodes (WASM Compile)...', 100);
+                        
+                        // Detection for 100% Hang
+                        setTimeout(() => {
+                            if (!isWorkerLoaded) {
+                                updateSystemStatus('offline', 'Compiling taking longer than usual...');
+                                updateProgress('Heavy Model Initialization - Hang tight...', 100);
+                            }
+                        }, 10000);
                     }
                 } else if (msg.type === 'loaded') {
                     isWorkerLoaded = true;
                     updateSystemStatus('ready', 'Engine Online');
                     updateProgress('Ready', 100, false);
-                    processNextFile();
+                    setTimeout(processNextFile, 500); // Small buffer for stability
                     
                 } else if (msg.type === 'partial') {
                     // Typewriter Output Stream
@@ -662,13 +686,16 @@
                         });
                     }
 
-                } else if (msg.type === 'done') {
-                    activeTranscriptionBox.classList.add('hidden');
-                    activeTextParagraph.textContent = ''; // Reset for next file.
+                    // Find the file we were processing to mark it done
+                    const processingFile = selectedFiles.find(f => f.status === 'processing');
+                    if(processingFile) processingFile.status = 'done';
+                    handleFileSelect([]); // Update UI queue icons
 
-                    const fileName = selectedFiles[msg.fileIndex].name;
-                    const blobUrl = URL.createObjectURL(selectedFiles[msg.fileIndex]);
-                    const playerID = 'audio_player_' + msg.fileIndex;
+                    const fileName = processingFile ? processingFile.name : 'Unknown';
+                    const blobUrl = URL.createObjectURL(processingFile);
+                    const playerID = 'audio_player_' + Math.random().toString(36).substr(2, 9);
+
+                    // ... rest of the HTML construction ...
 
                     // Extract pure text for copying
                     const rawText = msg.result.text || "No speech detected.";
@@ -748,7 +775,10 @@
         };
 
         const processNextFile = () => {
-            if (currentFileIndex >= selectedFiles.length) {
+            const nextIndex = selectedFiles.findIndex(f => f.status === 'pending');
+            
+            if (nextIndex === -1) {
+                isProcessing = false;
                 transcribeBtn.disabled = false;
                 updateSystemStatus('ready', 'System Idle (Online)');
                 updateProgress('', 0, false);
@@ -758,16 +788,18 @@
                 return;
             }
 
-            const currentFile = selectedFiles[currentFileIndex];
-            updateSystemStatus('working', `Decoding Node (${currentFileIndex + 1}/${selectedFiles.length})`);
+            isProcessing = true;
+            const currentFile = selectedFiles[nextIndex];
+            currentFile.status = 'processing';
+            
+            updateSystemStatus('working', `Decoding Node (${nextIndex + 1}/${selectedFiles.length})`);
             updateProgress(`Decoding ${currentFile.name}...`, 100);
             
-            // Re-disable button if it's mid-queue
             transcribeBtn.disabled = true;
-            transcribeBtn.innerHTML = '<div class="loader !w-5 !h-5 !border-2 !border-brand-300 border-t-white mr-2"></div> Extracting Speech...';
+            transcribeBtn.innerHTML = '<div class="loader !w-5 !h-5 !border-2 !border-brand-300 border-t-white mr-2"></div> Extracting...';
 
             activeTranscriptionBox.classList.remove('hidden');
-            activeTextParagraph.textContent = ''; // prepare for stream
+            activeTextParagraph.textContent = ''; 
 
             const fileReader = new FileReader();
             fileReader.onload = async (e) => {
@@ -780,15 +812,15 @@
                     worker.postMessage({ 
                         type: 'transcribe', 
                         audioData: float32Data, 
-                        fileIndex: currentFileIndex 
+                        fileIndex: nextIndex 
                     }, [float32Data.buffer]);
                     
                 } catch (error) {
+                    currentFile.status = 'error';
                     const mdBlock = `<div class="mb-10 text-red-400">Error Decoder: Failed to parse raw audio stream for ${currentFile.name}</div>`;
                     appendToDocumentRaw(mdBlock, "Error Decoding Audio");
                     
                     activeTranscriptionBox.classList.add('hidden');
-                    currentFileIndex++;
                     processNextFile();
                 }
             };
@@ -796,17 +828,12 @@
         };
 
         transcribeBtn.addEventListener('click', () => {
-            if (!selectedFiles || selectedFiles.length === 0) return;
+            if (isProcessing) return;
             
-            // We append. But we must only process files starting from currentFileIndex.
-            // If previous run finished, currentFileIndex might be equal to or less than selectedFiles.length.
-            // Wait, to process NEW files correctly:
-            if(currentFileIndex === selectedFiles.length) {
-                showToast("All current files already processed.", true);
-                transcribeBtn.disabled = false;
-                transcribeBtn.innerHTML = '<i data-lucide="check" class="w-5 h-5"></i> All Processed';
-                lucide.createIcons();
-                return; // or reset, but we shouldn't re-process old files.
+            const pendingExist = selectedFiles.some(f => f.status === 'pending');
+            if(!pendingExist) {
+                showToast("No pending files to process.", true);
+                return;
             }
             
             transcribeBtn.disabled = true;
@@ -818,6 +845,15 @@
                 
                 updateSystemStatus('downloading', 'Requesting Node Assignment...');
                 updateProgress('Connecting...', 0);
+                
+                // Detection for Connection Hang
+                setTimeout(() => {
+                    if (!isWorkerLoaded) {
+                        updateSystemStatus('offline', 'Still waiting for AI script...');
+                        updateProgress('Connection slow - trying again...', 50);
+                    }
+                }, 8000);
+
                 worker.postMessage({ type: 'load', model: currentLoadedModel });
             } else if (!isWorkerLoaded) {
                 updateProgress('Awaiting Knowledge Graph...', 50);
