@@ -117,7 +117,7 @@ NOT in markdown:
         // --- CUSTOM MARKDOWN PARSER ---
         const parseMarkdown = (text) => {
           if (!text) return null;
-          const lines = text.split('\n');
+          const lines = text.replace(/\r\n/g, '\n').split('\n');
           const elements = [];
 
           const parseInline = (line) => {
@@ -268,19 +268,14 @@ NOT in markdown:
             window.html2pdf().set(opt).from(element).save().then(() => setIsGenerating(false));
           };
 
-          const copyPromptToClipboard = () => {
-            const textArea = document.createElement("textarea");
-            textArea.value = AI_PROMPT;
-            document.body.appendChild(textArea);
-            textArea.select();
+          const copyPromptToClipboard = async () => {
             try {
-              document.execCommand('copy');
+              await navigator.clipboard.writeText(AI_PROMPT);
               setIsCopied(true);
               setTimeout(() => setIsCopied(false), 2000);
             } catch (err) {
               console.error('Copy failed', err);
             }
-            document.body.removeChild(textArea);
           };
 
           return (
@@ -416,7 +411,7 @@ NOT in markdown:
                           </div>
                           <span className="text-sm text-white font-medium font-inter">Upload Image File</span>
                           <span className="text-[11px] text-[#64748B] mt-1 font-inter">Drag & drop your mnemonic image</span>
-                          <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+                          <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} onClick={(e) => (e.target.value = null)} />
                         </label>
                       ) : (
                         <div className="bg-[#1E293B] rounded-xl border border-[#334155] p-2 h-32 flex items-center justify-center relative overflow-hidden">
@@ -487,7 +482,7 @@ NOT in markdown:
                           )}
 
                           {/* MEANING Section */}
-                          {(parsedData.meaningHindi || parsedData.meaningEn) && (
+                          {(parsedData.meaningHi || parsedData.meaningEn) && (
                             <div className="flex gap-5 avoid-break">
                               {parsedData.meaningHi && (
                                 <div className="flex-1 bg-[#151E32] border border-[#2A344A] rounded-xl p-5 border-l-4 border-l-[#3B82F6] shadow-sm">

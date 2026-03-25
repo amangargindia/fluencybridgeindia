@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fluency-bridge-v2';
+const CACHE_NAME = 'fluency-bridge-v3';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -37,6 +37,20 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   // Only intercept GET requests
   if (event.request.method !== 'GET') return;
+
+  // NETWORK-FIRST Strategy for index.json so updates are instant
+  if (event.request.url.includes('index.json')) {
+    event.respondWith(
+      fetch(event.request)
+        .then(response => {
+          const responseToCache = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(event.request, responseToCache));
+          return response;
+        })
+        .catch(() => caches.match(event.request))
+    );
+    return;
+  }
 
   event.respondWith(
     caches.match(event.request)

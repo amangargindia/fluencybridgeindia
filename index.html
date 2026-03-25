@@ -1,178 +1,294 @@
-<!DOCTYPE html>  
-<html lang="en">  
-<head>  
-    <meta charset="UTF-8">  
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
-    <title>Fluency Bridge</title>  
-  
-    <!-- Tailwind -->  
-    <script src="https://cdn.tailwindcss.com"></script>  
-  
-    <!-- Serif font -->  
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">  
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fluency Bridge | Directory</title>
+
+    <!-- Tailwind CSS with custom theme -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { 50: '#eff6ff', 100: '#dbeafe', 400: '#60a5fa', 500: '#3b82f6', 600: '#2563eb', 900: '#1e3a8a' },
+                        fluency: { 
+                            base: '#030712', /* Deepest navy/black */
+                            panel: '#0f172a', /* Slightly lighter for sidebars */
+                            border: '#1e293b'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Serif font -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- PWA Configuration -->
     <script src="/pwa-setup.js"></script>
 
     <style>
-        /* Floating button tap animation */
-        .fab:active {
-            transform: scale(0.9);
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Floating animations */
+        @keyframes float { 
+            0% { transform: translateY(0px); } 
+            50% { transform: translateY(-5px); } 
+            100% { transform: translateY(0px); } 
+        }
+        .hero-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(37,99,235,0.15) 0%, rgba(3,7,18,0) 70%);
+            border-radius: 50%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .tool-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .tool-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.15), 0 8px 10px -6px rgba(37, 99, 235, 0.1);
         }
     </style>
-</head>  
-  
-<body class="bg-gradient-to-b from-slate-900 via-blue-950 to-slate-950 text-white min-h-screen font-sans p-6">  
-  
-    <div class="max-w-4xl mx-auto mt-12">  
-  
-        <!-- HERO -->  
-        <header class="text-center mb-10">  
-            <h1 class="text-4xl md:text-5xl tracking-wide">  
-                <span class="block text-white/90 font-semibold tracking-widest">  
-                    FLUENCY  
-                </span>  
-                <span class="block text-white mt-2 text-5xl md:text-6xl"  
-                      style="font-family: 'Playfair Display', serif; font-style: italic;">  
-                    bridge  
-                </span>  
-            </h1>  
-  
-            <p class="text-sm text-blue-300 mt-4">  
-                Build precision. Eliminate confusion.  
-            </p>  
-        </header>  
-  
-        <!-- CONTROLS -->  
-        <div class="mb-6 flex flex-col md:flex-row gap-4">  
-  
-            <!-- SEARCH -->  
-            <input id="search" type="text" placeholder="Search..."  
-                class="flex-1 p-2 rounded bg-slate-800 border border-slate-600">  
-  
-            <!-- SORT -->  
-            <select id="sort" class="p-2 rounded bg-slate-800 border border-slate-600">  
-                <option value="default">Sort: Default</option>  
-                <option value="az">A → Z</option>  
-                <option value="za">Z → A</option>  
-            </select>  
-  
-        </div>  
-  
-        <!-- CONTENT -->  
-        <div id="tools"></div>  
-  
-    </div>  
-  
+</head>
+
+<body class="bg-fluency-base text-slate-300 min-h-screen flex flex-col selection:bg-brand-500 selection:text-white relative overflow-x-hidden">
+
+    <!-- Glowing Background Artifacts -->
+    <div class="hero-glow absolute top-[15%] left-1/2 -translate-x-1/2 h-[500px] w-[800px] bg-brand-600/5 blur-[120px] rounded-[100%] pointer-events-none"></div>
+
+    <!-- MAIN CONTENT -->
+    <main class="max-w-5xl mx-auto w-full px-6 py-12 lg:py-20 relative z-10 flex-1">
+        
+        <!-- TOP HERO -->
+        <header class="text-center mb-16 relative">
+            <h1 class="text-5xl md:text-6xl tracking-tight leading-none mb-2">
+                <span class="block text-slate-100 font-extrabold tracking-[0.2em] mb-1">
+                    FLUENCY
+                </span>
+                <span class="block text-white text-[4rem] md:text-[5.5rem] bg-gradient-to-r from-brand-400 to-white bg-clip-text text-transparent pb-2" style="font-family: 'Playfair Display', serif; font-style: italic; font-weight: 600;">
+                    bridge
+                </span>
+            </h1>
+            <p class="text-brand-400/80 font-medium tracking-wide uppercase text-xs md:text-sm mt-4 flex items-center justify-center gap-2">
+                <i data-lucide="sparkles" class="w-4 h-4 text-brand-500"></i>
+                Build precision. Eliminate confusion.
+                <i data-lucide="sparkles" class="w-4 h-4 text-brand-500"></i>
+            </p>
+        </header>
+
+        <!-- FILTERS AND SEARCH -->
+        <div class="mb-10 flex flex-col md:flex-row gap-4 max-w-2xl mx-auto">
+            <div class="relative flex-1 group">
+                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500 group-focus-within:text-brand-400 transition-colors">
+                    <i data-lucide="search" class="w-5 h-5"></i>
+                </div>
+                <input id="search" type="text" placeholder="Search experiences, tools, and tests..."
+                    class="w-full bg-fluency-panel border border-fluency-border text-slate-200 placeholder-slate-500 rounded-xl py-3 pl-11 pr-4 focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all shadow-inner">
+            </div>
+            <div class="relative inline-block w-full md:w-48 group">
+                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500 group-focus-within:text-brand-400 transition-colors">
+                    <i data-lucide="sort-asc" class="w-4 h-4"></i>
+                </div>
+                <select id="sort" class="w-full appearance-none bg-fluency-panel border border-fluency-border text-slate-200 rounded-xl py-3 pl-10 pr-10 focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all cursor-pointer font-medium text-sm">
+                    <option value="default">Default Sort</option>
+                    <option value="az">A → Z</option>
+                    <option value="za">Z → A</option>
+                </select>
+                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-500">
+                    <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- DYNAMIC CARDS CONTAINER -->
+        <div id="tools" class="space-y-12">
+            <!-- Loading State -->
+            <div class="flex justify-center items-center py-20 text-slate-500">
+                <i data-lucide="loader-2" class="w-8 h-8 animate-spin text-brand-500"></i>
+            </div>
+        </div>
+    </main>
+
     <!-- FLOATING CONTACT BUTTON -->
-    <a href="/contactus.html"
-       class="fab fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full 
-              bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-500/30 
-              flex items-center justify-center text-2xl transition-all">
-        📞
+    <a href="/contactus.html" class="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-brand-600 hover:bg-brand-500 shadow-[0_0_20px_rgba(37,99,235,0.4)] flex items-center justify-center text-white transition-all hover:scale-105 active:scale-95 group">
+        <i data-lucide="headset" class="w-6 h-6 group-hover:animate-pulse"></i>
     </a>
-  
-    <!-- SCRIPT -->  
-    <script>  
-        const EXTENSION = ".html";  
-  
-        const container = document.getElementById("tools");  
-        const searchInput = document.getElementById("search");  
-        const sortSelect = document.getElementById("sort");  
-  
-        let originalData = [];  
-  
-        function render(data) {  
-            container.innerHTML = "";  
-  
-            const grouped = {};  
-  
-            data.forEach(item => {  
-                const category = item.category || "Other";  
-                if (!grouped[category]) grouped[category] = [];  
-                grouped[category].push(item);  
-            });  
-  
-            Object.keys(grouped).forEach(category => {  
-  
-                const section = document.createElement("div");  
-                section.className = "mb-12";  
-  
-                const heading = document.createElement("button");  
-                heading.className = "w-full text-left text-xl font-bold text-blue-300 mb-4 uppercase tracking-wide flex justify-between items-center";  
-  
-                heading.innerHTML = `  
-                    <span>${category}</span>  
-                    <span class="text-sm">▼</span>  
-                `;  
-  
-                const grid = document.createElement("div");  
-                grid.className = "grid grid-cols-1 md:grid-cols-2 gap-6";  
-  
-                heading.addEventListener("click", () => {  
-                    grid.classList.toggle("hidden");  
-                });  
-  
-                grouped[category].forEach(item => {  
-  
-                    const url = (item.folder ? item.folder + "/" : "") + item.slug + EXTENSION;  
-  
-                    const card = document.createElement("a");  
-                    card.href = url;  
-                    card.className = `  
-                        block p-6 bg-slate-800/60 backdrop-blur border border-slate-700 rounded-xl   
-                        hover:border-blue-500 hover:shadow-lg hover:shadow-blue-500/20 transition-all group  
-                    `;  
-  
-                    card.innerHTML = `  
-                        <h2 class="text-lg font-semibold text-blue-400 mb-2 group-hover:text-blue-300">  
-                            ${item.title}  
-                        </h2>  
-                        <p class="text-sm text-slate-300">Open →</p>  
-                    `;  
-  
-                    grid.appendChild(card);  
-                });  
-  
-                section.appendChild(heading);  
-                section.appendChild(grid);  
-                container.appendChild(section);  
-            });  
-        }  
-  
-        function applyFilters() {  
-            let filtered = [...originalData];  
-  
-            const query = searchInput.value.toLowerCase();  
-            if (query) {  
-                filtered = filtered.filter(item =>  
-                    item.title.toLowerCase().includes(query)  
-                );  
-            }  
-  
-            if (sortSelect.value === "az") {  
-                filtered.sort((a, b) => a.title.localeCompare(b.title));  
-            } else if (sortSelect.value === "za") {  
-                filtered.sort((a, b) => b.title.localeCompare(a.title));  
-            }  
-  
-            render(filtered);  
-        }  
-  
-        searchInput.addEventListener("input", applyFilters);  
-        sortSelect.addEventListener("change", applyFilters);  
-  
-        fetch('./index.json')  
-            .then(res => res.json())  
-            .then(data => {  
-                originalData = data;  
-                render(originalData);  
-            })  
-            .catch(err => {  
-                console.error("Error loading JSON:", err);  
-            });  
+
+    <!-- SCRIPT -->
+    <script>
+        lucide.createIcons();
+
+        const EXTENSION = ".html";
+        const container = document.getElementById("tools");
+        const searchInput = document.getElementById("search");
+        const sortSelect = document.getElementById("sort");
+
+        let originalData = [];
+
+        // Helper to pick category icons
+        function getCategoryIcon(cat) {
+            const lc = cat.toLowerCase();
+            if (lc.includes("tools")) return "wrench";
+            if (lc.includes("test")) return "check-square";
+            if (lc.includes("mistake")) return "alert-circle";
+            return "folder";
+        }
+
+        // Helper to pick tool specific icons (if recognized)
+        function getToolIcon(slug) {
+            if(slug.includes('vocab')) return "spell-check";
+            if(slug.includes('transcription') || slug.includes('audio')) return "mic";
+            if(slug.includes('pdf') || slug.includes('epub') || slug.includes('docx')) return "file-text";
+            if(slug.includes('mistake')) return "clipboard-x";
+            return "package";
+        }
+
+        function render(data) {
+            container.innerHTML = "";
+
+            if(data.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-16 text-slate-500 flex flex-col items-center">
+                        <i data-lucide="search-x" class="w-12 h-12 mb-4 text-slate-600"></i>
+                        <h3 class="text-lg font-medium text-slate-400">No results found</h3>
+                        <p class="text-sm mt-1">Try adjusting your search query.</p>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            const grouped = {};
+            data.forEach(item => {
+                const category = item.category || "Other";
+                if (!grouped[category]) grouped[category] = [];
+                grouped[category].push(item);
+            });
+
+            Object.keys(grouped).forEach(category => {
+                const section = document.createElement("div");
+                section.className = "mb-10";
+
+                const heading = document.createElement("button");
+                heading.className = "w-full text-left text-lg font-bold text-slate-100 flex items-center justify-between group border-b border-fluency-border pb-3 mb-6 transition-colors hover:border-brand-500/50";
+                
+                heading.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <div class="p-2 rounded-lg bg-slate-800/50 text-brand-400 group-hover:bg-brand-900/30 group-hover:text-brand-300 transition-colors border border-slate-700/50">
+                            <i data-lucide="${getCategoryIcon(category)}" class="w-5 h-5"></i>
+                        </div>
+                        <span class="tracking-wide">${category}</span>
+                        <span class="ml-2 text-[10px] font-medium bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full group-hover:bg-brand-900 group-hover:text-brand-400 transition-colors">${grouped[category].length}</span>
+                    </div>
+                    <i data-lucide="chevron-down" class="w-5 h-5 text-slate-500 group-hover:text-brand-400 transition-colors"></i>
+                `;
+
+                const grid = document.createElement("div");
+                grid.className = "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 transition-all duration-300 transform origin-top";
+
+                heading.addEventListener("click", () => {
+                    grid.classList.toggle("hidden");
+                    const icon = heading.querySelector('.lucide-chevron-down') || heading.querySelector('.lucide-chevron-up');
+                    if(grid.classList.contains("hidden")) {
+                        icon.setAttribute('data-lucide', 'chevron-up');
+                    } else {
+                        icon.setAttribute('data-lucide', 'chevron-down');
+                    }
+                    lucide.createIcons();
+                });
+
+                grouped[category].forEach(item => {
+                    const url = (item.folder ? item.folder + "/" : "") + item.slug + EXTENSION;
+                    const card = document.createElement("a");
+                    card.href = url;
+                    card.className = "tool-card block p-6 bg-fluency-panel border border-fluency-border rounded-2xl group flex flex-col justify-between h-full relative overflow-hidden";
+                    
+                    card.innerHTML = `
+                        <div class="absolute -right-4 -top-4 w-24 h-24 bg-brand-600/5 rounded-full blur-xl group-hover:bg-brand-500/10 transition-colors"></div>
+                        <div>
+                            <div class="w-10 h-10 rounded-xl bg-slate-800/80 border border-slate-700/50 flex items-center justify-center text-brand-400 mb-4 group-hover:scale-110 group-hover:bg-brand-600 group-hover:text-white transition-all shadow-sm">
+                                <i data-lucide="${getToolIcon(item.slug)}" class="w-5 h-5"></i>
+                            </div>
+                            <h2 class="text-[1.05rem] font-bold text-slate-200 mb-2 group-hover:text-brand-300 transition-colors leading-snug">
+                                ${item.title}
+                            </h2>
+                            <p class="text-xs text-slate-500 font-medium tracking-wide">/${item.folder || 'root'}/${item.slug}</p>
+                        </div>
+                        <div class="mt-6 flex items-center gap-1.5 text-sm md:text-xs font-semibold text-brand-500 translate-y-1 group-hover:translate-y-0 opacity-80 group-hover:opacity-100 transition-all">
+                            Access Portal <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+
+                section.appendChild(heading);
+                section.appendChild(grid);
+                container.appendChild(section);
+            });
             
-    </script>  
-  
-</body>  
+            // Re-bind Lucide icons for dynamically added content
+            lucide.createIcons();
+        }
+
+        function applyFilters() {
+            let filtered = [...originalData];
+            const query = searchInput.value.toLowerCase();
+            
+            if (query) {
+                filtered = filtered.filter(item => item.title.toLowerCase().includes(query) || (item.category && item.category.toLowerCase().includes(query)) || (item.slug && item.slug.toLowerCase().includes(query)));
+            }
+            if (sortSelect.value === "az") {
+                filtered.sort((a, b) => a.title.localeCompare(b.title));
+            } else if (sortSelect.value === "za") {
+                filtered.sort((a, b) => b.title.localeCompare(a.title));
+            }
+            render(filtered);
+        }
+
+        searchInput.addEventListener("input", applyFilters);
+        sortSelect.addEventListener("change", applyFilters);
+
+        // Fetch Tools list
+        fetch('./index.json?_t=' + new Date().getTime()) // Anti-cache query param added here for absolute safety
+            .then(res => {
+                if(!res.ok) throw new Error("JSON not found");
+                return res.json();
+            })
+            .then(data => {
+                originalData = data;
+                render(originalData);
+            })
+            .catch(err => {
+                console.error("Error loading JSON:", err);
+                container.innerHTML = `
+                    <div class="text-center py-16 text-slate-500 border border-slate-700/50 bg-slate-800/20 rounded-2xl mx-auto max-w-lg">
+                        <i data-lucide="alert-triangle" class="w-10 h-10 mb-3 mx-auto text-red-400"></i>
+                        <h3 class="text-lg font-medium text-slate-300">Failed to load tools</h3>
+                        <p class="text-sm mt-1 text-slate-400">Please ensure index.json exists and is readable.</p>
+                    </div>
+                `;
+                lucide.createIcons();
+            });
+            
+    </script>
+</body>
 </html>
