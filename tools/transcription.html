@@ -99,9 +99,14 @@
                     <div class="text-xs text-brand-400 font-medium tracking-wide uppercase">Transcription Engine</div>
                 </div>
             </div>
-            <div class="text-xs text-slate-500 hidden sm:flex items-center gap-2" id="system-status">
-                <span class="w-2 h-2 rounded-full bg-slate-500" id="status-dot"></span>
-                <span id="status-text">System Offline (Awaiting Init)</span>
+            <div class="flex items-center gap-4">
+                <button id="updatesBtn" class="text-xs text-slate-300 hover:text-white transition-colors flex items-center gap-1.5 bg-slate-800/50 hover:bg-slate-700/80 px-3 py-1.5 rounded-lg border border-slate-700/50">
+                    <i data-lucide="info" class="w-4 h-4 text-brand-400"></i> <span class="hidden sm:inline">Updates & Info</span>
+                </button>
+                <div class="text-xs text-slate-500 hidden sm:flex items-center gap-2" id="system-status">
+                    <span class="w-2 h-2 rounded-full bg-slate-500" id="status-dot"></span>
+                    <span id="status-text">System Offline (Awaiting Init)</span>
+                </div>
             </div>
         </div>
     </header>
@@ -224,6 +229,53 @@
         <span id="toast-message" class="text-sm font-medium">Notification</span>
     </div>
 
+    <!-- Updates & Info Modal -->
+    <div id="updatesModal" class="fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm hidden flex-col items-center justify-center p-4 lg:p-10 opacity-0 transition-opacity duration-300">
+        <div class="bg-fluency-panel w-full max-w-4xl max-h-[90vh] rounded-2xl border border-fluency-border flex flex-col shadow-2xl scale-95 transition-transform duration-300 transform" id="updatesModalContent">
+            <div class="p-6 border-b border-fluency-border flex justify-between items-center bg-slate-900/50 rounded-t-2xl">
+                <h2 class="text-xl font-bold text-slate-100 flex items-center gap-2"><i data-lucide="book-open" class="w-6 h-6 text-brand-400"></i> System Documentation</h2>
+                <button id="closeUpdatesBtn" class="text-slate-400 hover:text-white transition-colors p-2 hover:bg-slate-800 rounded-lg">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="p-8 overflow-y-auto custom-scrollbar prose prose-invert prose-brand max-w-none text-slate-300">
+                <h3 class="text-brand-300">How The System Works</h3>
+                <p>The Fluency Bridge Transcription Tool operates entirely <strong>client-side</strong> within your browser. By leveraging WebAssembly (WASM) and <a href="https://huggingface.co/docs/transformers.js/index" target="_blank" class="text-brand-400">Transformers.js</a>, the tool downloads the Whisper AI model directly to your device and processes audio locally.</p>
+                <p><strong>Zero server dependency</strong> means your audio data never leaves your computer, guaranteeing 100% privacy and averting costly API usage.</p>
+                <hr class="border-slate-700">
+                <h3 class="text-brand-300">Core Features</h3>
+                <ul>
+                    <li><strong>Live Dictation Typewriter:</strong> Streams live speech using the Web Speech API while recording, later compiling a highly accurate offline transcription using Whisper as a fallback.</li>
+                    <li><strong>Automated Extraction:</strong> The system automatically extracts plaintext and downloads a <code>.txt</code> file naming it by the current date and time upon transcription completion.</li>
+                    <li><strong>Instant Clipboard Sync:</strong> Transcriptions are automatically copied to your clipboard to negate accidental data loss.</li>
+                    <li><strong>Audio Export:</strong> Captured live audio can be downloaded from the transcript cards directly in <code>.webm</code> format.</li>
+                </ul>
+                <hr class="border-slate-700">
+                <h3 class="text-brand-300">Technicalities & Models</h3>
+                <p>The system utilizes three Whisper architectural layers:</p>
+                <div class="overflow-x-auto">
+                    <table>
+                        <thead>
+                            <tr><th>Layer</th><th>Size (RAM needed)</th><th>Performance</th><th>Use Case</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Tiny Layer</td><td>~40MB Model (&lt;1GB RAM)</td><td>Fastest</td><td>Low-end devices, real-time fallback</td></tr>
+                            <tr><td>Base Layer</td><td>~145MB Model (~1.5GB RAM)</td><td>Balanced</td><td>Recommended. Optimal for general use.</td></tr>
+                            <tr><td>Small Layer</td><td>~500MB Model (&gt;3GB RAM)</td><td>Heavy</td><td>High-end Desktop PCs, complex vocabularies.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <hr class="border-slate-700">
+                <h3 class="text-brand-300 text-red-400">Caveats & Limitations</h3>
+                <ul>
+                    <li><strong>Mobile Device Constraints:</strong> Because WASM executes in browser memory, older iPhones or Androids may experience browser crashes if the <em>Small</em> model is used. Default to <em>Base</em> or <em>Tiny</em>.</li>
+                    <li><strong>Background Tab Throttling:</strong> Most browsers heavily throttle Javascript in inactive tabs. If you switch tabs during extraction, it will become dramatically slower or pause entirely until you return. <strong>Leave the tab active while engaged!</strong></li>
+                    <li><strong>Initial Download Lag:</strong> The very first time you invoke the engine, it must download the ML weights into your cache (up to 145MB). Future visits will utilize the cached weights instantly.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
     <!-- Application Logic -->
     <script>
         lucide.createIcons();
@@ -287,6 +339,60 @@
 
         const toast = document.getElementById('toast');
         const toastMessage = document.getElementById('toast-message');
+        
+        const updatesBtn = document.getElementById('updatesBtn');
+        const updatesModal = document.getElementById('updatesModal');
+        const closeUpdatesBtn = document.getElementById('closeUpdatesBtn');
+        const updatesModalContent = document.getElementById('updatesModalContent');
+
+        updatesBtn.addEventListener('click', () => {
+            updatesModal.classList.remove('hidden');
+            updatesModal.classList.add('flex');
+            setTimeout(() => {
+                updatesModal.classList.remove('opacity-0');
+                updatesModalContent.classList.remove('scale-95');
+            }, 10);
+        });
+
+        closeUpdatesBtn.addEventListener('click', () => {
+            updatesModal.classList.add('opacity-0');
+            updatesModalContent.classList.add('scale-95');
+            setTimeout(() => {
+                updatesModal.classList.add('hidden');
+                updatesModal.classList.remove('flex');
+            }, 300);
+        });
+
+        function autoCopyAndDownload(textToSave, prefix) {
+            navigator.clipboard.writeText(textToSave).then(() => {
+                showToast('Text automatically copied & downloaded!');
+            }).catch(e => console.error('Auto-copy failed: ', e));
+
+            const now = new Date();
+            const dateStr = now.toISOString().replace(/[:.]/g, '-');
+            const blob = new Blob([textToSave], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${prefix}_${dateStr}.txt`;
+            a.style.display = 'none';
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 100);
+        }
+
+        function escapeHTML(str) {
+            return String(str).replace(/[&<>'"]/g, tag => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                "'": '&#39;',
+                '"': '&quot;'
+            }[tag] || tag));
+        }
 
         function showToast(message, isError = false) {
             toastMessage.textContent = message;
@@ -439,7 +545,7 @@
                             let interactiveHtml = dictationChunks.map(c => {
                                 const start = c.timestamp[0];
                                 const timeStr = `[${formatFloatTime(start)}]`;
-                                return `<span class="cursor-pointer hover:bg-brand-900/50 hover:text-brand-300 rounded px-1 transition-colors border-b border-transparent hover:border-brand-500 block mb-2" onclick="playAudio('${playerID}', ${start})"><span class="text-[10px] text-brand-500 font-mono font-bold mr-2 select-none">${timeStr}</span><span class="text-slate-200">${c.text}</span></span>`;
+                                return `<span class="cursor-pointer hover:bg-brand-900/50 hover:text-brand-300 rounded px-1 transition-colors border-b border-transparent hover:border-brand-500 block mb-2" onclick="playAudio('${playerID}', ${start})"><span class="text-[10px] text-brand-500 font-mono font-bold mr-2 select-none">${timeStr}</span><span class="text-slate-200">${escapeHTML(c.text)}</span></span>`;
                             }).join('');
                             
                             const clipboardTextWithTimestamps = dictationChunks.map(c => `[${formatFloatTime(c.timestamp[0])}] ${c.text.trim()}`).join('\n');
@@ -451,7 +557,10 @@
                                         <h2 class="text-brand-400 font-bold text-lg flex items-center gap-2"><i data-lucide="mic" class="w-5 h-5"></i> Live Dictation</h2>
                                         <div class="flex items-center gap-2">
                                             <span class="text-xs text-brand-500 font-medium tracking-wide border border-brand-900/50 py-1 px-2 rounded-lg bg-brand-900/30 hidden sm:inline-block">Live Typed</span>
-                                            <button onclick="this.closest('.transcript-card').remove(); if(document.querySelectorAll('.transcript-card').length === 0) { document.getElementById('empty-state').classList.remove('hidden'); document.getElementById('preview-wrapper').classList.add('hidden'); }" class="text-red-400/50 hover:text-red-400 hover:bg-red-900/30 p-1.5 rounded-lg transition-colors border border-transparent hover:border-red-500/30" title="Delete Recording">
+                                            <a href="${blobUrl}" download="${fileName}" class="text-brand-400/50 hover:text-brand-400 hover:bg-brand-900/30 p-1.5 rounded-lg transition-colors border border-transparent hover:border-brand-500/30" title="Download Audio">
+                                                <i data-lucide="download" class="w-4 h-4"></i>
+                                            </a>
+                                            <button onclick="const card = this.closest('.transcript-card'); const audio = card.querySelector('audio'); if(audio) URL.revokeObjectURL(audio.src); card.remove(); if(document.querySelectorAll('.transcript-card').length === 0) { document.getElementById('empty-state').classList.remove('hidden'); document.getElementById('preview-wrapper').classList.add('hidden'); }" class="text-red-400/50 hover:text-red-400 hover:bg-red-900/30 p-1.5 rounded-lg transition-colors border border-transparent hover:border-red-500/30" title="Delete Recording">
                                                 <i data-lucide="trash-2" class="w-4 h-4"></i>
                                             </button>
                                         </div>
@@ -468,6 +577,7 @@
                             `;
                             
                             appendToDocumentRaw(htmlBlock, simpleTextForClipboard);
+                            autoCopyAndDownload(simpleTextForClipboard, "Live_Dictation");
                         }
                         
                         // Stop all tracks to clear mic indicator
@@ -537,20 +647,7 @@
                 selectedFiles = [...selectedFiles, ...validFiles];
                 
                 // Build visual queue
-                fileQueueContainer.innerHTML = selectedFiles.map((f, i) => `
-                    <div class="flex items-center justify-between p-2 bg-slate-800 rounded-md border border-slate-700">
-                        <div class="flex items-center gap-2 truncate">
-                            <i data-lucide="${f.status === 'done' ? 'check-circle' : 'music'}" class="w-4 h-4 ${f.status === 'done' ? 'text-green-400' : 'text-brand-400'} flex-none"></i>
-                            <span class="text-xs text-slate-300 truncate">${f.name}</span>
-                        </div>
-                        ${f.status === 'pending' ? `
-                            <button onclick="window.removeFile(${i})" class="text-slate-500 hover:text-red-400 transition-colors">
-                                <i data-lucide="x" class="w-3 h-3"></i>
-                            </button>
-                        ` : ''}
-                    </div>
-                `).join('');
-                lucide.createIcons();
+                renderFileQueue();
                 
                 fileQueueContainer.classList.remove('hidden');
                 transcribeBtn.disabled = false;
@@ -558,10 +655,31 @@
             }
         };
 
+        function renderFileQueue() {
+            if(selectedFiles.length === 0) {
+                fileQueueContainer.classList.add('hidden');
+                transcribeBtn.disabled = true;
+                return;
+            }
+            fileQueueContainer.innerHTML = selectedFiles.map((f, i) => `
+                <div class="flex items-center justify-between p-2 bg-slate-800 rounded-md border border-slate-700">
+                    <div class="flex items-center gap-2 truncate">
+                        <i data-lucide="${f.status === 'done' ? 'check-circle' : 'music'}" class="w-4 h-4 ${f.status === 'done' ? 'text-green-400' : 'text-brand-400'} flex-none"></i>
+                        <span class="text-xs text-slate-300 truncate">${escapeHTML(f.name)}</span>
+                    </div>
+                    ${f.status === 'pending' ? `
+                        <button onclick="window.removeFile(${i})" class="text-slate-500 hover:text-red-400 transition-colors">
+                            <i data-lucide="x" class="w-3 h-3"></i>
+                        </button>
+                    ` : ''}
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
         window.removeFile = (index) => {
             selectedFiles.splice(index, 1);
-            if(selectedFiles.length === 0) fileQueueContainer.classList.add('hidden');
-            handleFileSelect([]); // Re-render
+            renderFileQueue();
         };
 
         dropZone.addEventListener('click', () => fileInput.click());
@@ -582,6 +700,8 @@
 
         modelSelector.addEventListener('change', () => {
             if (isWorkerLoaded && worker && currentLoadedModel !== modelSelector.value) {
+                worker.terminate();
+                worker = null;
                 isWorkerLoaded = false;
                 updateSystemStatus('offline', 'Model Changed - Needs Re-init');
             }
@@ -647,7 +767,9 @@
             `;
             
             const blob = new Blob([workerCode], { type: 'application/javascript' });
-            worker = new Worker(URL.createObjectURL(blob), { type: 'module' });
+            const workerUrl = URL.createObjectURL(blob);
+            worker = new Worker(workerUrl, { type: 'module' });
+            URL.revokeObjectURL(workerUrl);
 
             worker.onmessage = (e) => {
                 const msg = e.data;
@@ -671,6 +793,7 @@
                     }
                 } else if (msg.type === 'loaded') {
                     isWorkerLoaded = true;
+                    window.isLoadingModel = false;
                     updateSystemStatus('ready', 'Engine Online');
                     updateProgress('Ready', 100, false);
                     setTimeout(processNextFile, 500); // Small buffer for stability
@@ -696,7 +819,7 @@
 
                     const fileName = processingFile.name;
                     const blobUrl = URL.createObjectURL(processingFile);
-                    const playerID = 'audio_player_' + Math.random().toString(36).substr(2, 9);
+                    const playerID = 'audio_player_' + Math.random().toString(36).slice(2, 11);
                     
                     const formatFloatTime = (secs) => {
                         const m = Math.floor(secs / 60).toString().padStart(2, '0');
@@ -711,12 +834,12 @@
                         interactiveHtml = msg.result.chunks.map(c => {
                             const start = c.timestamp[0];
                             const timeStr = `[${formatFloatTime(start)}]`;
-                            return `<span class="cursor-pointer hover:bg-brand-900/50 hover:text-brand-300 rounded px-1 transition-colors border-b border-transparent hover:border-brand-500 block mb-2" onclick="playAudio('${playerID}', ${start})"><span class="text-[10px] text-brand-500 font-mono font-bold mr-2 select-none">${timeStr}</span><span class="text-slate-200">${c.text}</span></span>`;
+                            return `<span class="cursor-pointer hover:bg-brand-900/50 hover:text-brand-300 rounded px-1 transition-colors border-b border-transparent hover:border-brand-500 block mb-2" onclick="playAudio('${playerID}', ${start})"><span class="text-[10px] text-brand-500 font-mono font-bold mr-2 select-none">${timeStr}</span><span class="text-slate-200">${escapeHTML(c.text)}</span></span>`;
                         }).join('');
                         
                         clipboardTextWithTimestamps = msg.result.chunks.map(c => `[${formatFloatTime(c.timestamp[0])}] ${c.text.trim()}`).join('\n');
                     } else {
-                        interactiveHtml = msg.result.text || "No speech detected.";
+                        interactiveHtml = escapeHTML(msg.result.text || "No speech detected.");
                         clipboardTextWithTimestamps = msg.result.text || "";
                     }
 
@@ -724,10 +847,13 @@
                     const htmlBlock = `
                         <div class="transcript-card mb-10 relative group bg-fluency-panel p-6 rounded-2xl border border-fluency-border shadow-md" data-rawtext="${encodeURIComponent(simpleTextForClipboard)}">
                             <div class="flex items-center justify-between mb-4 border-b border-slate-700/50 pb-3">
-                                <h2 class="text-brand-400 font-bold text-lg flex items-center gap-2"><i data-lucide="file-audio" class="w-5 h-5"></i> ${fileName}</h2>
+                                <h2 class="text-brand-400 font-bold text-lg flex items-center gap-2"><i data-lucide="file-audio" class="w-5 h-5"></i> ${escapeHTML(fileName)}</h2>
                                 <div class="flex items-center gap-2">
                                     <span class="text-xs text-slate-500 font-medium tracking-wide border border-slate-700 py-1 px-2 rounded-lg bg-slate-800/50 hidden sm:inline-block">Analyzed ${new Date().toLocaleString()}</span>
-                                    <button onclick="this.closest('.transcript-card').remove(); if(document.querySelectorAll('.transcript-card').length === 0) { document.getElementById('empty-state').classList.remove('hidden'); document.getElementById('preview-wrapper').classList.add('hidden'); }" class="text-red-400/50 hover:text-red-400 hover:bg-red-900/30 p-1.5 rounded-lg transition-colors border border-transparent hover:border-red-500/30" title="Delete Recording">
+                                    <a href="${blobUrl}" download="${fileName}" class="text-brand-400/50 hover:text-brand-400 hover:bg-brand-900/30 p-1.5 rounded-lg transition-colors border border-transparent hover:border-brand-500/30" title="Download Audio">
+                                        <i data-lucide="download" class="w-4 h-4"></i>
+                                    </a>
+                                    <button onclick="const card = this.closest('.transcript-card'); const audio = card.querySelector('audio'); if(audio) URL.revokeObjectURL(audio.src); card.remove(); if(document.querySelectorAll('.transcript-card').length === 0) { document.getElementById('empty-state').classList.remove('hidden'); document.getElementById('preview-wrapper').classList.add('hidden'); }" class="text-red-400/50 hover:text-red-400 hover:bg-red-900/30 p-1.5 rounded-lg transition-colors border border-transparent hover:border-red-500/30" title="Delete Recording">
                                         <i data-lucide="trash-2" class="w-4 h-4"></i>
                                     </button>
                                 </div>
@@ -742,6 +868,7 @@
                     `;
                     
                     appendToDocumentRaw(htmlBlock, simpleTextForClipboard);
+                    autoCopyAndDownload(simpleTextForClipboard, "Transcription");
                     processNextFile();
                     
                 } else if (msg.type === 'error') {
@@ -752,16 +879,17 @@
                     if(processingFile) processingFile.status = 'error';
                     handleFileSelect([]);
 
-                    const fileName = processingFile ? processingFile.name : 'Unknown';
+                    const fileName = escapeHTML(processingFile ? processingFile.name : 'Unknown');
+                    const errorMsg = escapeHTML(msg.error);
                     const errorHtml = `
                         <div class="mb-10 bg-fluency-panel p-6 rounded-2xl border border-red-900/50 shadow-md">
                             <div class="flex items-center mb-4 border-b border-slate-700/50 pb-3">
                                 <h2 class="text-red-400 font-bold text-lg flex items-center gap-2"><i data-lucide="alert-triangle" class="w-5 h-5"></i> Error Processing ${fileName}</h2>
                             </div>
-                            <div class="text-slate-300">Engine Failure: ${msg.error}</div>
+                            <div class="text-slate-300">Engine Failure: ${errorMsg}</div>
                         </div>
                     `;
-                    appendToDocumentRaw(errorHtml, `Error Processing ${fileName}: ${msg.error}`);
+                    appendToDocumentRaw(errorHtml, `Error Processing ${fileName}: ${errorMsg}`);
                     processNextFile();
                 }
             };
@@ -799,14 +927,15 @@
                 try {
                     const arrayBuffer = e.target.result;
                     const audioContext = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
-                    const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+                    const audioBuffer = await audioContext.decodeAudioData(arrayBuffer).catch(err => { throw new Error("Audio format unsupported or corrupted.") });
                     const float32Data = audioBuffer.getChannelData(0);
+                    const clonedData = float32Data.slice(); // Deep clone to avoid buffer detachment
                     
                     worker.postMessage({ 
                         type: 'transcribe', 
-                        audioData: float32Data, 
+                        audioData: clonedData, 
                         fileIndex: nextIndex 
-                    }, [float32Data.buffer]);
+                    });
                     
                 } catch (error) {
                     currentFile.status = 'error';
@@ -833,8 +962,12 @@
             transcribeBtn.innerHTML = '<div class="loader !w-5 !h-5 !border-2 !border-brand-300 border-t-white mr-2"></div> Engaging Engine...';
             
             if (!worker || currentLoadedModel !== modelSelector.value) {
+                if (window.isLoadingModel) return;
+                window.isLoadingModel = true;
+
                 currentLoadedModel = modelSelector.value;
-                if (!worker) initializeWorker();
+                if (worker) worker.terminate();
+                initializeWorker();
                 
                 updateSystemStatus('downloading', 'Requesting Node Assignment...');
                 updateProgress('Connecting...', 0);
@@ -844,6 +977,7 @@
                     if (!isWorkerLoaded) {
                         updateSystemStatus('offline', 'Still waiting for AI script...');
                         updateProgress('Connection slow - trying again...', 50);
+                        window.isLoadingModel = false;
                     }
                 }, 8000);
 
