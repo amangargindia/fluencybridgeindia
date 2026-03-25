@@ -29,6 +29,9 @@
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        /* PDF Printing Optimization */
+        .pdf-avoid-break { page-break-inside: avoid !important; break-inside: avoid !important; }
     </style>
 </head>
 <body class="bg-[#0B1324] text-white overflow-hidden">
@@ -263,7 +266,7 @@ NOT in markdown:
               image: { type: 'jpeg', quality: 1 },
               html2canvas: { scale: 2, useCORS: true, letterRendering: true, backgroundColor: '#0B1324' },
               jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
-              pagebreak: { mode: ['css', 'avoid-all'], avoid: '.avoid-break' } 
+              pagebreak: { mode: ['css', 'legacy'] } 
             };
 
             window.html2pdf().set(opt).from(element).save().then(() => setIsGenerating(false));
@@ -474,7 +477,7 @@ NOT in markdown:
                           
                           {/* STORY Section */}
                           {parsedData.story && (
-                            <div className="bg-[#151E32] border border-[#2A344A] rounded-xl p-6 avoid-break relative">
+                            <div className="bg-[#151E32] border border-[#2A344A] rounded-xl p-6 relative">
                                <div className="flex items-center gap-2 mb-3 border-b border-[#2A344A] pb-2">
                                  <FileText size={16} className="text-[#60A5FA]" />
                                  <span className="text-xs font-bold text-[#9CA3AF] uppercase tracking-widest font-inter">Contextual Story</span>
@@ -487,7 +490,7 @@ NOT in markdown:
 
                           {/* MEANING Section */}
                           {(parsedData.meaningHi || parsedData.meaningEn) && (
-                            <div className="flex gap-5 avoid-break">
+                            <div className="flex gap-5 pdf-avoid-break">
                               {parsedData.meaningHi && (
                                 <div className="flex-1 bg-[#151E32] border border-[#2A344A] rounded-xl p-5 border-l-4 border-l-[#3B82F6] shadow-sm">
                                   <h3 className="text-[10px] uppercase tracking-widest text-[#9CA3AF] font-bold mb-2 font-inter">Hindi Meaning</h3>
@@ -505,7 +508,7 @@ NOT in markdown:
 
                           {/* MNEMONIC Section */}
                           {(mnemonicImage || parsedData.mnemonicText) && (
-                            <div className="bg-[#151E32] border border-[#2A344A] rounded-xl p-6 avoid-break relative">
+                            <div className="bg-[#151E32] border border-[#2A344A] rounded-xl p-6 pdf-avoid-break relative">
                               <div className="flex items-center gap-2 mb-4 border-b border-[#2A344A] pb-2">
                                  <ImageIcon size={16} className="text-[#60A5FA]" />
                                  <span className="text-xs font-bold text-[#9CA3AF] uppercase tracking-widest font-inter">Mnemonic Logic</span>
@@ -526,13 +529,13 @@ NOT in markdown:
                           {/* USAGE Section */}
                           {parsedData.usages.length > 0 && (
                             <div className="bg-[#151E32] border border-[#2A344A] rounded-xl p-6 relative">
-                               <div className="flex items-center gap-2 mb-4 border-b border-[#2A344A] pb-2 avoid-break">
+                               <div className="flex items-center gap-2 mb-4 border-b border-[#2A344A] pb-2 pdf-avoid-break">
                                  <Type size={16} className="text-[#60A5FA]" />
                                  <span className="text-xs font-bold text-[#9CA3AF] uppercase tracking-widest font-inter">Real-World Usage</span>
                                </div>
                               <div className="grid grid-cols-1 gap-4">
                                 {parsedData.usages.map((u, i) => (
-                                  <div key={i} className="bg-[#0F172A] border border-[#2A344A] rounded-lg p-4 flex gap-4 items-start avoid-break shadow-sm">
+                                  <div key={i} className="bg-[#0F172A] border border-[#2A344A] rounded-lg p-4 flex gap-4 items-start pdf-avoid-break shadow-sm">
                                     <span className="flex-shrink-0 w-7 h-7 bg-[#1E3A8A] text-[#60A5FA] rounded-md flex items-center justify-center font-bold text-sm border border-[#2563EB]/30 shadow-sm font-inter">
                                       {i + 1}
                                     </span>
