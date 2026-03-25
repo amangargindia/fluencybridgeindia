@@ -162,6 +162,10 @@
             return "package";
         }
 
+        function cleanTitle(rawTitle) {
+            return rawTitle.replace(/FB Internal Tools\s*-\s*|\s*-\s*FB Internal Tools/gi, '').trim();
+        }
+
         function render(data) {
             container.innerHTML = "";
 
@@ -184,26 +188,36 @@
                 grouped[category].push(item);
             });
 
-            Object.keys(grouped).forEach(category => {
+            // Sort categories to force 'Tools' to be the very first one
+            const sortedCategories = Object.keys(grouped).sort((a, b) => {
+                if(a.toLowerCase() === 'tools') return -1;
+                if(b.toLowerCase() === 'tools') return 1;
+                return a.localeCompare(b);
+            });
+
+            sortedCategories.forEach(category => {
+                const isTools = category.toLowerCase() === 'tools';
                 const section = document.createElement("div");
-                section.className = "mb-10";
+                section.className = isTools ? "mb-16" : "mb-10 opacity-90";
 
                 const heading = document.createElement("button");
-                heading.className = "w-full text-left text-lg font-bold text-slate-100 flex items-center justify-between group border-b border-fluency-border pb-3 mb-6 transition-colors hover:border-brand-500/50";
+                heading.className = "w-full text-left flex items-center justify-between group border-b border-fluency-border pb-3 mb-6 transition-colors hover:border-brand-500/50 " + (isTools ? "text-2xl font-black text-white" : "text-lg font-bold text-slate-100");
                 
                 heading.innerHTML = `
                     <div class="flex items-center gap-3">
-                        <div class="p-2 rounded-lg bg-slate-800/50 text-brand-400 group-hover:bg-brand-900/30 group-hover:text-brand-300 transition-colors border border-slate-700/50">
-                            <i data-lucide="${getCategoryIcon(category)}" class="w-5 h-5"></i>
+                        <div class="p-2 rounded-lg bg-slate-800/50 ${isTools ? 'text-brand-400 border border-brand-500/30' : 'text-slate-400 border border-slate-700/50'} group-hover:bg-brand-900/30 group-hover:text-brand-300 transition-colors">
+                            <i data-lucide="${getCategoryIcon(category)}" class="${isTools ? 'w-6 h-6' : 'w-5 h-5'}"></i>
                         </div>
-                        <span class="tracking-wide">${category}</span>
+                        <span class="tracking-wide">${category} ${isTools ? '<span class="text-[10px] text-brand-500 ml-2 font-mono uppercase tracking-widest border border-brand-500/30 px-2 py-0.5 rounded-full bg-brand-900/20 align-middle">Primary</span>' : ''}</span>
                         <span class="ml-2 text-[10px] font-medium bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full group-hover:bg-brand-900 group-hover:text-brand-400 transition-colors">${grouped[category].length}</span>
                     </div>
                     <i data-lucide="chevron-down" class="w-5 h-5 text-slate-500 group-hover:text-brand-400 transition-colors"></i>
                 `;
 
                 const grid = document.createElement("div");
-                grid.className = "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 transition-all duration-300 transform origin-top";
+                grid.className = isTools 
+                    ? "grid grid-cols-1 md:grid-cols-2 gap-6 transition-all duration-300 transform origin-top" 
+                    : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 transition-all duration-300 transform origin-top";
 
                 heading.addEventListener("click", () => {
                     grid.classList.toggle("hidden");
@@ -218,23 +232,26 @@
 
                 grouped[category].forEach(item => {
                     const url = (item.folder ? item.folder + "/" : "") + item.slug + EXTENSION;
+                    const cleanName = cleanTitle(item.title);
+                    
                     const card = document.createElement("a");
                     card.href = url;
-                    card.className = "tool-card block p-6 bg-fluency-panel border border-fluency-border rounded-2xl group flex flex-col justify-between h-full relative overflow-hidden";
+                    card.className = isTools 
+                        ? "tool-card block p-6 md:p-8 bg-gradient-to-br from-fluency-panel to-[#0a101f] border border-brand-500/20 rounded-2xl group flex flex-col justify-between h-full relative overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.4)] hover:border-brand-400 hover:shadow-[0_0_25px_rgba(37,99,235,0.2)]"
+                        : "tool-card block p-5 bg-fluency-panel border border-fluency-border rounded-xl group flex flex-col justify-between h-full relative overflow-hidden";
                     
                     card.innerHTML = `
-                        <div class="absolute -right-4 -top-4 w-24 h-24 bg-brand-600/5 rounded-full blur-xl group-hover:bg-brand-500/10 transition-colors"></div>
+                        ${isTools ? '<div class="absolute -right-10 -top-10 w-40 h-40 bg-brand-600/10 rounded-full blur-3xl group-hover:bg-brand-500/20 transition-colors"></div>' : '<div class="absolute -right-4 -top-4 w-24 h-24 bg-brand-600/5 rounded-full blur-xl group-hover:bg-brand-500/10 transition-colors"></div>'}
                         <div>
-                            <div class="w-10 h-10 rounded-xl bg-slate-800/80 border border-slate-700/50 flex items-center justify-center text-brand-400 mb-4 group-hover:scale-110 group-hover:bg-brand-600 group-hover:text-white transition-all shadow-sm">
-                                <i data-lucide="${getToolIcon(item.slug)}" class="w-5 h-5"></i>
+                            <div class="${isTools ? 'w-12 h-12 bg-brand-900/50 text-brand-400 mb-5 border-brand-500/30' : 'w-10 h-10 bg-slate-800/80 text-slate-400 mb-4 border-slate-700/50'} rounded-xl border flex items-center justify-center group-hover:scale-110 group-hover:bg-brand-600 group-hover:text-white transition-all shadow-sm">
+                                <i data-lucide="${getToolIcon(item.slug)}" class="${isTools ? 'w-6 h-6' : 'w-5 h-5'}"></i>
                             </div>
-                            <h2 class="text-[1.05rem] font-bold text-slate-200 mb-2 group-hover:text-brand-300 transition-colors leading-snug">
-                                ${item.title}
+                            <h2 class="${isTools ? 'text-xl md:text-2xl font-black text-white' : 'text-[1.05rem] font-bold text-slate-200'} mb-2 group-hover:text-brand-300 transition-colors leading-snug">
+                                ${cleanName}
                             </h2>
-                            <p class="text-xs text-slate-500 font-medium tracking-wide">/${item.folder || 'root'}/${item.slug}</p>
                         </div>
-                        <div class="mt-6 flex items-center gap-1.5 text-sm md:text-xs font-semibold text-brand-500 translate-y-1 group-hover:translate-y-0 opacity-80 group-hover:opacity-100 transition-all">
-                            Access Portal <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+                        <div class="mt-6 flex items-center gap-1.5 ${isTools ? 'text-sm' : 'text-xs md:text-xs'} font-semibold text-brand-500 translate-y-1 group-hover:translate-y-0 opacity-80 group-hover:opacity-100 transition-all">
+                            Access ${isTools ? 'Workspace' : 'Portal'} <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
                         </div>
                     `;
                     grid.appendChild(card);
