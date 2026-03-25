@@ -34,5 +34,11 @@
     "slug": "transcription",
     "folder": "tools",
     "category": "Tools"
+  },
+  {
+    "title": "VocabPod Builder - FB Internal Tools",
+    "slug": "vocabpodgenerator",
+    "folder": "tools",
+    "category": "Tools"
   }
 ]
