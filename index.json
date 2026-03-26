@@ -18,6 +18,12 @@
     "category": "Tests"
   },
   {
+    "title": "Fluency Bridge Verb Types Practice - V2",
+    "slug": "v2practice",
+    "folder": "tests",
+    "category": "Tests"
+  },
+  {
     "title": "FB Internal Tools - Class Notes Creator",
     "slug": "docxtopdf",
     "folder": "tools",
