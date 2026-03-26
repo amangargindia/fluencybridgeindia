@@ -42,6 +42,12 @@
     "category": "Tools"
   },
   {
+    "title": "Azure EPUB to Audio Pro",
+    "slug": "tts",
+    "folder": "tools",
+    "category": "Tools"
+  },
+  {
     "title": "VocabPod Builder - FB Internal Tools",
     "slug": "vocabpodgenerator",
     "folder": "tools",
