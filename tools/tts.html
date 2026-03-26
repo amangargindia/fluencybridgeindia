@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Azure EPUB to Audio Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        app: {
+                            bg: '#111623',
+                            panel: '#161c2d',
+                            border: '#2a3347',
+                            muted: '#8b98ae',
+                            primary: '#3461c1',
+                            primaryHover: '#2b529f',
+                            accent: '#558cf4',
+                            iconBg: '#202b46',
+                            danger: '#ef4444',
+                            dangerHover: '#dc2626'
+                        }
+                    },
+                    fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body { background-color: #111623; color: white; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #161c2d; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #2a3347; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3461c1; }
+        .hide-file-input { position: absolute; width: 0; height: 0; opacity: 0; overflow: hidden; }
+        select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%238b98ae' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+        }
+        /* Custom Checkbox */
+        input[type="checkbox"] { accent-color: #3461c1; width: 1.1rem; height: 1.1rem; cursor: pointer; }
+        /* Range Slider */
+        input[type=range] { -webkit-appearance: none; background: transparent; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%; background: #558cf4; cursor: pointer; margin-top: -6px; }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: #2a3347; border-radius: 2px; }
+    </style>
+</head>
+<body class="min-h-screen flex justify-center py-10 px-4 font-sans">
+
+    <div class="w-full max-w-[650px] flex flex-col gap-8">
+        
+        <header class="flex items-center gap-4 pb-6 border-b border-app-border justify-between">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-app-iconBg text-app-accent flex items-center justify-center border border-app-border shadow-sm">
+                    <i data-lucide="mic" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h1 class="text-white text-lg font-semibold tracking-wide">FB Internal Tools</h1>
+                    <p class="text-app-accent text-xs font-bold tracking-widest uppercase mt-0.5">AUDIOBOOK CREATOR PRO</p>
+                </div>
+            </div>
+        </header>
+
+        <main class="flex flex-col gap-8">
+
+            <section class="flex flex-col gap-3">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-app-muted text-xs font-bold tracking-wider uppercase">Authentication</h2>
+                </div>
+                <div class="flex gap-3">
+                    <div class="flex-1 relative">
+                        <i data-lucide="key" class="absolute left-3 top-3.5 w-4 h-4 text-app-muted"></i>
+                        <input type="password" id="api-key" value="4oV9BDR9sSxCzuqSvHmYXvqo3XnF07h7HAb8YaPBUeNrX0iNvzfeJQQJ99CCACqBBLyXJ3w3AAAYACOGOoAT" placeholder="Azure API Key" class="w-full bg-app-panel border border-app-border text-white text-sm rounded-lg pl-10 p-3 outline-none focus:border-app-accent transition-colors">
+                    </div>
+                    <select id="azure-region" class="w-1/3 bg-app-panel border border-app-border text-white text-sm rounded-lg p-3 outline-none focus:border-app-accent appearance-none cursor-pointer">
+                        <option value="eastus">eastus</option>
+                        <option value="eastus2">eastus2</option>
+                        <option value="westus">westus</option>
+                        <option value="westeurope">westeurope</option>
+                        <option value="northeurope">northeurope</option>
+                        <option value="centralindia">centralindia</option>
+                        <option value="southeastasia">southeastasia</option>
+                    </select>
+                </div>
+            </section>
+
+            <section class="flex flex-col gap-3">
+                <h2 class="text-app-muted text-xs font-bold tracking-wider uppercase">1. Document Source</h2>
+                <div id="drop-zone" class="border-2 border-dashed border-app-border bg-app-panel rounded-2xl p-8 flex flex-col items-center justify-center text-center cursor-pointer hover:border-app-accent transition-colors relative group">
+                    <input type="file" id="file-input" accept=".epub" class="hide-file-input">
+                    <div class="w-12 h-12 rounded-full bg-app-iconBg text-app-accent flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                        <i data-lucide="book-up" class="w-6 h-6"></i>
+                    </div>
+                    <h3 id="file-name-display" class="text-white font-medium mb-1">Upload EPUB File</h3>
+                    <p id="file-desc-display" class="text-app-muted text-sm">Drag & drop your ebook here</p>
+                </div>
+
+                <div id="chapter-selection-box" class="hidden mt-2 bg-app-panel border border-app-border rounded-xl p-4 flex flex-col gap-3">
+                    <div class="flex justify-between items-center border-b border-app-border pb-2">
+                        <span class="text-sm font-medium text-white flex items-center gap-2"><i data-lucide="list-checks" class="w-4 h-4 text-app-accent"></i> Select Chapters</span>
+                        <button id="toggle-all-btn" class="text-xs text-app-accent hover:text-white transition-colors">Deselect All</button>
+                    </div>
+                    <div id="chapter-list" class="max-h-48 overflow-y-auto flex flex-col gap-2 pr-2">
+                        </div>
+                </div>
+            </section>
+
+            <section class="flex flex-col gap-4">
+                <h2 class="text-app-muted text-xs font-bold tracking-wider uppercase">2. Voice Settings</h2>
+                
+                <div class="bg-app-panel border border-app-border rounded-xl p-5 flex flex-col gap-5">
+                    
+                    <div class="flex gap-4 items-end">
+                        <div class="flex flex-col gap-2 flex-1">
+                            <label class="text-app-muted text-xs font-medium">Neural Voice</label>
+                            <select id="voice-family" class="w-full bg-[#111623] border border-app-border text-white text-sm rounded-lg p-3 outline-none focus:border-app-accent appearance-none cursor-pointer">
+                                <option value="en-US-JennyNeural">Jenny (US Female)</option>
+                                <option value="en-US-GuyNeural">Guy (US Male)</option>
+                                <option value="en-US-AriaNeural">Aria (US Female)</option>
+                                <option value="en-US-DavisNeural">Davis (US Male)</option>
+                                <option value="en-GB-SoniaNeural">Sonia (UK Female)</option>
+                                <option value="en-GB-RyanNeural">Ryan (UK Male)</option>
+                                <option value="en-IN-NeerjaNeural">Neerja (IN Female)</option>
+                                <option value="en-IN-PrabhatNeural">Prabhat (IN Male)</option>
+                            </select>
+                        </div>
+                        <button id="preview-btn" class="bg-[#111623] border border-app-border hover:border-app-accent text-white px-4 py-3 rounded-lg flex items-center gap-2 transition-colors text-sm font-medium h-[46px]">
+                            <span id="preview-icon"><i data-lucide="play" class="w-4 h-4 text-app-accent"></i></span> Preview
+                        </button>
+                    </div>
+
+                    <div class="flex flex-col gap-2">
+                        <label class="text-app-muted text-xs font-medium flex justify-between">
+                            <span>Speaking Rate</span>
+                            <span id="rate-val-display" class="text-white">Normal</span>
+                        </label>
+                        <div class="flex gap-2">
+                            <button class="rate-btn flex-1 py-2 px-3 rounded-lg border border-app-border text-app-muted text-sm hover:text-white transition-colors" data-rate="-20%">Slow</button>
+                            <button class="rate-btn active flex-1 py-2 px-3 rounded-lg border border-app-accent bg-app-iconBg text-white text-sm transition-colors" data-rate="0%">Normal</button>
+                            <button class="rate-btn flex-1 py-2 px-3 rounded-lg border border-app-border text-app-muted text-sm hover:text-white transition-colors" data-rate="+20%">Fast</button>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col gap-3">
+                        <label class="text-app-muted text-xs font-medium flex justify-between">
+                            <span>Voice Pitch</span>
+                            <span id="pitch-val-display" class="text-white">Default</span>
+                        </label>
+                        <input type="range" id="pitch-slider" min="-20" max="20" value="0" class="w-full">
+                    </div>
+
+                    <div class="flex items-center gap-3 pt-2 border-t border-app-border">
+                        <input type="checkbox" id="clean-text-toggle" checked>
+                        <label for="clean-text-toggle" class="text-sm text-gray-300 cursor-pointer">
+                            Smart Clean (Remove URLs & footnote numbers)
+                        </label>
+                    </div>
+                </div>
+            </section>
+
+            <div id="warning-box" class="hidden bg-orange-950/30 border border-orange-900/50 text-orange-200 text-xs p-3 rounded-lg flex gap-3 items-start">
+                <i data-lucide="alert-triangle" class="w-4 h-4 text-orange-500 mt-0.5 shrink-0"></i>
+                <p id="warning-text">Warning text goes here.</p>
+            </div>
+
+            <div class="flex gap-3 pt-2">
+                <button id="generate-btn" disabled class="flex-1 bg-app-primary hover:bg-app-primaryHover text-white font-medium py-3.5 rounded-xl flex items-center justify-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg">
+                    <span id="btn-icon-wrapper"><i data-lucide="file-archive" class="w-5 h-5"></i></span>
+                    <span id="btn-text">Generate MP3 ZIP</span>
+                </button>
+                <button id="cancel-btn" class="hidden px-6 bg-app-danger hover:bg-app-dangerHover text-white font-medium py-3.5 rounded-xl flex items-center justify-center gap-2 transition-colors shadow-lg">
+                    <i data-lucide="x-circle" class="w-5 h-5"></i> Stop
+                </button>
+            </div>
+        </main>
+
+        <footer id="status-container" class="mt-4 flex flex-col items-center justify-center text-center pb-8">
+            <h3 id="status-title" class="text-white font-medium text-md mb-1">Awaiting Source Document</h3>
+            <p id="status-desc" class="text-app-muted text-sm max-w-sm">
+                Output will be a .zip file containing separate MP3s for each chapter.
+            </p>
+
+            <div id="progress-wrapper" class="w-full max-w-sm mt-5 hidden">
+                <div class="flex justify-between text-xs text-app-muted mb-1 font-medium">
+                    <span id="progress-label">Processing...</span>
+                    <span id="progress-percent">0%</span>
+                </div>
+                <div class="w-full bg-app-panel rounded-full h-2 border border-app-border overflow-hidden">
+                    <div id="progress-bar" class="bg-app-accent h-full rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+            </div>
+        </footer>
+
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // State variables
+        let epubsChapters = [];
+        let isGenerating = false;
+        let isCancelled = false;
+        let currentAudio = null; // For preview
+
+        // DOM Elements
+        const DOM = {
+            apiKey: document.getElementById('api-key'),
+            region: document.getElementById('azure-region'),
+            voice: document.getElementById('voice-family'),
+            rateBtns: document.querySelectorAll('.rate-btn'),
+            pitchSlider: document.getElementById('pitch-slider'),
+            pitchDisplay: document.getElementById('pitch-val-display'),
+            cleanToggle: document.getElementById('clean-text-toggle'),
+            
+            dropZone: document.getElementById('drop-zone'),
+            fileInput: document.getElementById('file-input'),
+            fileName: document.getElementById('file-name-display'),
+            fileDesc: document.getElementById('file-desc-display'),
+            
+            chapterBox: document.getElementById('chapter-selection-box'),
+            chapterList: document.getElementById('chapter-list'),
+            toggleAllBtn: document.getElementById('toggle-all-btn'),
+            
+            previewBtn: document.getElementById('preview-btn'),
+            previewIcon: document.getElementById('preview-icon'),
+            generateBtn: document.getElementById('generate-btn'),
+            cancelBtn: document.getElementById('cancel-btn'),
+            
+            warningBox: document.getElementById('warning-box'),
+            warningText: document.getElementById('warning-text'),
+            
+            statusTitle: document.getElementById('status-title'),
+            statusDesc: document.getElementById('status-desc'),
+            progWrap: document.getElementById('progress-wrapper'),
+            progBar: document.getElementById('progress-bar'),
+            progLabel: document.getElementById('progress-label'),
+            progPercent: document.getElementById('progress-percent'),
+            btnIconWrapper: document.getElementById('btn-icon-wrapper'),
+            btnText: document.getElementById('btn-text')
+        };
+
+        // Initialize Settings from LocalStorage
+        function loadSettings() {
+            if(localStorage.getItem('az_region')) DOM.region.value = localStorage.getItem('az_region');
+            if(localStorage.getItem('az_voice')) DOM.voice.value = localStorage.getItem('az_voice');
+            if(localStorage.getItem('az_pitch')) {
+                DOM.pitchSlider.value = localStorage.getItem('az_pitch');
+                updatePitchDisplay(DOM.pitchSlider.value);
+            }
+            if(localStorage.getItem('az_rate')) {
+                setRateActive(localStorage.getItem('az_rate'));
+            }
+            if(localStorage.getItem('az_clean') !== null) {
+                DOM.cleanToggle.checked = localStorage.getItem('az_clean') === 'true';
+            }
+        }
+
+        function saveSettings() {
+            localStorage.setItem('az_region', DOM.region.value);
+            localStorage.setItem('az_voice', DOM.voice.value);
+            localStorage.setItem('az_pitch', DOM.pitchSlider.value);
+            localStorage.setItem('az_rate', getActiveRate());
+            localStorage.setItem('az_clean', DOM.cleanToggle.checked);
+        }
+
+        // Attach Save Listeners
+        [DOM.region, DOM.voice, DOM.pitchSlider, DOM.cleanToggle].forEach(el => el.addEventListener('change', saveSettings));
+
+        // Pitch UI
+        function updatePitchDisplay(val) {
+            let num = parseInt(val);
+            DOM.pitchDisplay.textContent = num === 0 ? "Default" : (num > 0 ? `+${num}%` : `${num}%`);
+        }
+        DOM.pitchSlider.addEventListener('input', (e) => updatePitchDisplay(e.target.value));
+
+        // Rate UI
+        function setRateActive(rateVal) {
+            DOM.rateBtns.forEach(b => {
+                if(b.dataset.rate === rateVal) {
+                    b.classList.add('active', 'border-app-accent', 'bg-app-iconBg', 'text-white');
+                    b.classList.remove('border-app-border', 'text-app-muted');
+                    document.getElementById('rate-val-display').textContent = b.textContent;
+                } else {
+                    b.classList.remove('active', 'border-app-accent', 'bg-app-iconBg', 'text-white');
+                    b.classList.add('border-app-border', 'text-app-muted');
+                }
+            });
+        }
+        function getActiveRate() {
+            const active = document.querySelector('.rate-btn.active');
+            return active ? active.dataset.rate : "0%";
+        }
+        DOM.rateBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                setRateActive(btn.dataset.rate);
+                saveSettings();
+            });
+        });
+
+        // Initialize
+        loadSettings();
+
+        // --- File Handling & Parsing ---
+        DOM.dropZone.addEventListener('click', () => DOM.fileInput.click());
+        DOM.dropZone.addEventListener('dragover', (e) => { e.preventDefault(); DOM.dropZone.classList.add('border-app-accent', 'bg-app-iconBg'); });
+        DOM.dropZone.addEventListener('dragleave', () => DOM.dropZone.classList.remove('border-app-accent', 'bg-app-iconBg'));
+        DOM.dropZone.addEventListener('drop', (e) => {
+            e.preventDefault(); DOM.dropZone.classList.remove('border-app-accent', 'bg-app-iconBg');
+            if (e.dataTransfer.files.length) handleFileSelect(e.dataTransfer.files[0]);
+        });
+        DOM.fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) handleFileSelect(e.target.files[0]);
+        });
+
+        async function handleFileSelect(file) {
+            if (!file.name.toLowerCase().endsWith('.epub')) { alert('Please upload an EPUB file.'); return; }
+            
+            DOM.fileName.textContent = file.name;
+            DOM.fileDesc.textContent = `Extracting chapters...`;
+            DOM.generateBtn.disabled = true;
+            DOM.chapterBox.classList.add('hidden');
+            epubsChapters = [];
+            DOM.warningBox.classList.add('hidden');
+
+            try {
+                epubsChapters = await parseEpubToChapters(file);
+                renderChapterList();
+                updateSelectionStats();
+                
+                DOM.chapterBox.classList.remove('hidden');
+                DOM.generateBtn.disabled = false;
+                DOM.statusTitle.textContent = "Ready to Generate";
+                DOM.statusDesc.textContent = "Select desired chapters, adjust voice settings, and start.";
+            } catch (error) {
+                console.error(error);
+                DOM.fileDesc.textContent = `Error reading EPUB structure.`;
+                alert(error.message);
+            }
+        }
+
+        async function parseEpubToChapters(file) {
+            const zip = await JSZip.loadAsync(file);
+            const chapters = [];
+            const parser = new DOMParser();
+
+            // Find OPF
+            const containerFile = zip.file("META-INF/container.xml");
+            if (!containerFile) throw new Error("Invalid EPUB format (missing container.xml)");
+            const containerDoc = parser.parseFromString(await containerFile.async("string"), "text/xml");
+            const rootfilePath = containerDoc.querySelector("rootfile").getAttribute("full-path");
+            
+            const opfDoc = parser.parseFromString(await zip.file(rootfilePath).async("string"), "text/xml");
+            const basePath = rootfilePath.includes('/') ? rootfilePath.substring(0, rootfilePath.lastIndexOf('/') + 1) : "";
+
+            const manifest = {};
+            opfDoc.querySelectorAll("manifest > item").forEach(i => manifest[i.getAttribute("id")] = i.getAttribute("href"));
+
+            const spineIds = Array.from(opfDoc.querySelectorAll("spine > itemref")).map(i => i.getAttribute("idref"));
+
+            let chapCounter = 1;
+            for (const id of spineIds) {
+                const href = manifest[id];
+                if (!href) continue;
+                
+                const fileObj = zip.file(basePath + decodeURIComponent(href));
+                if (!fileObj) continue;
+
+                const htmlDoc = parser.parseFromString(await fileObj.async("string"), "text/html");
+                htmlDoc.querySelectorAll('script, style, img, svg').forEach(el => el.remove());
+                
+                const text = htmlDoc.body ? htmlDoc.body.textContent.trim() : "";
+                if (text.length > 50) { // Ignore tiny empty skeleton files
+                    let title = `Chapter ${chapCounter}`;
+                    const titleTag = htmlDoc.querySelector("title");
+                    const h1Tag = htmlDoc.querySelector("h1, h2"); // fallback to first heading
+                    
+                    if (h1Tag && h1Tag.textContent.trim().length > 2) {
+                        title = h1Tag.textContent.trim().substring(0, 40);
+                    } else if (titleTag && titleTag.textContent.trim().length > 2) {
+                        title = titleTag.textContent.trim().substring(0, 40);
+                    }
+                    
+                    // clean up title for filename safety
+                    title = title.replace(/[<>:"/\\|?*\n\r]/g, '').trim();
+
+                    chapters.push({ 
+                        id: `chap_${chapCounter}`, 
+                        title: title, 
+                        text: text, 
+                        selected: true,
+                        wordCount: text.split(/\s+/).length
+                    });
+                    chapCounter++;
+                }
+            }
+            if(chapters.length === 0) throw new Error("Could not find any readable text in this document.");
+            return chapters;
+        }
+
+        // --- Chapter UI ---
+        function renderChapterList() {
+            DOM.chapterList.innerHTML = '';
+            epubsChapters.forEach((chap, i) => {
+                const div = document.createElement('div');
+                div.className = "flex justify-between items-center bg-[#111623] p-2.5 rounded border border-app-border hover:border-app-muted transition-colors";
+                div.innerHTML = `
+                    <label class="flex items-center gap-3 cursor-pointer flex-1 truncate">
+                        <input type="checkbox" class="chap-cb" data-idx="${i}" ${chap.selected ? 'checked' : ''}>
+                        <span class="text-sm text-gray-200 font-medium truncate">${chap.title}</span>
+                    </label>
+                    <span class="text-xs text-app-muted whitespace-nowrap ml-2">${(chap.wordCount).toLocaleString()} words</span>
+                `;
+                DOM.chapterList.appendChild(div);
+            });
+
+            document.querySelectorAll('.chap-cb').forEach(cb => {
+                cb.addEventListener('change', (e) => {
+                    epubsChapters[e.target.dataset.idx].selected = e.target.checked;
+                    updateSelectionStats();
+                });
+            });
+        }
+
+        let allSelected = true;
+        DOM.toggleAllBtn.addEventListener('click', () => {
+            allSelected = !allSelected;
+            epubsChapters.forEach(c => c.selected = allSelected);
+            renderChapterList();
+            updateSelectionStats();
+            DOM.toggleAllBtn.textContent = allSelected ? "Deselect All" : "Select All";
+        });
+
+        function updateSelectionStats() {
+            const selected = epubsChapters.filter(c => c.selected);
+            const totalWords = selected.reduce((sum, c) => sum + c.wordCount, 0);
+            const estimatedMins = Math.round(totalWords / 150); // 150 wpm
+            const approxChars = totalWords * 5; // roughly 5 chars per word
+
+            let timeStr = estimatedMins > 60 ? `${Math.floor(estimatedMins/60)}h ${estimatedMins%60}m` : `${estimatedMins} mins`;
+            DOM.fileDesc.textContent = `${selected.length} Chapters • ~${totalWords.toLocaleString()} words • Est. Audio: ${timeStr}`;
+
+            // Quota Warning
+            if (approxChars > 450000) {
+                DOM.warningBox.classList.remove('hidden');
+                DOM.warningText.innerHTML = `<strong>High Volume Alert:</strong> This selection is ~${(approxChars/1000).toFixed(0)}k characters. The Azure Free Tier (F0) limit is 500k characters per month. Generating this may consume your entire monthly quota or fail.`;
+            } else {
+                DOM.warningBox.classList.add('hidden');
+            }
+        }
+
+        // --- Text Processing ---
+        function cleanTextForAudio(text) {
+            if(!DOM.cleanToggle.checked) return text;
+            let t = text;
+            t = t.replace(/https?:\/\/[^\s]+/g, ' '); // remove urls
+            t = t.replace(/\[\d+\]/g, ' '); // remove footnote brackets [1]
+            t = t.replace(/_{2,}/g, ' '); // remove long underlines
+            return t;
+        }
+
+        function chunkText(text, maxLength = 2500) {
+            const chunks = [];
+            let currentChunk = "";
+            const sentences = text.match(/[^.!?\n]+[.!?\n]+/g) || [text]; 
+            for (const sentence of sentences) {
+                if (currentChunk.length + sentence.length > maxLength) {
+                    if (currentChunk) chunks.push(currentChunk.trim());
+                    currentChunk = sentence;
+                } else {
+                    currentChunk += " " + sentence;
+                }
+            }
+            if (currentChunk) chunks.push(currentChunk.trim());
+            return chunks;
+        }
+
+        // --- Azure API Call ---
+        async function fetchTTS(text, region, voice, rate, pitch, key) {
+            const url = `https://${region}.tts.speech.microsoft.com/cognitiveservices/v1`;
+            const safeText = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            const pitchStr = parseInt(pitch) >= 0 ? `+${pitch}%` : `${pitch}%`;
+
+            const ssml = `
+                <speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' xml:lang='en-US'>
+                    <voice name='${voice}'>
+                        <prosody rate='${rate}' pitch='${pitchStr}'>
+                            ${safeText}
+                        </prosody>
+                    </voice>
+                </speak>
+            `;
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Ocp-Apim-Subscription-Key': key,
+                    'Content-Type': 'application/ssml+xml',
+                    'X-Microsoft-OutputFormat': 'audio-16khz-128kbitrate-mono-mp3'
+                },
+                body: ssml
+            });
+
+            if (!response.ok) {
+                const err = await response.text();
+                if(response.status === 401) throw new Error("Authentication Failed. Check API Key and Region.");
+                if(response.status === 429) throw new Error("Quota Exceeded (429). You have hit your Azure limits.");
+                throw new Error(`Azure Error ${response.status}: ${err}`);
+            }
+            return await response.blob();
+        }
+
+        // --- Voice Preview ---
+        DOM.previewBtn.addEventListener('click', async () => {
+            if(currentAudio) { currentAudio.pause(); currentAudio = null; }
+            
+            const key = DOM.apiKey.value.trim();
+            if(!key) return alert("Please enter your Azure API Key");
+
+            DOM.previewIcon.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 text-app-accent animate-spin"></i>`;
+            lucide.createIcons();
+
+            try {
+                const sampleText = "This is a quick preview of how the audiobook will sound with your current settings.";
+                const blob = await fetchTTS(
+                    sampleText, 
+                    DOM.region.value, 
+                    DOM.voice.value, 
+                    getActiveRate(), 
+                    DOM.pitchSlider.value, 
+                    key
+                );
+                currentAudio = new Audio(URL.createObjectURL(blob));
+                currentAudio.play();
+                DOM.previewIcon.innerHTML = `<i data-lucide="volume-2" class="w-4 h-4 text-app-accent"></i>`;
+                
+                currentAudio.onended = () => {
+                    DOM.previewIcon.innerHTML = `<i data-lucide="play" class="w-4 h-4 text-app-accent"></i>`;
+                    lucide.createIcons();
+                };
+            } catch (err) {
+                alert(err.message);
+                DOM.previewIcon.innerHTML = `<i data-lucide="play" class="w-4 h-4 text-app-accent"></i>`;
+            }
+            lucide.createIcons();
+        });
+
+        // --- Main Generation ---
+        DOM.generateBtn.addEventListener('click', async () => {
+            const key = DOM.apiKey.value.trim();
+            if(!key) return alert("Please enter your Azure API Key.");
+
+            const selectedChaps = epubsChapters.filter(c => c.selected);
+            if(selectedChaps.length === 0) return alert("Please select at least one chapter.");
+
+            isGenerating = true;
+            isCancelled = false;
+            
+            // UI Update
+            DOM.generateBtn.classList.add('hidden');
+            DOM.cancelBtn.classList.remove('hidden');
+            DOM.progWrap.classList.remove('hidden');
+            DOM.statusTitle.textContent = "Generating Audiobook Archive...";
+            DOM.statusDesc.textContent = "Please keep this tab open. Do not refresh.";
+            
+            try {
+                const zipOutput = new JSZip();
+                const totalChapters = selectedChaps.length;
+                let currentChapIdx = 0;
+
+                for (const chap of selectedChaps) {
+                    if(isCancelled) throw new Error("Generation stopped by user.");
+                    
+                    currentChapIdx++;
+                    const clean = cleanTextForAudio(chap.text);
+                    const chunks = chunkText(clean, 2500);
+                    const audioBlobs = [];
+
+                    for (let i = 0; i < chunks.length; i++) {
+                        if(isCancelled) throw new Error("Generation stopped by user.");
+                        
+                        // Update Progress UI
+                        const overallPercent = Math.round(((currentChapIdx - 1) / totalChapters) * 100 + ((i / chunks.length) * (100 / totalChapters)));
+                        DOM.progLabel.textContent = `Chapter ${currentChapIdx}/${totalChapters}: ${chap.title.substring(0, 20)}... (Part ${i+1}/${chunks.length})`;
+                        DOM.progBar.style.width = `${overallPercent}%`;
+                        DOM.progPercent.textContent = `${overallPercent}%`;
+
+                        // Fetch
+                        const blob = await fetchTTS(chunks[i], DOM.region.value, DOM.voice.value, getActiveRate(), DOM.pitchSlider.value, key);
+                        audioBlobs.push(blob);
+                    }
+
+                    // Combine chunks for this chapter
+                    const finalChapAudio = new Blob(audioBlobs, { type: 'audio/mpeg' });
+                    
+                    // Format filename (e.g., "01 - Chapter 1.mp3")
+                    const fileIdxStr = currentChapIdx.toString().padStart(2, '0');
+                    zipOutput.file(`${fileIdxStr} - ${chap.title}.mp3`, finalChapAudio);
+                }
+
+                if(!isCancelled) {
+                    DOM.progLabel.textContent = "Compressing ZIP file...";
+                    DOM.progBar.style.width = `100%`;
+                    DOM.progPercent.textContent = `100%`;
+
+                    const zipBlob = await zipOutput.generateAsync({ type: "blob" });
+                    downloadBlob(zipBlob, DOM.fileName.textContent.replace('.epub', ' - Audiobook.zip'));
+                    
+                    DOM.statusTitle.textContent = "Success!";
+                    DOM.statusDesc.textContent = "Your ZIP file has been downloaded.";
+                }
+
+            } catch (err) {
+                console.error(err);
+                if (err.message === "Generation stopped by user.") {
+                    DOM.statusTitle.textContent = "Cancelled";
+                    DOM.statusDesc.textContent = "Audiobook generation was stopped.";
+                } else {
+                    DOM.statusTitle.textContent = "Error";
+                    DOM.statusDesc.textContent = err.message;
+                    alert(`Error: ${err.message}`);
+                }
+            } finally {
+                // Reset UI
+                isGenerating = false;
+                DOM.generateBtn.classList.remove('hidden');
+                DOM.cancelBtn.classList.add('hidden');
+                setTimeout(() => { if(!isGenerating) DOM.progWrap.classList.add('hidden'); }, 4000);
+            }
+        });
+
+        DOM.cancelBtn.addEventListener('click', () => {
+            if(isGenerating && confirm("Are you sure you want to stop generating?")) {
+                isCancelled = true;
+                DOM.cancelBtn.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> Stopping...`;
+                lucide.createIcons();
+            }
+        });
+
+        function downloadBlob(blob, filename) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
