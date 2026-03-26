@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fluency Bridge Verb Types Practice - V2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeIn {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+        body {
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #030712;
+            color: white;
+            margin: 0;
+            min-height: 100vh;
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center p-4 md:p-8">
+
+    <!-- Top Gradient matching screenshot -->
+    <div class="fixed top-0 left-0 right-0 h-64 bg-gradient-to-b from-[#0a1536] to-transparent pointer-events-none z-0"></div>
+
+    <div class="w-full max-w-md mt-12 md:mt-24 relative z-10">
+        
+        <!-- Logo -->
+        <div class="flex flex-col items-center mb-8 relative z-10">
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-24 bg-[#3b82f6]/10 blur-[60px] rounded-full -z-10"></div>
+            <span class="text-[10px] tracking-[0.4em] font-semibold text-gray-300 mb-0.5">F L U E N C Y</span>
+            <span class="text-5xl font-serif italic tracking-wide text-white" style="font-family: Georgia, serif;">bridge</span>
+        </div>
+
+        <div class="bg-[#0b1120] border-t border-white/5 rounded-[2rem] shadow-2xl p-6 md:p-8 relative overflow-hidden min-h-[300px]">
+            
+            <!-- Start Screen -->
+            <div id="screen-start" class="flex flex-col animate-fadeIn">
+                <h1 class="text-xl md:text-2xl font-bold text-center mb-4 text-white">
+                    Fluency Bridge Verb Types Practice - V2
+                </h1>
+                <p class="text-[#94a3b8] text-center text-sm md:text-base mb-10 leading-relaxed px-2">
+                    Test your knowledge of English irregular verbs. Practice 10 random verbs at a time and improve your fluency.
+                </p>
+
+                <button onclick="startAssessment()" class="w-full bg-[#2563eb] hover:bg-[#1d4ed8] active:bg-[#1e40af] text-white font-semibold rounded-xl py-4 transition-colors duration-200 shadow-[0_0_20px_rgba(37,99,235,0.2)]">
+                    Start Practice
+                </button>
+            </div>
+
+            <!-- Playing Screen -->
+            <div id="screen-playing" class="flex flex-col animate-fadeIn hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <span id="question-counter" class="text-sm font-medium text-[#64748b]">
+                        Question 1 of 10
+                    </span>
+                    <span id="score-display" class="text-sm font-medium text-[#64748b] bg-[#030712] px-3 py-1 rounded-full border border-white/5">
+                        Score: 0
+                    </span>
+                </div>
+
+                <div class="w-full bg-[#030712] rounded-full h-1.5 mb-8 overflow-hidden">
+                    <div id="progress-bar" class="bg-[#2563eb] h-1.5 rounded-full transition-all duration-300" style="width: 10%;"></div>
+                </div>
+
+                <h2 class="text-center text-[#94a3b8] mb-2 text-sm uppercase tracking-wider font-semibold">
+                    What is the V2 form of:
+                </h2>
+                <div id="current-verb" class="text-center text-4xl font-bold text-white mb-8 pb-4 border-b border-white/5">
+                    "verb"
+                </div>
+
+                <div id="options-container" class="space-y-3">
+                    <!-- Options injected by JS -->
+                </div>
+            </div>
+
+            <!-- Result Screen -->
+            <div id="screen-result" class="flex flex-col items-center animate-fadeIn hidden py-6">
+                <div class="w-24 h-24 rounded-full flex items-center justify-center mb-6 bg-[#030712] border-2 border-white/5 shadow-inner">
+                    <span class="text-3xl font-bold text-white">
+                        <span id="final-score">0</span><span class="text-[#64748b] text-xl">/10</span>
+                    </span>
+                </div>
+                
+                <h2 class="text-2xl font-bold text-white mb-2">
+                    Practice Complete
+                </h2>
+                
+                <p id="result-message" class="text-center mb-8 px-4 text-[#94a3b8]">
+                    You scored 0 out of 10.
+                </p>
+
+                <button onclick="startAssessment()" class="w-full bg-[#2563eb] hover:bg-[#1d4ed8] active:bg-[#1e40af] text-white font-semibold rounded-xl py-4 transition-colors duration-200 shadow-[0_0_20px_rgba(37,99,235,0.2)]">
+                    Practice Again
+                </button>
+                
+                <button onclick="showScreen('start')" class="w-full bg-transparent hover:bg-white/5 text-[#94a3b8] font-medium rounded-xl py-4 mt-3 transition-colors duration-200">
+                    Back to Home
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // List of exactly 100 common English verbs (V1 and V2)
+        const verbList = [
+            { v1: 'arise', v2: 'arose' }, { v1: 'awake', v2: 'awoke' }, { v1: 'be', v2: 'was/were' },
+            { v1: 'bear', v2: 'bore' }, { v1: 'beat', v2: 'beat' }, { v1: 'become', v2: 'became' },
+            { v1: 'begin', v2: 'began' }, { v1: 'bend', v2: 'bent' }, { v1: 'bet', v2: 'bet' },
+            { v1: 'bind', v2: 'bound' }, { v1: 'bite', v2: 'bit' }, { v1: 'bleed', v2: 'bled' },
+            { v1: 'blow', v2: 'blew' }, { v1: 'break', v2: 'broke' }, { v1: 'bring', v2: 'brought' },
+            { v1: 'build', v2: 'built' }, { v1: 'burn', v2: 'burnt' }, { v1: 'burst', v2: 'burst' },
+            { v1: 'buy', v2: 'bought' }, { v1: 'catch', v2: 'caught' }, { v1: 'choose', v2: 'chose' },
+            { v1: 'come', v2: 'came' }, { v1: 'cost', v2: 'cost' }, { v1: 'creep', v2: 'crept' },
+            { v1: 'cut', v2: 'cut' }, { v1: 'deal', v2: 'dealt' }, { v1: 'dig', v2: 'dug' },
+            { v1: 'do', v2: 'did' }, { v1: 'draw', v2: 'drew' }, { v1: 'dream', v2: 'dreamt' },
+            { v1: 'drink', v2: 'drank' }, { v1: 'drive', v2: 'drove' }, { v1: 'eat', v2: 'ate' },
+            { v1: 'fall', v2: 'fell' }, { v1: 'feed', v2: 'fed' }, { v1: 'feel', v2: 'felt' },
+            { v1: 'fight', v2: 'fought' }, { v1: 'find', v2: 'found' }, { v1: 'flee', v2: 'fled' },
+            { v1: 'fly', v2: 'flew' }, { v1: 'forbid', v2: 'forbade' }, { v1: 'forget', v2: 'forgot' },
+            { v1: 'forgive', v2: 'forgave' }, { v1: 'freeze', v2: 'froze' }, { v1: 'get', v2: 'got' },
+            { v1: 'give', v2: 'gave' }, { v1: 'go', v2: 'went' }, { v1: 'grow', v2: 'grew' },
+            { v1: 'hang', v2: 'hung' }, { v1: 'have', v2: 'had' }, { v1: 'hear', v2: 'heard' },
+            { v1: 'hide', v2: 'hid' }, { v1: 'hit', v2: 'hit' }, { v1: 'hold', v2: 'held' },
+            { v1: 'hurt', v2: 'hurt' }, { v1: 'keep', v2: 'kept' }, { v1: 'kneel', v2: 'knelt' },
+            { v1: 'know', v2: 'knew' }, { v1: 'lay', v2: 'laid' }, { v1: 'lead', v2: 'led' },
+            { v1: 'lean', v2: 'leant' }, { v1: 'learn', v2: 'learnt' }, { v1: 'leave', v2: 'left' },
+            { v1: 'lend', v2: 'lent' }, { v1: 'let', v2: 'let' }, { v1: 'lie', v2: 'lay' },
+            { v1: 'light', v2: 'lit' }, { v1: 'lose', v2: 'lost' }, { v1: 'make', v2: 'made' },
+            { v1: 'mean', v2: 'meant' }, { v1: 'meet', v2: 'met' }, { v1: 'pay', v2: 'paid' },
+            { v1: 'put', v2: 'put' }, { v1: 'read', v2: 'read' }, { v1: 'ride', v2: 'rode' },
+            { v1: 'ring', v2: 'rang' }, { v1: 'rise', v2: 'rose' }, { v1: 'run', v2: 'ran' },
+            { v1: 'say', v2: 'said' }, { v1: 'see', v2: 'saw' }, { v1: 'seek', v2: 'sought' },
+            { v1: 'sell', v2: 'sold' }, { v1: 'send', v2: 'sent' }, { v1: 'set', v2: 'set' },
+            { v1: 'sew', v2: 'sewed' }, { v1: 'shake', v2: 'shook' }, { v1: 'shine', v2: 'shone' },
+            { v1: 'shoot', v2: 'shot' }, { v1: 'show', v2: 'showed' }, { v1: 'shrink', v2: 'shrank' },
+            { v1: 'shut', v2: 'shut' }, { v1: 'sing', v2: 'sang' }, { v1: 'sink', v2: 'sank' },
+            { v1: 'sit', v2: 'sat' }, { v1: 'sleep', v2: 'slept' }, { v1: 'slide', v2: 'slid' },
+            { v1: 'smell', v2: 'smelt' }, { v1: 'speak', v2: 'spoke' }, { v1: 'spell', v2: 'spelt' },
+            { v1: 'spend', v2: 'spent' }, { v1: 'spill', v2: 'spilt' }, { v1: 'spin', v2: 'spun' },
+            { v1: 'spit', v2: 'spat' }, { v1: 'split', v2: 'split' }, { v1: 'spoil', v2: 'spoilt' },
+            { v1: 'spread', v2: 'spread' }, { v1: 'spring', v2: 'sprang' }, { v1: 'stand', v2: 'stood' },
+            { v1: 'steal', v2: 'stole' }, { v1: 'stick', v2: 'stuck' }, { v1: 'sting', v2: 'stung' }
+        ];
+
+        // App State
+        let currentQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let isAnswering = false; // Prevent multiple clicks
+
+        // Utility to shuffle an array
+        const shuffleArray = (array) => {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        };
+
+        // UI Management
+        const showScreen = (screenName) => {
+            document.getElementById('screen-start').classList.add('hidden');
+            document.getElementById('screen-playing').classList.add('hidden');
+            document.getElementById('screen-result').classList.add('hidden');
+            
+            document.getElementById(`screen-${screenName}`).classList.remove('hidden');
+            
+            // Re-trigger animation
+            const el = document.getElementById(`screen-${screenName}`);
+            el.classList.remove('animate-fadeIn');
+            void el.offsetWidth; // trigger reflow
+            el.classList.add('animate-fadeIn');
+        };
+
+        const startAssessment = () => {
+            // Pick 10 random questions
+            const shuffledVerbs = shuffleArray(verbList);
+            currentQuestions = shuffledVerbs.slice(0, 10);
+            currentQuestionIndex = 0;
+            score = 0;
+            isAnswering = false;
+
+            showScreen('playing');
+            renderQuestion();
+        };
+
+        const generateOptions = (currentVerb) => {
+            const correctV2 = currentVerb.v2;
+            // Get all wrong options
+            const wrongOptions = verbList
+                .filter(v => v.v2 !== correctV2)
+                .map(v => v.v2);
+            
+            // Pick 3 random wrong
+            const shuffledWrong = shuffleArray(wrongOptions).slice(0, 3);
+            
+            // Combine and shuffle final 4
+            return shuffleArray([correctV2, ...shuffledWrong]);
+        };
+
+        const renderQuestion = () => {
+            isAnswering = false;
+            const currentVerb = currentQuestions[currentQuestionIndex];
+            const options = generateOptions(currentVerb);
+
+            // Update UI texts
+            document.getElementById('question-counter').innerText = `Question ${currentQuestionIndex + 1} of 10`;
+            document.getElementById('score-display').innerText = `Score: ${score}`;
+            document.getElementById('current-verb').innerText = `"${currentVerb.v1}"`;
+            
+            // Update progress bar
+            const progressPct = ((currentQuestionIndex + 1) / 10) * 100;
+            document.getElementById('progress-bar').style.width = `${progressPct}%`;
+
+            // Render buttons
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = ''; // Clear previous
+
+            options.forEach(option => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left px-5 py-4 rounded-xl border transition-all duration-200 font-medium text-base bg-[#030712] border-white/5 hover:bg-[#0f172a] hover:border-white/10 text-[#cbd5e1] option-btn";
+                btn.innerText = option;
+                
+                btn.onclick = () => handleOptionClick(option, btn, currentVerb.v2);
+                
+                optionsContainer.appendChild(btn);
+            });
+        };
+
+        const handleOptionClick = (selectedOption, buttonElement, correctV2) => {
+            if (isAnswering) return;
+            isAnswering = true; // Lock inputs
+
+            const isCorrect = selectedOption === correctV2;
+            
+            // Update score
+            if (isCorrect) {
+                score++;
+                document.getElementById('score-display').innerText = `Score: ${score}`;
+            }
+
+            // Style all buttons based on result
+            const allButtons = document.querySelectorAll('.option-btn');
+            allButtons.forEach(btn => {
+                btn.disabled = true;
+                const optionText = btn.innerText;
+                
+                // Reset base classes for styling
+                btn.className = "w-full text-left px-5 py-4 rounded-xl border transition-all duration-200 font-medium text-base ";
+                
+                if (optionText === correctV2) {
+                    // Correct answer (Green)
+                    btn.className += "bg-[#052e16] border-[#22c55e]/50 text-[#4ade80]";
+                } else if (optionText === selectedOption && !isCorrect) {
+                    // Selected wrong answer (Red)
+                    btn.className += "bg-[#450a0a] border-[#ef4444]/50 text-[#f87171]";
+                } else {
+                    // Unselected wrong answers (Dimmed)
+                    btn.className += "bg-[#030712] border-white/5 text-[#475569] opacity-50";
+                }
+            });
+
+            // Move to next question or result after delay
+            setTimeout(() => {
+                if (currentQuestionIndex < 9) {
+                    currentQuestionIndex++;
+                    renderQuestion();
+                } else {
+                    showResult();
+                }
+            }, 800);
+        };
+
+        const showResult = () => {
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('result-message').innerText = `You scored ${score} out of 10.`;
+            showScreen('result');
+        };
+
+    </script>
+</body>
+</html>
+
