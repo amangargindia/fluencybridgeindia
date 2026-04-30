@@ -1,0 +1,790 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FluencyBridge - Master Since & For</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            bg: '#060B19',
+                            card: '#111A2C',
+                            input: '#080D1A',
+                            primary: '#2563EB'
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.4s ease-out forwards',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        html { scroll-behavior: smooth; }
+        body { 
+            background-color: #060B19; 
+            color: white; 
+            overflow-x: hidden; 
+            font-family: ui-sans-serif, system-ui, sans-serif; 
+        }
+        
+        /* Ambient Lighting */
+        .ambient-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at top, rgba(19, 30, 58, 0.8), transparent);
+            pointer-events: none; filter: blur(40px); z-index: -1;
+        }
+
+        /* Scrollbar Styling for Code Blocks */
+        pre::-webkit-scrollbar { height: 8px; width: 8px; }
+        pre::-webkit-scrollbar-track { background: #080D1A; border-radius: 8px; }
+        pre::-webkit-scrollbar-thumb { background: #2563EB; border-radius: 8px; }
+
+        /* Strict Print Theming */
+        @media print {
+            body { 
+                background: #060B19 !important; 
+                color: white !important; 
+                -webkit-print-color-adjust: exact !important; 
+                print-color-adjust: exact !important;
+            }
+            .ambient-bg { display: none !important; }
+            .no-print { display: none !important; }
+            #view-notes { display: block !important; }
+            .print-card { 
+                page-break-inside: avoid; 
+                border: 1px solid rgba(255,255,255,0.1) !important;
+            }
+        }
+    </style>
+</head>
+<body class="selection:bg-blue-500/30">
+    <div class="ambient-bg"></div>
+
+    <div class="relative z-10 w-full min-h-screen flex flex-col">
+        <!-- Top Nav / Logo (Hidden in Print to save space) -->
+        <header class="flex flex-col items-center py-8 no-print">
+            <span class="tracking-[0.3em] text-[10px] text-gray-300 uppercase mb-1 opacity-80">F L U E N C Y</span>
+            <span class="text-white text-4xl italic font-serif tracking-tight">bridge</span>
+        </header>
+
+        <!-- Main Content Area -->
+        <main id="app-content" class="flex-1 w-full relative">
+            
+            <!-- VIEW: HOME DASHBOARD -->
+            <section id="view-home" class="max-w-md mx-auto px-6 pb-24 space-y-6 animate-fade-in no-print">
+                <div class="text-center space-y-2 mb-8">
+                    <h1 class="text-2xl font-bold text-white">Master Since & For</h1>
+                    <p class="text-gray-400 text-sm leading-relaxed">Conquer the most confusing English prepositions with logical reasoning and Indian context.</p>
+                </div>
+
+                <div class="grid gap-4">
+                    <button onclick="navigateTo('notes')" class="group text-left bg-brand-card border-t border-white/5 shadow-2xl rounded-3xl p-6 hover:bg-[#16223A] transition-all w-full">
+                        <div class="flex items-center justify-between mb-2">
+                            <h2 class="text-lg font-bold text-white">Revise Concept</h2>
+                            <div class="bg-white/5 p-2 rounded-xl group-hover:bg-white/10 transition">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-400"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+                            </div>
+                        </div>
+                        <p class="text-gray-400 text-sm">Hinglish notes mind maps and common mistakes.</p>
+                    </button>
+
+                    <button onclick="navigateTo('reallife')" class="group text-left bg-brand-card border-t border-white/5 shadow-2xl rounded-3xl p-6 hover:bg-[#16223A] transition-all w-full">
+                        <div class="flex items-center justify-between mb-2">
+                            <h2 class="text-lg font-bold text-white">Real-life Usage</h2>
+                            <div class="bg-white/5 p-2 rounded-xl group-hover:bg-white/10 transition">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-400"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                            </div>
+                        </div>
+                        <p class="text-gray-400 text-sm">Everyday sentences for the Indian middle class.</p>
+                    </button>
+
+                    <button onclick="startQuiz()" class="group text-left bg-gradient-to-br from-[#2563EB] to-[#1D4ED8] shadow-2xl shadow-blue-900/30 rounded-3xl p-6 hover:brightness-110 transition-all mt-4 w-full">
+                        <div class="flex items-center justify-between mb-2">
+                            <h2 class="text-lg font-bold text-white">Start Assessment</h2>
+                            <div class="bg-white/20 p-2 rounded-xl">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                            </div>
+                        </div>
+                        <p class="text-blue-100 text-sm">10 random questions out of 100 database. Test your accuracy.</p>
+                    </button>
+                    
+                    <button onclick="openAnkiModal()" class="text-center text-xs text-gray-500 hover:text-white transition-colors mt-2 py-2">
+                        Download Anki Flashcard Deck (CSV)
+                    </button>
+                </div>
+            </section>
+
+            <!-- VIEW: NOTES (HINGLISH) -->
+            <section id="view-notes" class="max-w-md mx-auto px-6 pb-24 space-y-8 animate-fade-in text-gray-300 hidden">
+                <div class="bg-brand-card border-t border-white/5 rounded-3xl p-6 print-card">
+                    <div class="flex justify-between items-start mb-4">
+                        <h1 class="text-2xl font-bold text-white">Revise Since & For</h1>
+                        <button onclick="window.print()" class="no-print bg-white/5 hover:bg-white/10 p-2 rounded-lg text-gray-300 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
+                        </button>
+                    </div>
+                    <p class="text-sm text-gray-400 mb-6">Ye dono words time batane ke liye use hote hain (especially Perfect aur Perfect Continuous tenses mein). Par inka logic alag hai.</p>
+                    
+                    <div class="bg-brand-input rounded-xl p-4 border border-white/5 no-print">
+                        <h3 class="text-white font-bold mb-3 text-sm uppercase tracking-wider">Table of Contents</h3>
+                        <ul class="space-y-2 text-sm">
+                            <li><a href="#basic-rule" class="text-blue-400 hover:text-blue-300">1. Basic Rule (Asaan Bhasha mein)</a></li>
+                            <li><a href="#mind-map" class="text-blue-400 hover:text-blue-300">2. The Mind Map Logic</a></li>
+                            <li><a href="#nuances" class="text-blue-400 hover:text-blue-300">3. Nuances & Traps</a></li>
+                            <li><a href="#key-mistakes" class="text-blue-400 hover:text-blue-300">4. Top 3 Mistakes (Tense Errors)</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div id="basic-rule" class="bg-brand-card border-t border-white/5 rounded-3xl p-6 scroll-mt-6 print-card">
+                    <h2 class="text-xl font-bold text-white mb-4">1. Basic Rule (Golden Logic)</h2>
+                    <div class="space-y-6">
+                        <div class="bg-brand-input p-4 rounded-xl border border-white/5 border-l-4 border-l-[#2563EB]">
+                            <h3 class="text-lg font-bold text-blue-400 mb-1">SINCE = "Kab Se" (Starting Point)</h3>
+                            <p class="text-sm leading-relaxed mb-3">Jab aapko wo exact point batana ho jahan se kaam SHURU hua tha. Aap ghadi ya calendar mein uspe ungli rakh sakte ho.</p>
+                            <ul class="text-sm space-y-1 text-gray-400">
+                                <li>• <strong class="text-gray-200">Time:</strong> Since 9 AM since 8 o'clock.</li>
+                                <li>• <strong class="text-gray-200">Days/Dates:</strong> Since Monday since 4th July.</li>
+                                <li>• <strong class="text-gray-200">Years/Months:</strong> Since 2015 since January.</li>
+                                <li>• <strong class="text-gray-200">Events/Life phases:</strong> Since childhood since my wedding since I woke up.</li>
+                            </ul>
+                        </div>
+                        <div class="bg-brand-input p-4 rounded-xl border border-white/5 border-l-4 border-l-green-500">
+                            <h3 class="text-lg font-bold text-green-400 mb-1">FOR = "Kitni Der Se" (Duration)</h3>
+                            <p class="text-sm leading-relaxed mb-3">Jab aap total samay (length of time) ki ginti batate ho. Isme starting point nahi diya hota bas total time diya hota hai.</p>
+                            <ul class="text-sm space-y-1 text-gray-400">
+                                <li>• <strong class="text-gray-200">Minutes/Hours:</strong> For 5 minutes for 2 hours.</li>
+                                <li>• <strong class="text-gray-200">Days/Weeks:</strong> For 3 days for a week.</li>
+                                <li>• <strong class="text-gray-200">Months/Years:</strong> For 6 months for 10 years.</li>
+                                <li>• <strong class="text-gray-200">Vague times:</strong> For a long time for ages for a while.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="mind-map" class="bg-brand-card border-t border-white/5 rounded-3xl p-6 scroll-mt-6 print-card">
+                    <h2 class="text-xl font-bold text-white mb-4">2. The Visual Mind Map</h2>
+                    <p class="text-sm mb-4">Imagine a timeline. Aaj ka din "Now" hai.</p>
+                    <div class="bg-brand-input rounded-xl p-6 flex flex-col items-center justify-center space-y-6 relative overflow-hidden border border-white/5">
+                        <div class="w-full relative py-4">
+                            <div class="absolute top-1/2 left-0 w-full h-0.5 bg-gray-700"></div>
+                            <div class="absolute top-1/2 left-[20%] w-3 h-3 bg-blue-500 rounded-full -translate-y-1/2 shadow-[0_0_10px_rgba(59,130,246,0.8)]"></div>
+                            <div class="absolute top-1/2 right-[10%] w-3 h-3 bg-white rounded-full -translate-y-1/2"></div>
+                            <div class="absolute top-1/2 left-[20%] w-[70%] h-0.5 bg-blue-500 origin-left scale-x-100"></div>
+                            <div class="absolute top-0 left-[15%] text-xs text-blue-400 font-bold">2010 (Start)</div>
+                            <div class="absolute top-0 right-[5%] text-xs text-white font-bold">Now</div>
+                            <div class="text-center mt-6 text-sm text-blue-300 font-medium">Since 2010 <br/><span class="text-[10px] text-gray-500">(Focus on the dot)</span></div>
+                        </div>
+                        <div class="w-full relative py-4 mt-8">
+                            <div class="absolute top-1/2 left-0 w-full h-0.5 bg-gray-700"></div>
+                            <div class="absolute top-1/2 right-[10%] w-3 h-3 bg-white rounded-full -translate-y-1/2"></div>
+                            <div class="absolute top-1/2 left-[20%] right-[10%] h-3 bg-green-500/20 -translate-y-1/2 rounded-full border border-green-500/50"></div>
+                            <div class="absolute top-0 left-[45%] text-xs text-green-400 font-bold">14 Years Total</div>
+                            <div class="absolute top-0 right-[5%] text-xs text-white font-bold">Now</div>
+                            <div class="text-center mt-6 text-sm text-green-300 font-medium">For 14 years <br/><span class="text-[10px] text-gray-500">(Focus on the length)</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="nuances" class="bg-brand-card border-t border-white/5 rounded-3xl p-6 scroll-mt-6 print-card">
+                    <h2 class="text-xl font-bold text-white mb-4">3. Nuances & Traps (Dhokha kahan hota hai)</h2>
+                    <ul class="space-y-4">
+                        <li class="bg-brand-input p-4 rounded-xl border border-white/5">
+                            <strong class="text-white block mb-1">Trap 1 "For a long time" vs "Since a long time"</strong>
+                            <p class="text-sm">Log aksar kehte hain <span class="line-through text-red-400">"Since a long time"</span>. Ye GALAT hai. "A long time" ek lamba samay (duration) hai isliye hamesha <strong class="text-green-400">"For a long time"</strong> bole.</p>
+                        </li>
+                        <li class="bg-brand-input p-4 rounded-xl border border-white/5">
+                            <strong class="text-white block mb-1">Trap 2 Clauses with Since</strong>
+                            <p class="text-sm">Aap Since ke baad puri line (clause) likh sakte ho jo starting event ka kaam karegi. Example <strong class="text-blue-400">"I have known him since we were in school."</strong> Yahan "we were in school" ek past event hai.</p>
+                        </li>
+                    </ul>
+                </div>
+
+                <div id="key-mistakes" class="bg-brand-card border-t border-white/5 rounded-3xl p-6 scroll-mt-6 print-card">
+                    <h2 class="text-xl font-bold text-white mb-4">4. The Tense Mistake (Very Important)</h2>
+                    <p class="text-sm mb-4">Preposition sahi lagane se kaam nahi chalega Tense bhi badalna padta hai</p>
+                    <div class="bg-red-500/10 border border-red-500/20 p-4 rounded-xl mb-4">
+                        <div class="text-red-400 font-bold mb-2">❌ Wrong</div>
+                        <p class="text-white mb-1">"I <span class="underline">am living</span> here since 2010."</p>
+                        <p class="text-xs text-gray-400">Reason 'am living' present continuous hai. Ye us kaam ke liye hai jo ABHI chal raha hai usme 'since/for' nahi jodte.</p>
+                    </div>
+                    <div class="bg-green-500/10 border border-green-500/20 p-4 rounded-xl">
+                        <div class="text-green-400 font-bold mb-2">✅ Right</div>
+                        <p class="text-white mb-1">"I <span class="underline font-bold">have been living</span> here since 2010."</p>
+                        <p class="text-xs text-gray-400">Rule Jab bhi time duration/start point do hamesha <strong>Present Perfect Continuous</strong> (have/has been + ing) use karo.</p>
+                    </div>
+                </div>
+
+                <button onclick="startQuiz()" class="no-print w-full bg-brand-primary text-white font-bold py-4 rounded-xl hover:bg-blue-600 transition-colors shadow-lg shadow-blue-900/30">
+                    Put this to Test → Jump to Quiz
+                </button>
+            </section>
+
+            <!-- VIEW: REAL LIFE USAGE -->
+            <section id="view-reallife" class="max-w-md mx-auto px-6 pb-24 space-y-6 animate-fade-in hidden no-print">
+                <div class="text-center space-y-2 mb-8">
+                    <h1 class="text-2xl font-bold text-white">Daily Conversations</h1>
+                    <p class="text-gray-400 text-sm">Examples strictly relatable for Indian middle-class scenarios.</p>
+                </div>
+                <div class="space-y-4">
+                    <div class="bg-brand-card border-t border-white/5 rounded-3xl p-5 shadow-lg">
+                        <div class="flex items-center space-x-3 mb-3">
+                            <div class="bg-yellow-500/20 p-2 rounded-lg text-yellow-500">🛵</div>
+                            <h3 class="text-white font-bold">Zomato/Swiggy Delivery</h3>
+                        </div>
+                        <p class="text-blue-300 font-medium mb-1">"Bhaiya I have been waiting outside the gate <span class="bg-blue-500/20 text-blue-200 px-1 rounded">for 20 minutes</span>. Kahan ho aap?"</p>
+                        <p class="text-gray-400 text-xs mt-2">Why 'for'? Because 20 minutes is a duration.</p>
+                    </div>
+                    <div class="bg-brand-card border-t border-white/5 rounded-3xl p-5 shadow-lg">
+                        <div class="flex items-center space-x-3 mb-3">
+                            <div class="bg-purple-500/20 p-2 rounded-lg text-purple-500">📚</div>
+                            <h3 class="text-white font-bold">Exam Preparation (JEE/UPSC)</h3>
+                        </div>
+                        <p class="text-purple-300 font-medium mb-1">"Wo ladka Kota mein <span class="bg-purple-500/20 text-purple-200 px-1 rounded">since 10th class</span> coaching kar raha hai."</p>
+                        <p class="text-gray-400 text-xs mt-2">Why 'since'? 10th class is a specific phase/event in life acting as a start point.</p>
+                    </div>
+                    <div class="bg-brand-card border-t border-white/5 rounded-3xl p-5 shadow-lg">
+                        <div class="flex items-center space-x-3 mb-3">
+                            <div class="bg-green-500/20 p-2 rounded-lg text-green-500">🏠</div>
+                            <h3 class="text-white font-bold">Renting / Society Talk</h3>
+                        </div>
+                        <p class="text-green-300 font-medium mb-1">"Hum toh is society mein <span class="bg-green-500/20 text-green-200 px-1 rounded">since 2012</span> reh rahe hain tab toh yahan paani ki dikkat nahi thi."</p>
+                        <p class="text-gray-400 text-xs mt-2">Why 'since'? 2012 is a specific calendar year.</p>
+                    </div>
+                    <div class="bg-brand-card border-t border-white/5 rounded-3xl p-5 shadow-lg">
+                        <div class="flex items-center space-x-3 mb-3">
+                            <div class="bg-orange-500/20 p-2 rounded-lg text-orange-500">⚡</div>
+                            <h3 class="text-white font-bold">Power Cut / Inverter Issues</h3>
+                        </div>
+                        <p class="text-orange-300 font-medium mb-1">"Subah se light nahi hai. Inverter has been running <span class="bg-orange-500/20 text-orange-200 px-1 rounded">since morning</span>."</p>
+                        <p class="text-orange-300 font-medium mb-1 border-t border-white/5 pt-2 mt-2">"It has been off <span class="bg-orange-500/20 text-orange-200 px-1 rounded">for 6 hours</span>."</p>
+                        <p class="text-gray-400 text-xs mt-2">Notice the flip? Morning is a point (since). 6 hours is the counted duration (for).</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW: QUIZ ENGINE -->
+            <section id="view-quiz" class="max-w-md mx-auto px-6 pb-24 space-y-6 animate-fade-in flex flex-col h-full hidden no-print">
+                <div class="space-y-2">
+                    <div class="flex justify-between text-xs text-gray-400 font-bold uppercase tracking-wider">
+                        <span id="quiz-progress-text">Question 1/10</span>
+                        <span id="quiz-type-text" class="text-blue-400">MCQ</span>
+                    </div>
+                    <div class="h-2 w-full bg-white/10 rounded-full overflow-hidden">
+                        <div id="quiz-progress-bar" class="h-full bg-brand-primary transition-all duration-300" style="width: 10%"></div>
+                    </div>
+                </div>
+
+                <div class="bg-brand-card border-t border-white/5 rounded-3xl p-6 shadow-2xl min-h-[250px] flex flex-col">
+                    <h2 id="quiz-question-text" class="text-xl font-medium text-white mb-6 leading-snug">Question text here</h2>
+                    <div id="quiz-options-container" class="flex-1 space-y-3">
+                        <!-- Buttons dynamically generated here via pure JS -->
+                    </div>
+                </div>
+
+                <!-- Reasoning UI -->
+                <div id="quiz-reasoning-container" class="bg-blue-900/20 border border-blue-500/20 rounded-2xl p-5 shadow-lg animate-fade-in relative hidden">
+                    <h3 class="text-blue-300 font-bold text-xs uppercase tracking-wider mb-2">Hinglish Reasoning</h3>
+                    <p id="quiz-reasoning-text" class="text-sm text-gray-200 leading-relaxed">Reasoning text goes here...</p>
+                    
+                    <button onclick="leaveQuizToNotes()" class="mt-4 text-xs text-blue-400 hover:text-blue-300 underline underline-offset-2 flex items-center space-x-1">
+                        <span>Revise Concept</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                    </button>
+
+                    <button id="quiz-next-btn" onclick="nextQuestion()" class="mt-5 w-full bg-brand-primary text-white font-bold py-3 rounded-xl hover:bg-blue-600 transition-colors active:scale-[0.98]">
+                        Next Question →
+                    </button>
+                </div>
+            </section>
+
+            <!-- VIEW: RESULTS -->
+            <section id="view-results" class="max-w-md mx-auto px-6 pb-24 space-y-6 animate-fade-in text-center hidden no-print">
+                <div class="bg-brand-card border-t border-white/5 rounded-3xl p-8 shadow-2xl mt-4">
+                    <div class="w-24 h-24 rounded-full bg-brand-input border-4 border-brand-primary mx-auto flex items-center justify-center mb-6 shadow-[0_0_20px_rgba(37,99,235,0.4)]">
+                        <span id="result-percentage" class="text-3xl font-bold text-white">0%</span>
+                    </div>
+                    
+                    <h2 class="text-2xl font-bold text-white mb-2">Quiz Complete</h2>
+                    <p id="result-message" class="text-gray-400 text-sm mb-8">Message</p>
+
+                    <div class="grid grid-cols-2 gap-4 mb-8 text-left">
+                        <div class="bg-brand-input p-4 rounded-xl border border-white/5">
+                            <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">Score</p>
+                            <p class="text-xl font-bold text-white"><span id="result-score">0</span> <span class="text-sm text-gray-500">/ 10</span></p>
+                        </div>
+                        <div class="bg-brand-input p-4 rounded-xl border border-white/5">
+                            <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">Time</p>
+                            <p id="result-time" class="text-xl font-bold text-white">0m 0s</p>
+                        </div>
+                        <div class="col-span-2 bg-brand-input p-4 rounded-xl border border-white/5 flex items-center justify-between">
+                            <div>
+                                <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">Efficiency Rate</p>
+                                <p class="text-xl font-bold text-green-400"><span id="result-efficiency">0</span> <span class="text-xs text-gray-400 font-normal">pts / min</span></p>
+                            </div>
+                            <div class="text-2xl opacity-50">⚡</div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3">
+                        <button onclick="startQuiz()" class="w-full bg-brand-primary text-white font-bold py-4 rounded-xl hover:bg-blue-600 transition-colors shadow-lg active:scale-[0.98]">
+                            Play Again (New Questions)
+                        </button>
+                        <button onclick="navigateTo('notes')" class="w-full bg-transparent text-gray-300 font-bold py-4 rounded-xl hover:bg-white/5 transition-colors border border-white/10 active:scale-[0.98]">
+                            Revise Notes
+                        </button>
+                        <button onclick="openAnkiModal()" class="w-full bg-[#080D1A] text-gray-400 font-bold py-4 rounded-xl hover:text-white transition-colors border border-white/5 active:scale-[0.98] flex items-center justify-center space-x-2 mt-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                            <span>Download Anki File</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW: ANKI EXPORT MODAL -->
+            <section id="view-anki" class="max-w-md mx-auto px-6 pb-24 space-y-6 animate-fade-in hidden no-print">
+                <div class="bg-brand-card border-t border-white/5 rounded-3xl p-6 shadow-2xl mt-4">
+                    <h2 class="text-xl font-bold text-white mb-2">Anki Flashcard Deck</h2>
+                    <p class="text-xs text-gray-400 mb-6">100 unique questions strictly formatted with exactly one comma per line for perfect Anki CSV importing.</p>
+                    
+                    <div class="bg-[#040812] rounded-xl border border-white/10 p-4 mb-4 relative">
+                        <pre id="anki-code-block" class="text-[10px] font-mono text-green-400 max-h-64 overflow-y-auto w-full whitespace-pre-wrap break-all"></pre>
+                    </div>
+
+                    <button onclick="downloadAnkiCSV()" class="w-full bg-[#10B981] text-white font-bold py-4 rounded-xl hover:bg-[#059669] transition-colors shadow-lg active:scale-[0.98] mb-3">
+                        Download CSV File
+                    </button>
+                    <button onclick="navigateTo('home')" class="w-full bg-transparent text-gray-300 font-bold py-4 rounded-xl hover:bg-white/5 transition-colors border border-white/10 active:scale-[0.98]">
+                        Back to Home
+                    </button>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Fixed Bottom Footer (Hidden in Print) -->
+        <footer class="fixed bottom-0 left-0 right-0 bg-[#060B19]/90 backdrop-blur-md border-t border-white/5 p-4 z-50 no-print">
+            <div class="max-w-md mx-auto flex justify-between items-center text-sm">
+                <button onclick="navigateTo('home')" class="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    <span>Home</span>
+                </button>
+                
+                <!-- THE ISOLATED NON-REFRESHING TIMER -->
+                <div id="timer-display" class="text-gray-500 font-mono text-xs w-[60px] text-center bg-[#080D1A] py-1 px-2 rounded-lg border border-white/5">
+                    ⏱ 0m 0s
+                </div>
+
+                <button id="nav-back-btn" onclick="handleBackButton()" class="flex items-center justify-end space-x-2 text-gray-400 hover:text-white transition-colors hidden w-[60px]">
+                    <span>Back</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                </button>
+                <div id="nav-spacer" class="w-[60px]"></div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Application Logic (Vanilla JavaScript) -->
+    <script>
+        // ==========================================
+        // 1. DATABASE: 100 UNIQUE QUESTIONS
+        // (Cleaned to strictly avoid commas colons and semicolons in text to protect Anki CSV formatting)
+        // ==========================================
+        const QUESTION_BANK = [
+          // MCQs (1-30)
+          { id: 1, type: 'mcq', text: "I have been waiting for the Swiggy delivery ___ 45 minutes.", options: ["since", "for", "from"], correct: 1, reasoning: "45 minutes ek duration hai starting point nahi. Isliye for aayega." },
+          { id: 2, type: 'mcq', text: "Neha hasn't visited her hometown ___ Diwali.", options: ["since", "for", "till"], correct: 0, reasoning: "Diwali ek specific point in time event hai jab action start hua. Isliye since." },
+          { id: 3, type: 'mcq', text: "Papa has been reading the newspaper ___ morning.", options: ["since", "for", "in"], correct: 0, reasoning: "Morning din ka ek exact hissa hai. Yahan duration nahi batayi." },
+          { id: 4, type: 'mcq', text: "We have lived in this society ___ 2015.", options: ["since", "for", "about"], correct: 0, reasoning: "2015 ek exact year starting point hai. Jab saal diya ho tab since lagate hain." },
+          { id: 5, type: 'mcq', text: "Bhaiya has been preparing for UPSC ___ three years.", options: ["since", "for", "from"], correct: 1, reasoning: "Three years total samay duration bata raha hai exact saal nahi. Toh for use hoga." },
+          { id: 6, type: 'mcq', text: "I haven't eaten a good panipuri ___ a long time.", options: ["since", "for", "during"], correct: 1, reasoning: "A long time ek aspasht samay ki avadhi duration hai. Exact point nahi hai." },
+          { id: 7, type: 'mcq', text: "She has been sleeping ___ 10 o'clock.", options: ["since", "for", "at"], correct: 0, reasoning: "10 o'clock ghadi ka exact time starting point hai. Isliye since aayega." },
+          { id: 8, type: 'mcq', text: "They have been stuck in Mumbai traffic ___ two hours.", options: ["since", "for", "by"], correct: 1, reasoning: "Two hours total duration hai. Traffic mein kitni der faste rahe? 2 ghante. For sahi hai." },
+          { id: 9, type: 'mcq', text: "I have known my best friend ___ childhood.", options: ["since", "for", "from"], correct: 0, reasoning: "Life ke phases ko point in time maante hain. Since childhood hamesha sahi hota hai." },
+          { id: 10, type: 'mcq', text: "The WiFi hasn't been working ___ yesterday.", options: ["since", "for", "last"], correct: 0, reasoning: "Yesterday ek definite din hai past mein starting point. Duration nahi hai." },
+          { id: 11, type: 'mcq', text: "He has been ignoring my texts ___ Monday.", options: ["since", "for", "on"], correct: 0, reasoning: "Days of the week ke saath hamesha since aata hai kyunki wo exact points hain." },
+          { id: 12, type: 'mcq', text: "We haven't had electricity ___ three days.", options: ["since", "for", "in"], correct: 1, reasoning: "Three days ek ginti ya duration hai. Agar Monday hota toh since aata." },
+          { id: 13, type: 'mcq', text: "The milkman hasn't come ___ a week.", options: ["since", "for", "until"], correct: 1, reasoning: "A week matlab 7 din ka time period. Period ke pehle for lagta hai." },
+          { id: 14, type: 'mcq', text: "I have had this scooty ___ I was in college.", options: ["since", "for", "when"], correct: 0, reasoning: "I was in college ek past event hai jo starting point ka kaam kar raha hai." },
+          { id: 15, type: 'mcq', text: "She has been practicing classical dance ___ 5 years.", options: ["since", "for", "from"], correct: 1, reasoning: "5 years length of time duration hai. Starting point nahi hai." },
+          { id: 16, type: 'mcq', text: "It has been raining continuously ___ last night.", options: ["since", "for", "through"], correct: 0, reasoning: "Last night ek exact time bata raha hai jab baarish shuru hui." },
+          { id: 17, type: 'mcq', text: "Mummy has been in the kitchen ___ hours.", options: ["since", "for", "many"], correct: 1, reasoning: "Hours ek anishchit duration hai. Duration ke liye for lagta hai." },
+          { id: 18, type: 'mcq', text: "I haven't gone to the gym ___ January.", options: ["since", "for", "in"], correct: 0, reasoning: "Months ke naam exact points in time hote hain. Since use karenge." },
+          { id: 19, type: 'mcq', text: "They have been married ___ 25 years.", options: ["since", "for", "about"], correct: 1, reasoning: "25 years total duration bata raha hai shadi ki." },
+          { id: 20, type: 'mcq', text: "I have been watching T20 matches ___ 2007.", options: ["since", "for", "from"], correct: 0, reasoning: "2007 exact saal starting point hai jahan se action shuru hua." },
+          { id: 21, type: 'mcq', text: "He has been saving money ___ ages.", options: ["since", "for", "from"], correct: 1, reasoning: "Ages ek idiom hai jiska matlab hai bahut lambe samay se. Isliye for aayega." },
+          { id: 22, type: 'mcq', text: "We have been sitting on this train ___ 6 AM.", options: ["since", "for", "at"], correct: 0, reasoning: "6 AM ghadi ka exact samay hai point in time." },
+          { id: 23, type: 'mcq', text: "I haven't seen my cousins ___ a few months.", options: ["since", "for", "in"], correct: 1, reasoning: "A few months ek time period hai starting month ka naam nahi diya." },
+          { id: 24, type: 'mcq', text: "She has been working in this IT company ___ graduation.", options: ["since", "for", "after"], correct: 0, reasoning: "Graduation ek life event hai jo specific point in time maana jata hai." },
+          { id: 25, type: 'mcq', text: "The building has been under construction ___ a decade.", options: ["since", "for", "over"], correct: 1, reasoning: "A decade yaani 10 saal ek duration hai. Isliye for lagega." },
+          { id: 26, type: 'mcq', text: "I have been using this smartphone ___ last December.", options: ["since", "for", "from"], correct: 0, reasoning: "Last December exact mahina aur point in time batata hai." },
+          { id: 27, type: 'mcq', text: "We have been talking on the phone ___ hours.", options: ["since", "for", "by"], correct: 1, reasoning: "Hours length of time duration hai." },
+          { id: 28, type: 'mcq', text: "He hasn't eaten anything ___ he woke up.", options: ["since", "for", "when"], correct: 0, reasoning: "He woke up ek past event hai jo starting point ki tarah kaam kar raha hai." },
+          { id: 29, type: 'mcq', text: "I have been learning React ___ two weeks.", options: ["since", "for", "from"], correct: 1, reasoning: "Two weeks duration hai." },
+          { id: 30, type: 'mcq', text: "They haven't paid the rent ___ three months.", options: ["since", "for", "till"], correct: 1, reasoning: "Three months ek total samay ki avadhi duration hai." },
+
+          // True/False (31-55)
+          { id: 31, type: 'tf', text: "Sentence correctness 'I have been studying since 3 hours.'", correctAnswer: false, reasoning: "Galat. 3 hours duration hai. Sahi sentence hoga FOR 3 hours." },
+          { id: 32, type: 'tf', text: "Sentence correctness 'We have been friends since 2010.'", correctAnswer: true, reasoning: "Sahi. 2010 ek exact starting point hai toh since lagana bilkul theek hai." },
+          { id: 33, type: 'tf', text: "Sentence correctness 'She has been sleeping for morning.'", correctAnswer: false, reasoning: "Galat. Morning ek specific point in time hai. Yahan since morning aana chahiye." },
+          { id: 34, type: 'tf', text: "Sentence correctness 'They have lived here for a long time.'", correctAnswer: true, reasoning: "Sahi. A long time ek duration hai aur for duration ke liye hi use hota hai." },
+          { id: 35, type: 'tf', text: "Sentence correctness 'I am waiting since 2 PM.'", correctAnswer: false, reasoning: "Grammar mistake. Sahi hoga I HAVE BEEN waiting since 2 PM." },
+          { id: 36, type: 'tf', text: "Sentence correctness 'He hasn't called me for last week.'", correctAnswer: false, reasoning: "Galat. Last week ek exact past point hai. Sahi hoga SINCE last week." },
+          { id: 37, type: 'tf', text: "Sentence correctness 'I have had this car for 5 years.'", correctAnswer: true, reasoning: "Sahi. 5 years duration hai isliye for ka use theek hai." },
+          { id: 38, type: 'tf', text: "Sentence correctness 'It has been raining since ages.'", correctAnswer: false, reasoning: "Galat. Ages ek aspasht duration hai. Sahi expression for ages hota hai." },
+          { id: 39, type: 'tf', text: "Sentence correctness 'I haven't eaten pizza since my birthday.'", correctAnswer: true, reasoning: "Sahi. My birthday ek specific din hai." },
+          { id: 40, type: 'tf', text: "Sentence correctness 'We have been waiting for the bus since half an hour.'", correctAnswer: false, reasoning: "Galat. Half an hour aadha ghanta duration hai. Sahi FOR half an hour." },
+          { id: 41, type: 'tf', text: "Sentence correctness 'She has been a teacher since 2018.'", correctAnswer: true, reasoning: "Sahi. 2018 exact starting year hai." },
+          { id: 42, type: 'tf', text: "Sentence correctness 'I know him for childhood.'", correctAnswer: false, reasoning: "Galat. Childhood ek point hai. Sahi I have known him SINCE childhood." },
+          { id: 43, type: 'tf', text: "Sentence correctness 'They haven't visited us for months.'", correctAnswer: true, reasoning: "Sahi. Months ek anishchit avadhi duration hai." },
+          { id: 44, type: 'tf', text: "Sentence correctness 'I have been practicing guitar since I bought it.'", correctAnswer: true, reasoning: "Sahi. I bought it past ki ek ghatna hai jo starting point ban gayi hai." },
+          { id: 45, type: 'tf', text: "Sentence correctness 'He has been sick for Monday.'", correctAnswer: false, reasoning: "Galat. Monday din ka naam hai. Sahi since Monday." },
+          { id: 46, type: 'tf', text: "Sentence correctness 'We have been standing in the queue since 2 hours.'", correctAnswer: false, reasoning: "Galat. 2 hours duration hai. Sahi for 2 hours." },
+          { id: 47, type: 'tf', text: "Sentence correctness 'I have loved cricket since I was a kid.'", correctAnswer: true, reasoning: "Sahi. Past event was a kid as a starting point use hua hai." },
+          { id: 48, type: 'tf', text: "Sentence correctness 'She is studying here for 3 years.'", correctAnswer: false, reasoning: "Tense galat hai. For ke sath Present Perfect Continuous aata hai." },
+          { id: 49, type: 'tf', text: "Sentence correctness 'I haven't seen him since a week.'", correctAnswer: false, reasoning: "Galat. A week ek duration hai. Sahi FOR a week." },
+          { id: 50, type: 'tf', text: "Sentence correctness 'He has worked in Dubai for 10 years.'", correctAnswer: true, reasoning: "Sahi. 10 years ek duration hai." },
+          { id: 51, type: 'tf', text: "Sentence correctness 'It hasn't snowed here since 1999.'", correctAnswer: true, reasoning: "Sahi. 1999 exact year hai." },
+          { id: 52, type: 'tf', text: "Sentence correctness 'I have been awake for 5 AM.'", correctAnswer: false, reasoning: "Galat. 5 AM exact time hai. Sahi SINCE 5 AM." },
+          { id: 53, type: 'tf', text: "Sentence correctness 'They have been watching TV since 4 hours.'", correctAnswer: false, reasoning: "Galat. 4 hours duration hai. Sahi FOR 4 hours." },
+          { id: 54, type: 'tf', text: "Sentence correctness 'I haven't taken a vacation since last year.'", correctAnswer: true, reasoning: "Sahi. Last year ko ek point in time maana jata hai." },
+          { id: 55, type: 'tf', text: "Sentence correctness 'She has been crying for a while.'", correctAnswer: true, reasoning: "Sahi. A while ek aspasht duration hai." },
+
+          // Correct or Not (56-80)
+          { id: 56, type: 'correct_not', text: "Is 'I have been living in Delhi from 2015' correct?", correctAnswer: 'Incorrect', reasoning: "From galat hai. Perfect tense mein hamesha since use karte hain." },
+          { id: 57, type: 'correct_not', text: "Is 'We haven't met for 5 years' correct?", correctAnswer: 'Correct', reasoning: "5 years duration hai aur for yahan bilkul sahi hai." },
+          { id: 58, type: 'correct_not', text: "Is 'He hasn't spoken to me since three days' correct?", correctAnswer: 'Incorrect', reasoning: "Galat. Three days ek duration hai. Yahan for three days aana chahiye." },
+          { id: 59, type: 'correct_not', text: "Is 'The shop has been closed since Monday' correct?", correctAnswer: 'Correct', reasoning: "Sahi. Monday ek exact starting point hai." },
+          { id: 60, type: 'correct_not', text: "Is 'I am working in this office for 2 years' correct?", correctAnswer: 'Incorrect', reasoning: "TENSE galat hai. have been working lagta hai." },
+          { id: 61, type: 'correct_not', text: "Is 'They have been playing PUBG since 3 hours' correct?", correctAnswer: 'Incorrect', reasoning: "Galat. 3 hours duration hai. Sahi for 3 hours." },
+          { id: 62, type: 'correct_not', text: "Is 'I haven't eaten out since the lockdown started' correct?", correctAnswer: 'Correct', reasoning: "Sahi. lockdown started ek starting point ka kaam kar raha hai." },
+          { id: 63, type: 'correct_not', text: "Is 'We have been traveling for morning' correct?", correctAnswer: 'Incorrect', reasoning: "Galat. Morning period nahi point in time hai. Sahi hoga since morning." },
+          { id: 64, type: 'correct_not', text: "Is 'She has owned this house since 2005' correct?", correctAnswer: 'Correct', reasoning: "Sahi. 2005 saal hai isliye since." },
+          { id: 65, type: 'correct_not', text: "Is 'He has been fasting for sunrise' correct?", correctAnswer: 'Incorrect', reasoning: "Galat. Sunrise din ka ek exact event hai. Sahi since sunrise." },
+          { id: 66, type: 'correct_not', text: "Is 'I have been waiting for ages' correct?", correctAnswer: 'Correct', reasoning: "Sahi. Ages matlab ek lamba time period." },
+          { id: 67, type: 'correct_not', text: "Is 'The AC hasn't been serviced since 6 months' correct?", correctAnswer: 'Incorrect', reasoning: "Galat. 6 months duration hai. Sahi for 6 months." },
+          { id: 68, type: 'correct_not', text: "Is 'They have been discussing this issue since the meeting started' correct?", correctAnswer: 'Correct', reasoning: "Sahi. the meeting started ek past event hai." },
+          { id: 69, type: 'correct_not', text: "Is 'I haven't visited the doctor for last year' correct?", correctAnswer: 'Incorrect', reasoning: "Galat. Last year as a starting point treat kiya jata hai. Sahi since last year." },
+          { id: 70, type: 'correct_not', text: "Is 'We have been preparing for the exam for a year' correct?", correctAnswer: 'Correct', reasoning: "Sahi. A year time ki duration hai." },
+          { id: 71, type: 'correct_not', text: "Is 'He has been silent for the teacher scolded him' correct?", correctAnswer: 'Incorrect', reasoning: "Galat. Clause ke sath hamesha since aata hai." },
+          { id: 72, type: 'correct_not', text: "Is 'She hasn't paid the EMI since March' correct?", correctAnswer: 'Correct', reasoning: "Sahi. March mahine ka naam hai jo ki exact point in time hai." },
+          { id: 73, type: 'correct_not', text: "Is 'I have been trying to call you since 5 minutes' correct?", correctAnswer: 'Incorrect', reasoning: "Galat. 5 minutes duration hai. Sahi for 5 minutes." },
+          { id: 74, type: 'correct_not', text: "Is 'The train has been delayed since 2 hours' correct?", correctAnswer: 'Incorrect', reasoning: "Galat. 2 hours avadhi duration hai. Sahi for 2 hours." },
+          { id: 75, type: 'correct_not', text: "Is 'I have been wearing glasses since I was 10' correct?", correctAnswer: 'Correct', reasoning: "Sahi. I was 10 ek past ka specific point of time hai." },
+          { id: 76, type: 'correct_not', text: "Is 'They have been dating for 2019' correct?", correctAnswer: 'Incorrect', reasoning: "Galat. 2019 ek specific saal hai. Sahi hoga since 2019." },
+          { id: 77, type: 'correct_not', text: "Is 'We haven't had water supply for yesterday' correct?", correctAnswer: 'Incorrect', reasoning: "Galat. Yesterday ek definite past time hai. Sahi hoga since yesterday." },
+          { id: 78, type: 'correct_not', text: "Is 'He has been my mentor since my first day at work' correct?", correctAnswer: 'Correct', reasoning: "Sahi. first day at work exact starting event hai." },
+          { id: 79, type: 'correct_not', text: "Is 'I have been driving since 5 years' correct?", correctAnswer: 'Incorrect', reasoning: "Galat. 5 years duration hai. Yahan for 5 years hona chahiye." },
+          { id: 80, type: 'correct_not', text: "Is 'She has been reading that book for days' correct?", correctAnswer: 'Correct', reasoning: "Sahi. Days ek anishchit duration ko dikhata hai." },
+
+          // Flashcards (81-100)
+          { id: 81, type: 'flashcard', text: "Why do we say since childhood but for 10 years?", correctAnswer: "Childhood ek event hai jabki 10 years us time ki length bata raha hai.", reasoning: "Since = Kab se. For = Kitni der se." },
+          { id: 82, type: 'flashcard', text: "Find the error 'I am waiting here since 4 PM.'", correctAnswer: "Error tense mein hai. am waiting nahi have been waiting aayega.", reasoning: "Jab samay diya ho toh hum Present Perfect Continuous use karte hain." },
+          { id: 83, type: 'flashcard', text: "If I started studying at 9 AM and it is 11 AM now what are two correct sentences?", correctAnswer: "1 I have been studying SINCE 9 AM. 2 I have been studying FOR 2 hours.", reasoning: "9 AM starting point hai. 2 hours gap hai." },
+          { id: 84, type: 'flashcard', text: "Why is since 3 days wrong?", correctAnswer: "Kyunki 3 days duration hai exact din ka naam nahi.", reasoning: "Duration ke sath hamesha for aata hai." },
+          { id: 85, type: 'flashcard', text: "Is 'I have been knowing him for 5 years' correct?", correctAnswer: "Nahi knowing galat hai. Know ek stative verb hai.", reasoning: "Sahi sentence hoga I have known him for 5 years." },
+          { id: 86, type: 'flashcard', text: "Which is correct 'Since a long time' or 'For a long time'?", correctAnswer: "For a long time.", reasoning: "A long time ek lamba time period duration hai." },
+          { id: 87, type: 'flashcard', text: "Can we use from instead of since in perfect continuous tense?", correctAnswer: "Nahi. Past starting point ke liye sirf since aata hai.", reasoning: "From usually future tenses mein aata hai." },
+          { id: 88, type: 'flashcard', text: "Why do we use since with yesterday?", correctAnswer: "Kyunki yesterday time line par ek fix point hai jahan se action shuru hua.", reasoning: "Point ko identify karne ke liye since aata hai." },
+          { id: 89, type: 'flashcard', text: "Fill the blank We haven't seen her ___ centuries.", correctAnswer: "FOR centuries.", reasoning: "Centuries sadiyon samay ki ek avadhi bata raha hai." },
+          { id: 90, type: 'flashcard', text: "What is the rule for using since with a clause?", correctAnswer: "Clause past tense mein hona chahiye.", reasoning: "Wo past action ek starting point ban jata hai." },
+          { id: 91, type: 'flashcard', text: "Correct this 'He has lived here since 5 decades.'", correctAnswer: "He has lived here FOR 5 decades.", reasoning: "5 decades 50 saal duration hai." },
+          { id: 92, type: 'flashcard', text: "Why is since morning correct but since 5 hours wrong?", correctAnswer: "Morning din ka ek part hai but 5 hours time ki length hai.", reasoning: "Basics of Since vs For." },
+          { id: 93, type: 'flashcard', text: "Translate 'Main use pichle hafte se call kar raha hu.'", correctAnswer: "I have been calling him SINCE last week.", reasoning: "Last week ek definite point in time hai." },
+          { id: 94, type: 'flashcard', text: "Translate 'Papa 10 saal se is company me kaam kar rahe hain.'", correctAnswer: "Papa has been working in this company FOR 10 years.", reasoning: "10 saal total time period duration hai." },
+          { id: 95, type: 'flashcard', text: "What preposition comes with ages?", correctAnswer: "FOR.", reasoning: "Ages duration ko darshata hai." },
+          { id: 96, type: 'flashcard', text: "Is this correct 'I have been waiting for you since 20 minutes'?", correctAnswer: "Incorrect. Sahi hoga FOR 20 minutes.", reasoning: "20 minutes is a duration of time." },
+          { id: 97, type: 'flashcard', text: "The power went out at 8 PM and it is 10 PM. Give the FOR sentence.", correctAnswer: "The power has been out FOR 2 hours.", reasoning: "For requires the duration calculation." },
+          { id: 98, type: 'flashcard', text: "Can since mean because?", correctAnswer: "Yes. Example Since you are tired you should rest.", reasoning: "Lekin time ke context mein matlab kab se hota hai." },
+          { id: 99, type: 'flashcard', text: "Why does 'I have a headache since morning' sound unnatural?", correctAnswer: "Sahi hoga I have HAD a headache since morning.", reasoning: "Present perfect tense is used for states continuing from past." },
+          { id: 100, type: 'flashcard', text: "What are the golden questions to ask yourself?", correctAnswer: "Ask Kab se shuru hua -> SINCE. Ask Kitni der tak chala -> FOR.", reasoning: "This logic solves 99 percent of questions." }
+        ];
+
+        // ==========================================
+        // 2. STATE VARIABLES
+        // ==========================================
+        let currentView = 'home';
+        let totalTimeSpent = 0;
+        let quizQuestions = [];
+        let currentQIndex = 0;
+        let score = 0;
+        let isRevealed = false;
+        let quizStartTime = 0;
+        let quizTimeTaken = 0;
+        let ankiCodeGeneratedText = "";
+
+        // ==========================================
+        // 3. GLOBAL TIMER (Bug Bounty Fix)
+        // ==========================================
+        // Directly modifies the DOM text node without refreshing the page
+        const formatTime = (seconds) => {
+            const m = Math.floor(seconds / 60);
+            const s = seconds % 60;
+            return `${m}m ${s}s`;
+        };
+
+        setInterval(() => {
+            totalTimeSpent++;
+            const timerEl = document.getElementById('timer-display');
+            if(timerEl) timerEl.innerText = `⏱ ${formatTime(totalTimeSpent)}`;
+        }, 1000);
+
+        // ==========================================
+        // 4. UTILITIES & NAVIGATION
+        // ==========================================
+        const shuffleArray = (array) => {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        };
+
+        function navigateTo(viewId) {
+            currentView = viewId;
+            const views = ['home', 'notes', 'reallife', 'quiz', 'results', 'anki'];
+            
+            views.forEach(v => {
+                const el = document.getElementById(`view-${v}`);
+                if (el) {
+                    if (v === viewId) el.classList.remove('hidden');
+                    else el.classList.add('hidden');
+                }
+            });
+
+            // Update footer back button visibility
+            const backBtn = document.getElementById('nav-back-btn');
+            const spacer = document.getElementById('nav-spacer');
+            
+            if (viewId === 'home') {
+                backBtn.classList.add('hidden');
+                backBtn.classList.remove('flex');
+                spacer.classList.remove('hidden');
+            } else {
+                backBtn.classList.remove('hidden');
+                backBtn.classList.add('flex');
+                spacer.classList.add('hidden');
+            }
+
+            window.scrollTo(0, 0);
+        }
+
+        function handleBackButton() {
+            if (currentView === 'quiz') {
+                if (confirm("Are you sure you want to exit the quiz? Progress will be lost.")) navigateTo('home');
+            } else {
+                navigateTo('home');
+            }
+        }
+
+        // ==========================================
+        // 5. ANKI DECK GENERATOR
+        // Strictly avoids commas and special characters inside text to preserve CSV integrity
+        // ==========================================
+        function sanitizeForAnki(text) {
+            if (!text) return "";
+            // Remove commas colons and semicolons strictly
+            return text.toString().replace(/[,;:]/g, "");
+        }
+
+        function openAnkiModal() {
+            let ankiCsvData = "";
+            
+            QUESTION_BANK.forEach(q => {
+                let questionText = sanitizeForAnki(q.text);
+                let answerText = "";
+                
+                if (q.type === 'mcq') {
+                    answerText = sanitizeForAnki(q.options[q.correct]);
+                } else if (q.type === 'tf') {
+                    answerText = q.correctAnswer ? "TRUE" : "FALSE";
+                } else if (q.type === 'correct_not') {
+                    answerText = sanitizeForAnki(q.correctAnswer);
+                } else if (q.type === 'flashcard') {
+                    answerText = sanitizeForAnki(q.correctAnswer);
+                }
+                
+                // Exactly one comma per line separating question and answer
+                ankiCsvData += `${questionText},${answerText}\n`;
+            });
+
+            ankiCodeGeneratedText = ankiCsvData;
+            document.getElementById('anki-code-block').innerText = ankiCodeGeneratedText;
+            navigateTo('anki');
+        }
+
+        function downloadAnkiCSV() {
+            if(!ankiCodeGeneratedText) return;
+            const blob = new Blob([ankiCodeGeneratedText], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('hidden', '');
+            a.setAttribute('href', url);
+            a.setAttribute('download', 'FluencyBridge_Since_For_Anki.csv');
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        // ==========================================
+        // 6. QUIZ LOGIC
+        // ==========================================
+        function startQuiz() {
+            quizQuestions = shuffleArray(QUESTION_BANK).slice(0, 10);
+            currentQIndex = 0;
+            score = 0;
+            isRevealed = false;
+            quizStartTime = Date.now();
+            
+            renderCurrentQuestion();
+            navigateTo('quiz');
+        }
+
+        function renderCurrentQuestion() {
+            isRevealed = false;
+            const q = quizQuestions[currentQIndex];
+            
+            document.getElementById('quiz-progress-text').innerText = `Question ${currentQIndex + 1}/10`;
+            document.getElementById('quiz-type-text').innerText = q.type.replace('_', ' ').toUpperCase();
+            document.getElementById('quiz-progress-bar').style.width = `${((currentQIndex) / 10) * 100}%`;
+            document.getElementById('quiz-question-text').innerText = q.text;
+            
+            const optionsContainer = document.getElementById('quiz-options-container');
+            optionsContainer.innerHTML = ''; 
+
+            if (q.type === 'mcq') {
+                q.options.forEach((opt, idx) => {
+                    const btn = document.createElement('button');
+                    btn.className = "quiz-opt-btn w-full text-left px-5 py-4 rounded-xl border border-white/5 bg-brand-input text-gray-200 transition-all font-medium hover:bg-white/10 active:scale-[0.98]";
+                    btn.innerText = opt;
+                    btn.onclick = () => handleAnswer(idx, btn);
+                    optionsContainer.appendChild(btn);
+                });
+            } else if (q.type === 'tf') {
+                const grid = document.createElement('div');
+                grid.className = "grid grid-cols-2 gap-4";
+                [true, false].forEach(val => {
+                    const btn = document.createElement('button');
+                    btn.className = "quiz-opt-btn px-5 py-4 rounded-xl border border-white/5 bg-brand-input text-center font-bold transition-all text-white hover:bg-white/10 active:scale-[0.98]";
+                    btn.innerText = val ? 'TRUE' : 'FALSE';
+                    btn.onclick = () => handleAnswer(val, btn);
+                    grid.appendChild(btn);
+                });
+                optionsContainer.appendChild(grid);
+            } else if (q.type === 'correct_not') {
+                const grid = document.createElement('div');
+                grid.className = "grid grid-cols-2 gap-4";
+                ['Correct', 'Incorrect'].forEach(val => {
+                    const btn = document.createElement('button');
+                    btn.className = "quiz-opt-btn px-5 py-4 rounded-xl border border-white/5 bg-brand-input text-center font-bold transition-all text-white hover:bg-white/10 active:scale-[0.98]";
+                    btn.innerText = val;
+                    btn.onclick = () => handleAnswer(val, btn);
+                    grid.appendChild(btn);
+                });
+                optionsContainer.appendChild(grid);
+            } else if (q.type === 'flashcard') {
+                const btn = document.createElement('button');
+                btn.className = "w-full bg-brand-input border border-white/5 text-gray-300 hover:text-white px-5 py-8 rounded-xl font-bold transition-all hover:bg-white/10 active:scale-[0.98]";
+                btn.innerText = "Tap to Reveal Answer";
+                btn.onclick = () => handleAnswer('revealed', btn);
+                optionsContainer.appendChild(btn);
+            }
+
+            document.getElementById('quiz-reasoning-container').classList.add('hidden');
+            document.getElementById('quiz-next-btn').innerText = currentQIndex < 9 ? 'Next Question →' : 'See Results';
+        }
+
+        function handleAnswer(val, clickedBtn) {
+            if (isRevealed) return;
+            isRevealed = true;
+            const q = quizQuestions[currentQIndex];
+            let isCorrect = false;
+
+            if (q.type === 'flashcard') {
+                isCorrect = true; 
+                document.getElementById('quiz-options-container').innerHTML = `<div class="bg-brand-input border border-white/10 rounded-xl p-5 text-green-300 font-medium animate-fade-in">${q.correctAnswer}</div>`;
+            } else {
+                isCorrect = (val === q.correctAnswer || val === q.correct);
+                
+                const allBtns = document.querySelectorAll('.quiz-opt-btn');
+                allBtns.forEach(btn => {
+                    btn.classList.remove('hover:bg-white/10', 'active:scale-[0.98]', 'text-white');
+                    btn.disabled = true;
+                    
+                    let isThisBtnCorrect = false;
+                    if (q.type === 'mcq') isThisBtnCorrect = btn.innerText === q.options[q.correct];
+                    if (q.type === 'tf') isThisBtnCorrect = btn.innerText === (q.correctAnswer ? 'TRUE' : 'FALSE');
+                    if (q.type === 'correct_not') isThisBtnCorrect = btn.innerText === q.correctAnswer;
+
+                    if (isThisBtnCorrect) {
+                        btn.classList.add('bg-green-500/20', 'border-green-500', 'text-green-300');
+                    } else if (btn === clickedBtn) {
+                        btn.classList.add('bg-red-500/20', 'border-red-500', 'text-red-300');
+                    } else {
+                        btn.classList.add('opacity-50', 'text-gray-400');
+                    }
+                });
+            }
+
+            if (isCorrect) score++;
+
+            document.getElementById('quiz-reasoning-text').innerText = q.reasoning;
+            document.getElementById('quiz-reasoning-container').classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            if (currentQIndex < 9) {
+                currentQIndex++;
+                renderCurrentQuestion();
+            } else {
+                endQuiz();
+            }
+        }
+
+        function endQuiz() {
+            quizTimeTaken = Math.floor((Date.now() - quizStartTime) / 1000);
+            
+            const percentage = Math.round((score / 10) * 100);
+            const efficiency = quizTimeTaken > 0 ? ((score / (quizTimeTaken / 60)).toFixed(1)) : 0;
+            
+            let msg = "";
+            if (percentage === 100) msg = "Flawless! You're a Grammar Guru.";
+            else if (percentage >= 80) msg = "Great job! Minor mistakes solid logic.";
+            else if (percentage >= 50) msg = "Good effort but you need to revise the nuances.";
+            else msg = "Don't worry! Read the notes section and try again.";
+
+            document.getElementById('result-percentage').innerText = `${percentage}%`;
+            document.getElementById('result-message').innerText = msg;
+            document.getElementById('result-score').innerText = score;
+            document.getElementById('result-time').innerText = formatTime(quizTimeTaken);
+            document.getElementById('result-efficiency').innerText = efficiency;
+
+            navigateTo('results');
+        }
+
+        function leaveQuizToNotes() {
+            if (confirm("Do you want to leave the quiz to read notes? Your progress will be lost.")) {
+                navigateTo('notes');
+            }
+        }
+    </script>
+</body>
+</html>
+
+
+```
