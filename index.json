@@ -6,6 +6,12 @@
     "category": "Mistakes"
   },
   {
+    "title": "FluencyBridge - Master Since & For",
+    "slug": "sincefor",
+    "folder": "tests",
+    "category": "Tests"
+  },
+  {
     "title": "Fluency Bridge",
     "slug": "past-simple-verb-form-usage",
     "folder": "tests",
@@ -14,12 +20,6 @@
   {
     "title": "Fluency Bridge - English Mastery",
     "slug": "presentcontinuoustest",
-    "folder": "tests",
-    "category": "Tests"
-  },
-  {
-    "title": "FluencyBridge - Master Since & For",
-    "slug": "sincefor",
     "folder": "tests",
     "category": "Tests"
   },
