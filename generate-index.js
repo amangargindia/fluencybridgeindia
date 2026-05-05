@@ -25,7 +25,13 @@ function getHtmlFiles(dir, fileList = []) {
 
 function extractTitle(htmlContent) {
     const match = htmlContent.match(/<title[^>]*>([^<]+)<\/title>/i);
-    return match ? match[1].trim() : 'Unknown Title';
+    if (match) {
+        let title = match[1].trim();
+        title = title.replace(/FB Internal Tools\s*-\s*|\s*-\s*FB Internal Tools/gi, '');
+        title = title.replace(/Fluency Bridge\s*\|\s*|Fluency Bridge\s*-\s*/gi, '');
+        return title.trim();
+    }
+    return 'Unknown Title';
 }
 
 function capitalizeFirstLetter(string) {

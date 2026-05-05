@@ -163,7 +163,9 @@
         }
 
         function cleanTitle(rawTitle) {
-            return rawTitle.replace(/FB Internal Tools\s*-\s*|\s*-\s*FB Internal Tools/gi, '').trim();
+            let cleaned = rawTitle.replace(/FB Internal Tools\s*-\s*|\s*-\s*FB Internal Tools/gi, '');
+            cleaned = cleaned.replace(/Fluency Bridge\s*\|\s*|Fluency Bridge\s*-\s*/gi, '');
+            return cleaned.trim();
         }
 
         function render(data) {
@@ -214,15 +216,13 @@
                     <i data-lucide="chevron-down" class="w-5 h-5 text-slate-500 group-hover:text-brand-400 transition-colors"></i>
                 `;
 
-                const grid = document.createElement("div");
-                grid.className = isTools 
-                    ? "grid grid-cols-1 md:grid-cols-2 gap-6 transition-all duration-300 transform origin-top" 
-                    : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 transition-all duration-300 transform origin-top";
+                const categoryContentContainer = document.createElement("div");
+                categoryContentContainer.className = "transition-all duration-300 transform origin-top";
 
                 heading.addEventListener("click", () => {
-                    grid.classList.toggle("hidden");
+                    categoryContentContainer.classList.toggle("hidden");
                     const icon = heading.querySelector('.lucide-chevron-down') || heading.querySelector('.lucide-chevron-up');
-                    if(grid.classList.contains("hidden")) {
+                    if(categoryContentContainer.classList.contains("hidden")) {
                         icon.setAttribute('data-lucide', 'chevron-up');
                     } else {
                         icon.setAttribute('data-lucide', 'chevron-down');
@@ -230,35 +230,64 @@
                     lucide.createIcons();
                 });
 
+                const subfolders = {};
                 grouped[category].forEach(item => {
-                    const url = (item.folder ? item.folder + "/" : "") + item.slug + EXTENSION;
-                    const cleanName = cleanTitle(item.title);
-                    
-                    const card = document.createElement("a");
-                    card.href = url;
-                    card.className = isTools 
-                        ? "tool-card block p-6 md:p-8 bg-gradient-to-br from-fluency-panel to-[#0a101f] border border-brand-500/20 rounded-2xl group flex flex-col justify-between h-full relative overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.4)] hover:border-brand-400 hover:shadow-[0_0_25px_rgba(37,99,235,0.2)]"
-                        : "tool-card block p-5 bg-fluency-panel border border-fluency-border rounded-xl group flex flex-col justify-between h-full relative overflow-hidden";
-                    
-                    card.innerHTML = `
-                        ${isTools ? '<div class="absolute -right-10 -top-10 w-40 h-40 bg-brand-600/10 rounded-full blur-3xl group-hover:bg-brand-500/20 transition-colors"></div>' : '<div class="absolute -right-4 -top-4 w-24 h-24 bg-brand-600/5 rounded-full blur-xl group-hover:bg-brand-500/10 transition-colors"></div>'}
-                        <div>
-                            <div class="${isTools ? 'w-12 h-12 bg-brand-900/50 text-brand-400 mb-5 border-brand-500/30' : 'w-10 h-10 bg-slate-800/80 text-slate-400 mb-4 border-slate-700/50'} rounded-xl border flex items-center justify-center group-hover:scale-110 group-hover:bg-brand-600 group-hover:text-white transition-all shadow-sm">
-                                <i data-lucide="${getToolIcon(item.slug)}" class="${isTools ? 'w-6 h-6' : 'w-5 h-5'}"></i>
+                    const parts = item.folder ? item.folder.split('/') : [];
+                    const subfolderName = parts.length > 1 ? parts.slice(1).join(' / ') : "Main";
+                    if (!subfolders[subfolderName]) subfolders[subfolderName] = [];
+                    subfolders[subfolderName].push(item);
+                });
+
+                Object.keys(subfolders).sort().forEach(subName => {
+                    if (subName !== "Main" || Object.keys(subfolders).length > 1) {
+                        const subHeading = document.createElement("h4");
+                        subHeading.className = "text-sm font-semibold text-brand-400 mb-4 mt-8 uppercase tracking-wider pl-3 border-l-2 border-brand-500/50 flex items-center gap-2";
+                        subHeading.innerHTML = `<i data-lucide="folder-tree" class="w-4 h-4"></i> ${subName === "Main" ? category : subName}`;
+                        categoryContentContainer.appendChild(subHeading);
+                    } else if (subName !== "Main") {
+                        // just in case
+                        const subHeading = document.createElement("h4");
+                        subHeading.className = "text-sm font-semibold text-brand-400 mb-4 mt-8 uppercase tracking-wider pl-3 border-l-2 border-brand-500/50";
+                        subHeading.innerText = subName;
+                        categoryContentContainer.appendChild(subHeading);
+                    }
+
+                    const grid = document.createElement("div");
+                    grid.className = isTools 
+                        ? "grid grid-cols-1 md:grid-cols-2 gap-6" 
+                        : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4";
+
+                    subfolders[subName].forEach(item => {
+                        const url = (item.folder ? item.folder + "/" : "") + item.slug + EXTENSION;
+                        const cleanName = cleanTitle(item.title);
+                        
+                        const card = document.createElement("a");
+                        card.href = url;
+                        card.className = isTools 
+                            ? "tool-card block p-6 md:p-8 bg-gradient-to-br from-fluency-panel to-[#0a101f] border border-brand-500/20 rounded-2xl group flex flex-col justify-between h-full relative overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.4)] hover:border-brand-400 hover:shadow-[0_0_25px_rgba(37,99,235,0.2)]"
+                            : "tool-card block p-5 bg-fluency-panel border border-fluency-border rounded-xl group flex flex-col justify-between h-full relative overflow-hidden";
+                        
+                        card.innerHTML = `
+                            ${isTools ? '<div class="absolute -right-10 -top-10 w-40 h-40 bg-brand-600/10 rounded-full blur-3xl group-hover:bg-brand-500/20 transition-colors"></div>' : '<div class="absolute -right-4 -top-4 w-24 h-24 bg-brand-600/5 rounded-full blur-xl group-hover:bg-brand-500/10 transition-colors"></div>'}
+                            <div>
+                                <div class="${isTools ? 'w-12 h-12 bg-brand-900/50 text-brand-400 mb-5 border-brand-500/30' : 'w-10 h-10 bg-slate-800/80 text-slate-400 mb-4 border-slate-700/50'} rounded-xl border flex items-center justify-center group-hover:scale-110 group-hover:bg-brand-600 group-hover:text-white transition-all shadow-sm">
+                                    <i data-lucide="${getToolIcon(item.slug)}" class="${isTools ? 'w-6 h-6' : 'w-5 h-5'}"></i>
+                                </div>
+                                <h2 class="${isTools ? 'text-xl md:text-2xl font-black text-white' : 'text-[1.05rem] font-bold text-slate-200'} mb-2 group-hover:text-brand-300 transition-colors leading-snug">
+                                    ${cleanName}
+                                </h2>
                             </div>
-                            <h2 class="${isTools ? 'text-xl md:text-2xl font-black text-white' : 'text-[1.05rem] font-bold text-slate-200'} mb-2 group-hover:text-brand-300 transition-colors leading-snug">
-                                ${cleanName}
-                            </h2>
-                        </div>
-                        <div class="mt-6 flex items-center gap-1.5 ${isTools ? 'text-sm' : 'text-xs md:text-xs'} font-semibold text-brand-500 translate-y-1 group-hover:translate-y-0 opacity-80 group-hover:opacity-100 transition-all">
-                            Access ${isTools ? 'Workspace' : 'Portal'} <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
-                        </div>
-                    `;
-                    grid.appendChild(card);
+                            <div class="mt-6 flex items-center gap-1.5 ${isTools ? 'text-sm' : 'text-xs md:text-xs'} font-semibold text-brand-500 translate-y-1 group-hover:translate-y-0 opacity-80 group-hover:opacity-100 transition-all">
+                                Access ${isTools ? 'Workspace' : 'Portal'} <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+                            </div>
+                        `;
+                        grid.appendChild(card);
+                    });
+                    categoryContentContainer.appendChild(grid);
                 });
 
                 section.appendChild(heading);
-                section.appendChild(grid);
+                section.appendChild(categoryContentContainer);
                 container.appendChild(section);
             });
             
