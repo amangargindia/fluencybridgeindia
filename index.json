@@ -78,6 +78,12 @@
     "category": "Tests"
   },
   {
+    "title": "Many vs Much",
+    "slug": "Many-and-much",
+    "folder": "tests/Quantifiers",
+    "category": "Tests"
+  },
+  {
     "title": "Few & Little Nuance",
     "slug": "little-alittle-few-afew",
     "folder": "tests/determiner/quantifier",
