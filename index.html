@@ -67,6 +67,29 @@
             transform: translateY(-4px);
             box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.15), 0 8px 10px -6px rgba(37, 99, 235, 0.1);
         }
+
+        /* Randomizer Slot Machine */
+        .slot-machine {
+            height: 3.5rem;
+            overflow: hidden;
+            position: relative;
+            mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+            -webkit-mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+        }
+        .slot-track {
+            display: flex;
+            flex-direction: column;
+            /* The transition duration is set dynamically via JS */
+        }
+        .slot-item {
+            height: 3.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            white-space: normal;
+            padding: 0 1rem;
+        }
     </style>
 </head>
 
@@ -129,9 +152,54 @@
     </main>
 
     <!-- FLOATING CONTACT BUTTON -->
-    <a href="/contactus.html" class="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-brand-600 hover:bg-brand-500 shadow-[0_0_20px_rgba(37,99,235,0.4)] flex items-center justify-center text-2xl transition-all hover:scale-105 active:scale-95 group">
+    <a href="/contactus.html" class="fixed bottom-6 right-6 z-40 w-14 h-14 rounded-full bg-brand-600 hover:bg-brand-500 shadow-[0_0_20px_rgba(37,99,235,0.4)] flex items-center justify-center text-2xl transition-all hover:scale-105 active:scale-95 group">
         📞
     </a>
+
+    <!-- FLOATING RANDOM TOPIC BUTTON -->
+    <button onclick="openRandomizer()" class="fixed bottom-6 left-6 z-40 w-14 h-14 rounded-full bg-gradient-to-br from-brand-500 to-indigo-600 hover:from-brand-400 hover:to-indigo-500 shadow-[0_0_20px_rgba(79,70,229,0.4)] flex items-center justify-center text-white transition-all hover:scale-105 active:scale-95 group border border-indigo-400/30">
+        <i data-lucide="dices" class="w-6 h-6 group-hover:rotate-12 transition-transform"></i>
+    </button>
+
+    <!-- RANDOMIZER MODAL OVERLAY -->
+    <div id="randomizer-modal" class="fixed inset-0 z-50 bg-fluency-base/80 backdrop-blur-md hidden flex-col items-center justify-center opacity-0 transition-opacity duration-300">
+        <div class="relative w-full max-w-md p-8 bg-gradient-to-br from-fluency-panel to-[#0a101f] border border-brand-500/20 rounded-3xl shadow-[0_0_40px_rgba(37,99,235,0.15)] flex flex-col items-center transform scale-95 transition-transform duration-300" id="randomizer-box">
+            
+            <!-- Close Button -->
+            <button onclick="closeRandomizer()" class="absolute top-4 right-4 text-slate-500 hover:text-white transition-colors">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+
+            <!-- Modal Header -->
+            <div class="w-16 h-16 bg-brand-900/50 rounded-2xl flex items-center justify-center mb-6 border border-brand-500/30 text-brand-400">
+                <i data-lucide="dices" class="w-8 h-8"></i>
+            </div>
+            <h2 class="text-2xl font-black text-white mb-2 text-center">Random Topic</h2>
+            <p class="text-slate-400 text-sm text-center mb-8">Discover a new test from the library. We track your history so you never get repeats!</p>
+
+            <!-- Slot Machine Display -->
+            <div class="w-full bg-slate-900/80 border border-slate-700/50 rounded-xl p-4 mb-8 shadow-inner relative">
+                <div class="absolute left-0 top-1/2 -translate-y-1/2 w-full h-[3.5rem] border-y border-brand-500/30 bg-brand-500/5 pointer-events-none z-10"></div>
+                <div class="slot-machine w-full" id="slot-machine">
+                    <div class="slot-track" id="slot-track">
+                        <!-- Items injected via JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="w-full flex flex-col gap-3">
+                <a id="random-start-btn" href="#" class="w-full py-4 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(37,99,235,0.4)] transition-all opacity-50 pointer-events-none">
+                    Start Topic <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                </a>
+                <button onclick="spinRandomizer()" id="random-spin-btn" class="w-full py-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold transition-all border border-slate-700/50 flex items-center justify-center gap-2">
+                    <i data-lucide="refresh-cw" class="w-4 h-4"></i> Spin Again
+                </button>
+            </div>
+            
+            <p class="text-xs text-slate-500 mt-6 text-center" id="random-status-text">Ready to roll.</p>
+        </div>
+    </div>
 
     <!-- SCRIPT -->
     <script>
@@ -334,6 +402,117 @@
                 `;
                 lucide.createIcons();
             });
+        // --- RANDOMIZER LOGIC ---
+        const randomModal = document.getElementById('randomizer-modal');
+        const randomBox = document.getElementById('randomizer-box');
+        const slotTrack = document.getElementById('slot-track');
+        const startBtn = document.getElementById('random-start-btn');
+        const spinBtn = document.getElementById('random-spin-btn');
+        const statusText = document.getElementById('random-status-text');
+
+        let isSpinning = false;
+        let testItems = [];
+
+        function getTestHistory() {
+            try {
+                return JSON.parse(localStorage.getItem('fluency_history')) || [];
+            } catch(e) { return []; }
+        }
+
+        function setTestHistory(history) {
+            localStorage.setItem('fluency_history', JSON.stringify(history));
+        }
+
+        function openRandomizer() {
+            randomModal.classList.remove('hidden');
+            randomModal.classList.add('flex');
+            setTimeout(() => {
+                randomModal.classList.remove('opacity-0');
+                randomBox.classList.remove('scale-95');
+                randomBox.classList.add('scale-100');
+            }, 10);
+            
+            testItems = originalData.filter(item => item.category === 'Tests');
+            
+            // Setup initial track state if empty
+            if (slotTrack.children.length === 0) {
+                slotTrack.innerHTML = '<div class="slot-item text-slate-500 font-medium">Click Spin Again to roll</div>';
+                slotTrack.style.transform = 'translateY(0)';
+            }
+        }
+
+        function closeRandomizer() {
+            if(isSpinning) return; 
+            randomModal.classList.add('opacity-0');
+            randomBox.classList.remove('scale-100');
+            randomBox.classList.add('scale-95');
+            setTimeout(() => {
+                randomModal.classList.add('hidden');
+                randomModal.classList.remove('flex');
+            }, 300);
+        }
+
+        function spinRandomizer() {
+            if (isSpinning || testItems.length === 0) return;
+            isSpinning = true;
+            spinBtn.classList.add('opacity-50', 'pointer-events-none');
+            startBtn.classList.add('opacity-50', 'pointer-events-none');
+            startBtn.href = "#";
+
+            let history = getTestHistory();
+            let unseen = testItems.filter(item => !history.includes(item.slug));
+            
+            if (unseen.length === 0) {
+                history = [];
+                setTestHistory(history);
+                unseen = [...testItems];
+                statusText.innerText = "Wow! You've seen them all. Resetting history!";
+            } else {
+                statusText.innerText = `Finding 1 of ${unseen.length} unseen tests...`;
+            }
+
+            const winner = unseen[Math.floor(Math.random() * unseen.length)];
+            
+            slotTrack.innerHTML = '';
+            slotTrack.style.transition = 'none';
+            slotTrack.style.transform = 'translateY(0)';
+
+            const spinDuration = 3000;
+            const totalItemsInTrack = 30;
+            
+            for(let i=0; i<totalItemsInTrack; i++) {
+                const div = document.createElement('div');
+                div.className = 'slot-item text-lg md:text-xl font-bold text-slate-200 px-4';
+                
+                if (i === totalItemsInTrack - 1) {
+                    div.innerText = cleanTitle(winner.title);
+                    div.classList.add('text-brand-400');
+                } else {
+                    const randomDummy = testItems[Math.floor(Math.random() * testItems.length)];
+                    div.innerText = cleanTitle(randomDummy.title);
+                }
+                slotTrack.appendChild(div);
+            }
+
+            void slotTrack.offsetWidth;
+
+            slotTrack.style.transition = `transform ${spinDuration}ms cubic-bezier(0.15, 0.85, 0.15, 1)`;
+            slotTrack.style.transform = `translateY(-${(totalItemsInTrack - 1) * 3.5}rem)`;
+
+            setTimeout(() => {
+                isSpinning = false;
+                spinBtn.classList.remove('opacity-50', 'pointer-events-none');
+                startBtn.classList.remove('opacity-50', 'pointer-events-none');
+                
+                const url = (winner.folder ? winner.folder + "/" : "") + winner.slug + EXTENSION;
+                startBtn.href = url;
+                
+                history.push(winner.slug);
+                setTestHistory(history);
+                
+                statusText.innerHTML = `<span class="text-brand-400 font-semibold">Ready!</span> Topic saved to history.`;
+            }, spinDuration + 100);
+        }
             
     </script>
 </body>
