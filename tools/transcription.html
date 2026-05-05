@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FB Internal Tools - Transcription Engine</title>
+    
+    <!-- Tailwind CSS with Typography Plugin -->
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { 50: '#eff6ff', 100: '#dbeafe', 400: '#60a5fa', 500: '#3b82f6', 600: '#2563eb', 900: '#1e3a8a' },
+                        fluency: { 
+                            base: '#030712', /* Deepest navy/black */
+                            panel: '#0f172a', /* Slightly lighter for sidebars */
+                            border: '#1e293b'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Marked.js for Markdown Rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- PWA Configuration -->
+    <script src="/pwa-setup.js"></script>
+
+    <style>
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        /* Themed Dark Paper Styling for Preview */
+        .paper-container {
+            width: 100%; max-width: 210mm; min-height: 297mm;
+            margin: 0 auto; 
+            
+            /* Fluency Bridge Dark Theme */
+            background-color: #030712;
+            background-image: radial-gradient(ellipse 100% 30% at 50% 0%, rgba(37, 99, 235, 0.15) 0%, #030712 100%);
+            color: #f8fafc;
+            
+            border: 1px solid #1e293b;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            padding: 20mm; transition: all 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .paper-container { padding: 1.5rem; min-height: auto; }
+        }
+
+        /* Tables styled for Dark Mode */
+        .prose table { width: 100%; border-collapse: collapse; margin-top: 1rem; margin-bottom: 1rem; }
+        .prose th, .prose td { border: 1px solid #334155; padding: 0.5rem; }
+        .prose th { background-color: #0f172a; font-weight: 600; color: #f8fafc; }
+        
+        /* Custom Audio Player Styling Hint */
+        audio.custom-audio::-webkit-media-controls-panel { background-color: #1e293b; }
+        audio.custom-audio::-webkit-media-controls-play-button, audio.custom-audio::-webkit-media-controls-mute-button { background-color: #3b82f6; border-radius: 50%; }
+        audio.custom-audio::-webkit-media-controls-current-time-display, audio.custom-audio::-webkit-media-controls-time-remaining-display { color: #f8fafc; }
+        
+        .loader {
+            border: 4px solid #1e293b; border-top: 4px solid #3b82f6;
+            border-radius: 50%; width: 40px; height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Recording Pulse */
+        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+        .recording-active { animation: pulse-red 2s infinite; border-color: #ef4444 !important; background-color: rgba(239, 68, 68, 0.1) !important; }
+    </style>
+</head>
+<body class="bg-fluency-base text-slate-300 min-h-screen lg:h-screen lg:overflow-hidden flex flex-col font-sans selection:bg-brand-500 selection:text-white">
+
+    <!-- Top Header -->
+    <header class="bg-fluency-panel border-b border-fluency-border shadow-md flex-none z-20">
+        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3 text-white">
+                <a href="/" class="p-2 hover:bg-slate-800 rounded-lg transition-colors mr-1 cursor-pointer">
+                    <i data-lucide="arrow-left" class="w-5 h-5 text-slate-400"></i>
+                </a>
+                <a href="https://fluencybridgeedu.online/" class="bg-brand-600/20 p-2 rounded-lg border border-brand-500/30 hover:bg-brand-600/40 transition-colors cursor-pointer flex items-center justify-center">
+                    <i data-lucide="mic" class="w-5 h-5 text-brand-400"></i>
+                </a>
+                <div>
+                    <a href="https://fluencybridgeedu.online/" class="hover:text-brand-300 transition-colors">
+                        <h1 class="text-lg font-bold tracking-tight leading-tight">FB Internal Tools</h1>
+                    </a>
+                    <div class="text-xs text-brand-400 font-medium tracking-wide uppercase">Transcription Engine</div>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <button id="updatesBtn" class="text-xs text-slate-300 hover:text-white transition-colors flex items-center gap-1.5 bg-slate-800/50 hover:bg-slate-700/80 px-3 py-1.5 rounded-lg border border-slate-700/50">
+                    <i data-lucide="info" class="w-4 h-4 text-brand-400"></i> <span class="hidden sm:inline">Updates & Info</span>
+                </button>
+                <div class="text-xs text-slate-500 hidden sm:flex items-center gap-2" id="system-status">
+                    <span class="w-2 h-2 rounded-full bg-slate-500" id="status-dot"></span>
+                    <span id="status-text">System Offline (Awaiting Init)</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 flex flex-col lg:flex-row lg:overflow-hidden">
+        
+        <!-- Left Panel: Controls -->
+        <aside id="control-sidebar" class="w-full lg:w-80 bg-fluency-panel border-r border-fluency-border flex flex-col flex-none lg:overflow-y-auto z-10 shadow-xl custom-scrollbar">
+            <div class="p-6 space-y-8">
+                
+                <!-- Section 1: Upload & Record -->
+                <section>
+                    <h2 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">1. Audio Source</h2>
+                    
+                    <div class="flex gap-2 h-[12rem]">
+                        <div id="drop-zone" class="flex-1 border-2 border-dashed border-slate-700 bg-slate-800/30 rounded-xl p-4 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-slate-800/60 hover:border-brand-500 transition-colors group">
+                            <div class="w-10 h-10 bg-brand-900/50 text-brand-400 rounded-full flex items-center justify-center mb-2 group-hover:scale-110 transition-transform shadow-[0_0_15px_rgba(37,99,235,0.2)]">
+                                <i data-lucide="upload-cloud" class="w-5 h-5"></i>
+                            </div>
+                            <p class="text-sm font-medium text-slate-200 mb-1">Upload Files</p>
+                            <p class="text-[10px] text-slate-500">.mp3, .wav, .m4a</p>
+                            <input type="file" id="file-input" accept=".mp3, .wav, .m4a, .aac, .ogg, .flac, audio/*, video/mp4" class="hidden" multiple>
+                        </div>
+
+                        <!-- Live Record Button -->
+                        <button id="recordBtn" class="flex-1 border-2 border-slate-700 bg-slate-800/30 rounded-xl p-2 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-slate-800/60 hover:border-red-500 transition-colors group">
+                            <div id="recordIconBg" class="w-10 h-10 bg-slate-700/50 text-slate-400 rounded-full flex items-center justify-center mb-2 group-hover:text-red-400 transition-colors">
+                                <i data-lucide="mic" class="w-5 h-5"></i>
+                            </div>
+                            <p id="recordText" class="text-sm font-medium text-slate-300">Record</p>
+                            <p id="recordSubText" class="text-[10px] text-slate-500">Live Audio</p>
+                        </button>
+                    </div>
+
+                    <div id="file-queue-container" class="hidden mt-3 max-h-32 overflow-y-auto custom-scrollbar flex flex-col gap-2 p-2 bg-slate-900/50 rounded-lg border border-slate-700"></div>
+                </section>
+
+                <!-- Section 2: Model Configuration -->
+                <section>
+                    <h2 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">2. Engine Settings</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-400 mb-1">Model Precision Layer</label>
+                            <select id="modelSelector" class="w-full bg-slate-800 border border-slate-700 text-slate-200 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 block p-2.5 outline-none transition-shadow text-sm">
+                                <option value="Xenova/whisper-tiny.en">Tiny Layer (~40MB, Fastest)</option>
+                                <option value="Xenova/whisper-base.en" selected>Base Layer (~145MB, Mobile Safe)</option>
+                                <option value="Xenova/whisper-small.en">Small Layer (~500MB, Max DB Accuracy)</option>
+                            </select>
+                            <p class="text-[10px] text-slate-500 mt-2">Mobile users should select Base Layer to prevent out-of-memory errors on large transcriptions.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 3: Execution -->
+                <section class="flex flex-col gap-3 pt-2">
+                    <button id="transcribeBtn" disabled class="w-full bg-brand-600 hover:bg-brand-500 text-white font-medium py-3 px-4 rounded-xl shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_25px_rgba(37,99,235,0.5)] transition-all flex items-center justify-center gap-2 border border-brand-400/50 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none">
+                        <i data-lucide="play-circle" class="w-5 h-5"></i>
+                        Invoke Engine
+                    </button>
+                    
+                    <div id="progressContainer" class="hidden flex-col gap-2 bg-slate-900 border border-slate-700 rounded-lg p-3">
+                        <div class="flex justify-between items-center text-xs text-slate-400">
+                            <span id="progressText">Initializing Node...</span>
+                            <span id="progressPct">0%</span>
+                        </div>
+                        <div class="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                            <div id="progressBar" class="bg-brand-500 h-1.5 rounded-full transition-all duration-300 ease-out" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </aside>
+
+        <!-- Right Panel: Preview -->
+        <section class="flex-1 bg-fluency-base lg:overflow-y-auto relative custom-scrollbar" id="preview-scroll-container">
+            
+            <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center text-slate-500 p-8 text-center">
+                <div class="relative mb-6">
+                    <div class="absolute inset-0 bg-brand-500 blur-[40px] opacity-20 rounded-full"></div>
+                    <i data-lucide="mic" class="w-20 h-20 text-slate-700 relative z-10"></i>
+                </div>
+                <h3 class="text-xl font-medium text-slate-300 mb-2">Awaiting Audio Source</h3>
+                <p class="max-w-md text-sm text-slate-500 leading-relaxed">Upload audio files or Record Live. The engine will extract speech content and automatically compile it into structured documentation.</p>
+            </div>
+            
+            <!-- The dark paper preview wrapper -->
+            <div id="preview-wrapper" class="hidden p-4 md:p-10">
+                <!-- Actions Bar for Export -->
+                <div class="flex justify-end mb-4 gap-2 sticky top-0 z-20">
+                    <button id="toggleExpandBtn" class="bg-brand-600 hover:bg-brand-500 text-white px-3 py-1.5 rounded-lg border border-brand-500/50 flex items-center gap-2 text-sm transition-all shadow-lg">
+                        <i data-lucide="maximize" id="expandIcon" class="w-4 h-4"></i> <span id="expandText" class="hidden sm:inline">Expand View</span>
+                    </button>
+                    <button id="copyBtn" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 flex items-center gap-2 text-sm transition-colors shadow-lg">
+                        <i data-lucide="copy" class="w-4 h-4"></i> <span class="hidden sm:inline">Copy Text</span>
+                    </button>
+                </div>
+
+                <div class="paper-container relative group">
+                    <div id="markdown-content" class="w-full max-w-none transition-all duration-300 font-sans tracking-wide">
+                        <!-- Raw HTML Blocks with Audio Players will be injected here -->
+                    </div>
+                    
+                    <!-- Active Typewriter Streaming UI -->
+                    <div id="active-transcription" class="hidden mt-8 p-6 border border-brand-500/50 bg-brand-900/10 rounded-xl relative shadow-inner">
+                        <div class="absolute -top-3 left-4 bg-brand-600 px-3 py-0.5 text-[10px] font-bold uppercase rounded text-white shadow shadow-brand-500/50 tracking-wider flex items-center gap-1.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+                            Live Transcription
+                        </div>
+                        <p id="active-text" class="text-slate-300 font-sans leading-relaxed text-lg animate-pulse min-h-[1.5rem]"></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-4 right-4 bg-slate-800 border border-slate-700 text-white px-4 py-3 rounded-lg shadow-2xl transform translate-y-20 opacity-0 transition-all duration-300 flex items-center gap-3 z-50">
+        <span id="toast-icon-wrapper"><i data-lucide="info" class="w-5 h-5 text-brand-400"></i></span>
+        <span id="toast-message" class="text-sm font-medium">Notification</span>
+    </div>
+
+    <!-- Updates & Info Modal -->
+    <div id="updatesModal" class="fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm hidden flex-col items-center justify-center p-4 lg:p-10 opacity-0 transition-opacity duration-300">
+        <div class="bg-fluency-panel w-full max-w-4xl max-h-[90vh] rounded-2xl border border-fluency-border flex flex-col shadow-2xl scale-95 transition-transform duration-300 transform" id="updatesModalContent">
+            <div class="p-6 border-b border-fluency-border flex justify-between items-center bg-slate-900/50 rounded-t-2xl">
+                <h2 class="text-xl font-bold text-slate-100 flex items-center gap-2"><i data-lucide="book-open" class="w-6 h-6 text-brand-400"></i> System Documentation</h2>
+                <button id="closeUpdatesBtn" class="text-slate-400 hover:text-white transition-colors p-2 hover:bg-slate-800 rounded-lg">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="p-8 overflow-y-auto custom-scrollbar prose prose-invert prose-brand max-w-none text-slate-300">
+                <h3 class="text-brand-300">How The System Works</h3>
+                <p>The Fluency Bridge Transcription Tool operates entirely <strong>client-side</strong> within your browser. By leveraging WebAssembly (WASM) and <a href="https://huggingface.co/docs/transformers.js/index" target="_blank" class="text-brand-400">Transformers.js</a>, the tool downloads the Whisper AI model directly to your device and processes audio locally.</p>
+                <p><strong>Zero server dependency</strong> means your audio data never leaves your computer, guaranteeing 100% privacy and averting costly API usage.</p>
+                <hr class="border-slate-700">
+                <h3 class="text-brand-300">Core Features</h3>
+                <ul>
+                    <li><strong>Live Dictation Typewriter:</strong> Streams live speech using the Web Speech API while recording, later compiling a highly accurate offline transcription using Whisper as a fallback.</li>
+                    <li><strong>Automated Extraction:</strong> The system automatically extracts plaintext and downloads a <code>.txt</code> file naming it by the current date and time upon transcription completion.</li>
+                    <li><strong>Instant Clipboard Sync:</strong> Transcriptions are automatically copied to your clipboard to negate accidental data loss.</li>
+                    <li><strong>Audio Export:</strong> Captured live audio can be downloaded from the transcript cards directly in <code>.webm</code> format.</li>
+                </ul>
+                <hr class="border-slate-700">
+                <h3 class="text-brand-300">Technicalities & Models</h3>
+                <p>The system utilizes three Whisper architectural layers:</p>
+                <div class="overflow-x-auto">
+                    <table>
+                        <thead>
+                            <tr><th>Layer</th><th>Size (RAM needed)</th><th>Performance</th><th>Use Case</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Tiny Layer</td><td>~40MB Model (&lt;1GB RAM)</td><td>Fastest</td><td>Low-end devices, real-time fallback</td></tr>
+                            <tr><td>Base Layer</td><td>~145MB Model (~1.5GB RAM)</td><td>Balanced</td><td>Recommended. Optimal for general use.</td></tr>
+                            <tr><td>Small Layer</td><td>~500MB Model (&gt;3GB RAM)</td><td>Heavy</td><td>High-end Desktop PCs, complex vocabularies.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <hr class="border-slate-700">
+                <h3 class="text-brand-300 text-red-400">Caveats & Limitations</h3>
+                <ul>
+                    <li><strong>Mobile Device Constraints:</strong> Because WASM executes in browser memory, older iPhones or Androids may experience browser crashes if the <em>Small</em> model is used. Default to <em>Base</em> or <em>Tiny</em>.</li>
+                    <li><strong>Background Tab Throttling:</strong> Most browsers heavily throttle Javascript in inactive tabs. If you switch tabs during extraction, it will become dramatically slower or pause entirely until you return. <strong>Leave the tab active while engaged!</strong></li>
+                    <li><strong>Initial Download Lag:</strong> The very first time you invoke the engine, it must download the ML weights into your cache (up to 145MB). Future visits will utilize the cached weights instantly.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Logic -->
+    <script>
+        lucide.createIcons();
+
+        let selectedFiles = [];
+        let worker = null;
+        let isWorkerLoaded = false;
+        let currentLoadedModel = '';
+        let cumulativeText = ''; // Master string for clipboard copies
+        let isProcessing = false;
+
+        // Microphone Logic
+        let mediaRecorder;
+        let audioChunks = [];
+        let isRecording = false;
+        let recordingTimerInterval;
+        let recordingSeconds = 0;
+
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const recordBtn = document.getElementById('recordBtn');
+        const recordIconBg = document.getElementById('recordIconBg');
+        const recordText = document.getElementById('recordText');
+        const recordSubText = document.getElementById('recordSubText');
+
+        const fileQueueContainer = document.getElementById('file-queue-container');
+        const transcribeBtn = document.getElementById('transcribeBtn');
+        
+        const toggleExpandBtn = document.getElementById('toggleExpandBtn');
+        const expandIcon = document.getElementById('expandIcon');
+        const expandText = document.getElementById('expandText');
+        const controlSidebar = document.getElementById('control-sidebar');
+
+        toggleExpandBtn.addEventListener('click', () => {
+            controlSidebar.classList.toggle('hidden');
+            if (controlSidebar.classList.contains('hidden')) {
+                expandIcon.setAttribute('data-lucide', 'minimize');
+                expandText.textContent = 'Restore';
+            } else {
+                expandIcon.setAttribute('data-lucide', 'maximize');
+                expandText.textContent = 'Expand View';
+            }
+            lucide.createIcons();
+        });
+        const modelSelector = document.getElementById('modelSelector');
+
+        const progressContainer = document.getElementById('progressContainer');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        const progressPct = document.getElementById('progressPct');
+
+        const statusDot = document.getElementById('status-dot');
+        const statusText = document.getElementById('status-text');
+
+        const emptyState = document.getElementById('empty-state');
+        const previewWrapper = document.getElementById('preview-wrapper');
+        const markdownContent = document.getElementById('markdown-content');
+        
+        const activeTranscriptionBox = document.getElementById('active-transcription');
+        const activeTextParagraph = document.getElementById('active-text');
+
+        const toast = document.getElementById('toast');
+        const toastMessage = document.getElementById('toast-message');
+        
+        const updatesBtn = document.getElementById('updatesBtn');
+        const updatesModal = document.getElementById('updatesModal');
+        const closeUpdatesBtn = document.getElementById('closeUpdatesBtn');
+        const updatesModalContent = document.getElementById('updatesModalContent');
+
+        updatesBtn.addEventListener('click', () => {
+            updatesModal.classList.remove('hidden');
+            updatesModal.classList.add('flex');
+            setTimeout(() => {
+                updatesModal.classList.remove('opacity-0');
+                updatesModalContent.classList.remove('scale-95');
+            }, 10);
+        });
+
+        closeUpdatesBtn.addEventListener('click', () => {
+            updatesModal.classList.add('opacity-0');
+            updatesModalContent.classList.add('scale-95');
+            setTimeout(() => {
+                updatesModal.classList.add('hidden');
+                updatesModal.classList.remove('flex');
+            }, 300);
+        });
+
+        function autoCopyAndDownload(textToSave, prefix) {
+            navigator.clipboard.writeText(textToSave).then(() => {
+                showToast('Text automatically copied & downloaded!');
+            }).catch(e => console.error('Auto-copy failed: ', e));
+
+            const now = new Date();
+            const dateStr = now.toISOString().replace(/[:.]/g, '-');
+            const blob = new Blob([textToSave], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${prefix}_${dateStr}.txt`;
+            a.style.display = 'none';
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 100);
+        }
+
+        function escapeHTML(str) {
+            return String(str).replace(/[&<>'"]/g, tag => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                "'": '&#39;',
+                '"': '&quot;'
+            }[tag] || tag));
+        }
+
+        function showToast(message, isError = false) {
+            toastMessage.textContent = message;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            if(isError) {
+                toast.classList.replace('border-slate-700', 'border-red-900');
+                document.getElementById('toast-icon-wrapper').innerHTML = '<i data-lucide="alert-triangle" class="w-5 h-5 text-red-400"></i>';
+            } else {
+                toast.classList.replace('border-red-900', 'border-slate-700');
+                document.getElementById('toast-icon-wrapper').innerHTML = '<i data-lucide="check-circle-2" class="w-5 h-5 text-brand-400"></i>';
+            }
+            lucide.createIcons();
+            setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 4000);
+        }
+
+        function updateSystemStatus(state, message) {
+            statusText.textContent = message;
+            statusDot.className = 'w-2 h-2 rounded-full ' + (
+                state === 'offline' ? 'bg-slate-500' :
+                state === 'downloading' ? 'bg-yellow-400 animate-pulse box-shadow-[0_0_8px_rgba(250,204,21,0.6)]' :
+                state === 'ready' ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]' :
+                'bg-brand-500 animate-pulse'
+            );
+        }
+
+        function updateProgress(message, percentage, isVisible = true) {
+            if (isVisible) {
+                progressContainer.classList.remove('hidden');
+                progressContainer.classList.add('flex');
+                progressText.textContent = message;
+                progressPct.textContent = percentage + '%';
+                progressBar.style.width = percentage + '%';
+            } else {
+                progressContainer.classList.add('hidden');
+                progressContainer.classList.remove('flex');
+            }
+        }
+
+        // Global function to play clicked timestamp
+        window.playAudio = function(id, time) {
+            const player = document.getElementById(id);
+            if (player) {
+                player.currentTime = time;
+                player.play();
+            }
+        };
+
+        function appendToDocumentRaw(htmlBlock, rawText) {
+            emptyState.classList.add('hidden');
+            previewWrapper.classList.remove('hidden');
+            
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = htmlBlock;
+            
+            // Prepend new blocks to the top of the feed
+            markdownContent.insertBefore(tempDiv.firstElementChild, markdownContent.firstChild);
+            
+            // Scroll right panel to top softly
+            document.getElementById('preview-scroll-container').scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+            lucide.createIcons();
+        }
+
+        // --- Live Microphone Logic ---
+        
+        function formatTime(seconds) {
+            const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+            const s = (seconds % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
+        }
+        let speechEngine = null;
+        let liveDictationText = '';
+        let dictationChunks = [];
+        let recordingStartTime = 0;
+
+        recordBtn.addEventListener('click', async () => {
+            if (!isRecording) {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    mediaRecorder = new MediaRecorder(stream);
+                    audioChunks = [];
+                    
+                    mediaRecorder.ondataavailable = e => {
+                        if (e.data.size > 0) audioChunks.push(e.data);
+                    };
+                    
+                    recordingStartTime = Date.now();
+                    
+                    // --- Live Typewriter Web Speech API ---
+                    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                    if (SpeechRecognition) {
+                        speechEngine = new SpeechRecognition();
+                        speechEngine.continuous = true;
+                        speechEngine.interimResults = true;
+                        
+                        activeTranscriptionBox.classList.remove('hidden');
+                        activeTextParagraph.innerHTML = '<span class="text-slate-500 italic">Listening to microphone...</span>';
+                        liveDictationText = '';
+                        dictationChunks = [];
+                        
+                        speechEngine.onresult = (event) => {
+                            let interim = '';
+                            let final = '';
+                            
+                            for (let i = event.resultIndex; i < event.results.length; ++i) {
+                                if (event.results[i].isFinal) {
+                                    final += event.results[i][0].transcript;
+                                    const elapsed = (Date.now() - recordingStartTime) / 1000;
+                                    dictationChunks.push({ text: event.results[i][0].transcript, timestamp: [elapsed] });
+                                } else {
+                                    interim += event.results[i][0].transcript;
+                                }
+                            }
+                            
+                            liveDictationText += final;
+                            activeTextParagraph.innerHTML = '<span class="text-slate-200">' + liveDictationText + '</span><span class="text-brand-400 opacity-70 ml-1">' + interim + '</span>';
+                            
+                            // Keep typewriter scrolled to bottom natively
+                            const container = document.getElementById('preview-scroll-container');
+                            if(container) container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+                        };
+                        speechEngine.start();
+                    }
+                    
+                    mediaRecorder.onstop = () => {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                        const fileName = `Live_Dictation_${new Date().getTime()}.webm`;
+                        const file = new File([audioBlob], fileName, { type: 'audio/webm' });
+                        
+                        // Mark as pending so we can invoke the engine if needed
+                        file.status = 'pending';
+                        handleFileSelect([file]); 
+                        
+                        const blobUrl = URL.createObjectURL(file);
+                        const playerID = 'audio_live_' + new Date().getTime();
+                        
+                        // Construct the Final Display Node automatically
+                        if (speechEngine && dictationChunks.length > 0) {
+                            activeTranscriptionBox.classList.add('hidden');
+                            activeTextParagraph.innerHTML = '';
+                            
+                            const formatFloatTime = (secs) => {
+                                const m = Math.floor(secs / 60).toString().padStart(2, '0');
+                                const s = Math.floor(secs % 60).toString().padStart(2, '0');
+                                return `${m}:${s}`;
+                            };
+                            
+                            let interactiveHtml = dictationChunks.map(c => {
+                                const start = c.timestamp[0];
+                                const timeStr = `[${formatFloatTime(start)}]`;
+                                return `<span class="cursor-pointer hover:bg-brand-900/50 hover:text-brand-300 rounded px-1 transition-colors border-b border-transparent hover:border-brand-500 block mb-2" onclick="playAudio('${playerID}', ${start})"><span class="text-[10px] text-brand-500 font-mono font-bold mr-2 select-none">${timeStr}</span><span class="text-slate-200">${escapeHTML(c.text)}</span></span>`;
+                            }).join('');
+                            
+                            const clipboardTextWithTimestamps = dictationChunks.map(c => `[${formatFloatTime(c.timestamp[0])}] ${c.text.trim()}`).join('\n');
+                            const simpleTextForClipboard = `${clipboardTextWithTimestamps}\n\n`;
+                            
+                            const htmlBlock = `
+                                <div class="transcript-card mb-10 relative group bg-fluency-panel p-6 rounded-2xl border border-fluency-border shadow-md" data-rawtext="${encodeURIComponent(simpleTextForClipboard)}">
+                                    <div class="flex items-center justify-between mb-4 border-b border-slate-700/50 pb-3">
+                                        <h2 class="text-brand-400 font-bold text-lg flex items-center gap-2"><i data-lucide="mic" class="w-5 h-5"></i> Live Dictation</h2>
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-xs text-brand-500 font-medium tracking-wide border border-brand-900/50 py-1 px-2 rounded-lg bg-brand-900/30 hidden sm:inline-block">Live Typed</span>
+                                            <a href="${blobUrl}" download="${fileName}" class="text-brand-400/50 hover:text-brand-400 hover:bg-brand-900/30 p-1.5 rounded-lg transition-colors border border-transparent hover:border-brand-500/30" title="Download Audio">
+                                                <i data-lucide="download" class="w-4 h-4"></i>
+                                            </a>
+                                            <button onclick="const card = this.closest('.transcript-card'); const audio = card.querySelector('audio'); if(audio) URL.revokeObjectURL(audio.src); card.remove(); if(document.querySelectorAll('.transcript-card').length === 0) { document.getElementById('empty-state').classList.remove('hidden'); document.getElementById('preview-wrapper').classList.add('hidden'); }" class="text-red-400/50 hover:text-red-400 hover:bg-red-900/30 p-1.5 rounded-lg transition-colors border border-transparent hover:border-red-500/30" title="Delete Recording">
+                                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <!-- Native Embedded Audio Player -->
+                                    <audio id="${playerID}" src="${blobUrl}" controls class="w-full h-[40px] mb-5 rounded-lg opacity-80 hover:opacity-100 transition-opacity outline-none custom-audio"></audio>
+                                    
+                                    <h3 class="text-xs uppercase tracking-wider text-slate-500 mb-2 font-bold">Transcription (Click to Listen)</h3>
+                                    <div class="text-slate-200 leading-relaxed font-sans tracking-wide text-lg text-justify p-5 bg-fluency-base rounded-xl border border-fluency-border shadow-inner">
+                                        ${interactiveHtml}
+                                    </div>
+                                    <div class="absolute -left-1.5 top-8 bottom-8 w-1 bg-brand-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                </div>
+                            `;
+                            
+                            appendToDocumentRaw(htmlBlock, simpleTextForClipboard);
+                            autoCopyAndDownload(simpleTextForClipboard, "Live_Dictation");
+                        }
+                        
+                        // Stop all tracks to clear mic indicator
+                        stream.getTracks().forEach(track => track.stop());
+                    };
+                    
+                    mediaRecorder.start();
+                    isRecording = true;
+                    
+                    // Update UI internally
+                    recordBtn.classList.add('recording-active');
+                    recordIconBg.classList.replace('bg-slate-700/50', 'bg-red-500/20');
+                    recordIconBg.classList.replace('text-slate-400', 'text-red-500');
+                    recordIconBg.innerHTML = '<i data-lucide="square" class="w-4 h-4 fill-current"></i>';
+                    lucide.createIcons();
+                    
+                    recordText.textContent = "Recording";
+                    recordingSeconds = 0;
+                    recordSubText.textContent = formatTime(recordingSeconds);
+                    recordingTimerInterval = setInterval(() => {
+                        recordingSeconds++;
+                        recordSubText.textContent = formatTime(recordingSeconds);
+                    }, 1000);
+                    
+                } catch (err) {
+                    showToast('Microphone access denied or unavailable.', true);
+                }
+            } else {
+                // Stop Recording
+                mediaRecorder.stop();
+                if(speechEngine) {
+                    try { speechEngine.stop(); } catch(e){}
+                }
+                
+                isRecording = false;
+                clearInterval(recordingTimerInterval);
+                
+                // Reset UI
+                recordBtn.classList.remove('recording-active');
+                recordIconBg.classList.replace('bg-red-500/20', 'bg-slate-700/50');
+                recordIconBg.classList.replace('text-red-500', 'text-slate-400');
+                recordIconBg.innerHTML = '<i data-lucide="mic" class="w-5 h-5"></i>';
+                lucide.createIcons();
+                
+                recordText.textContent = "Record";
+                recordSubText.textContent = "Live Audio";
+            }
+        });
+
+        // --- File Queue Logic ---
+
+        const handleFileSelect = (files) => {
+            if (files && files.length > 0) {
+                const validFiles = Array.from(files).filter(f => {
+                    return f.type.startsWith('audio/') || f.type.startsWith('video/') || f.name.match(/\.(mp3|wav|m4a|aac|ogg|flac|mp4|webm)$/i);
+                });
+                
+                if (validFiles.length === 0) {
+                    showToast('Error: Invalid file format.', true);
+                    return;
+                }
+                
+                // Initialize status
+                validFiles.forEach(f => { if(!f.status) f.status = 'pending'; });
+                
+                // Append instead of replacing
+                selectedFiles = [...selectedFiles, ...validFiles];
+                
+                // Build visual queue
+                renderFileQueue();
+                
+                fileQueueContainer.classList.remove('hidden');
+                transcribeBtn.disabled = false;
+                showToast(`${validFiles.length} item(s) in queue.`);
+            }
+        };
+
+        function renderFileQueue() {
+            if(selectedFiles.length === 0) {
+                fileQueueContainer.classList.add('hidden');
+                transcribeBtn.disabled = true;
+                return;
+            }
+            fileQueueContainer.innerHTML = selectedFiles.map((f, i) => `
+                <div class="flex items-center justify-between p-2 bg-slate-800 rounded-md border border-slate-700">
+                    <div class="flex items-center gap-2 truncate">
+                        <i data-lucide="${f.status === 'done' ? 'check-circle' : 'music'}" class="w-4 h-4 ${f.status === 'done' ? 'text-green-400' : 'text-brand-400'} flex-none"></i>
+                        <span class="text-xs text-slate-300 truncate">${escapeHTML(f.name)}</span>
+                    </div>
+                    ${f.status === 'pending' ? `
+                        <button onclick="window.removeFile(${i})" class="text-slate-500 hover:text-red-400 transition-colors">
+                            <i data-lucide="x" class="w-3 h-3"></i>
+                        </button>
+                    ` : ''}
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        window.removeFile = (index) => {
+            selectedFiles.splice(index, 1);
+            renderFileQueue();
+        };
+
+        dropZone.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (e) => handleFileSelect(e.target.files));
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('border-brand-500', 'bg-slate-800');
+        });
+
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('border-brand-500', 'bg-slate-800'));
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('border-brand-500', 'bg-slate-800');
+            if (e.dataTransfer.files.length) handleFileSelect(e.dataTransfer.files);
+        });
+
+        modelSelector.addEventListener('change', () => {
+            if (isWorkerLoaded && worker && currentLoadedModel !== modelSelector.value) {
+                worker.terminate();
+                worker = null;
+                isWorkerLoaded = false;
+                updateSystemStatus('offline', 'Model Changed - Needs Re-init');
+            }
+        });
+
+        document.getElementById('copyBtn').addEventListener('click', () => {
+            const cards = document.querySelectorAll('.transcript-card');
+            if (cards.length === 0) return;
+            
+            const fullText = Array.from(cards).map(card => decodeURIComponent(card.getAttribute('data-rawtext'))).join('\n');
+            navigator.clipboard.writeText(fullText);
+            showToast('Text copied to clipboard!');
+        });
+
+
+        // --- Core Audio Engine (Web Worker) ---
+
+        const initializeWorker = () => {
+            const workerCode = `
+                import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2';
+                env.allowLocalModels = false;
+                let transcriber = null;
+                let activeModelName = '';
+
+                self.onmessage = async (e) => {
+                    if (e.data.type === 'load') {
+                        try {
+                            if (transcriber && activeModelName === e.data.model) {
+                                self.postMessage({ type: 'loaded' });
+                                return;
+                            }
+                            activeModelName = e.data.model;
+                            transcriber = await pipeline('automatic-speech-recognition', activeModelName, {
+                                progress_callback: (info) => {
+                                    self.postMessage({ type: 'progress', info: info });
+                                }
+                            });
+                            self.postMessage({ type: 'loaded' });
+                        } catch (err) {
+                            self.postMessage({ type: 'error', error: err.message });
+                        }
+                    } else if (e.data.type === 'transcribe') {
+                        try {
+                            const result = await transcriber(e.data.audioData, {
+                                chunk_length_s: 30,
+                                stride_length_s: 5,
+                                return_timestamps: true,
+                                chunk_callback: (chunk) => {
+                                    self.postMessage({ type: 'partial', chunk: { text: chunk.text, timestamp: chunk.timestamp }, fileIndex: e.data.fileIndex });
+                                }
+                            });
+                            
+                            const safeResult = {
+                                text: result.text,
+                                chunks: result.chunks ? result.chunks.map(c => ({ text: c.text, timestamp: c.timestamp })) : []
+                            };
+                            self.postMessage({ type: 'done', result: safeResult, fileIndex: e.data.fileIndex });
+                        } catch (err) {
+                            self.postMessage({ type: 'error', error: err.message, fileIndex: e.data.fileIndex });
+                        }
+                    }
+                };
+            `;
+            
+            const blob = new Blob([workerCode], { type: 'application/javascript' });
+            const workerUrl = URL.createObjectURL(blob);
+            worker = new Worker(workerUrl, { type: 'module' });
+            URL.revokeObjectURL(workerUrl);
+
+            worker.onmessage = (e) => {
+                const msg = e.data;
+                
+                if (msg.type === 'progress') {
+                    if (msg.info.status === 'downloading') {
+                        const pct = Math.round(msg.info.progress || 0);
+                        updateSystemStatus('downloading', 'Syncing Knowledge Graph...');
+                        updateProgress(`Downloading Layers (${pct}%)`, pct);
+                    } else if (msg.info.status === 'init') {
+                        updateSystemStatus('working', 'Compiling Matrix...');
+                        updateProgress('Initializing Nodes (WASM Compile)...', 100);
+                        
+                        // Detection for 100% Hang
+                        setTimeout(() => {
+                            if (!isWorkerLoaded) {
+                                updateSystemStatus('offline', 'Compiling taking longer than usual...');
+                                updateProgress('Heavy Model Initialization - Hang tight...', 100);
+                            }
+                        }, 10000);
+                    }
+                } else if (msg.type === 'loaded') {
+                    isWorkerLoaded = true;
+                    window.isLoadingModel = false;
+                    updateSystemStatus('ready', 'Engine Online');
+                    updateProgress('Ready', 100, false);
+                    setTimeout(processNextFile, 500); // Small buffer for stability
+                    
+                } else if (msg.type === 'partial') {
+                    // Typewriter Output Stream
+                    activeTranscriptionBox.classList.remove('hidden');
+                    if (msg.chunk && msg.chunk.text) {
+                        activeTextParagraph.textContent += msg.chunk.text;
+                        const scrollCont = document.getElementById('preview-scroll-container');
+                        if(scrollCont) scrollCont.scrollTo({ top: scrollCont.scrollHeight, behavior: 'smooth' });
+                    }
+
+                } else if (msg.type === 'done') {
+                    activeTranscriptionBox.classList.add('hidden');
+                    activeTextParagraph.textContent = ''; 
+
+                    const processingFile = selectedFiles.find(f => f.status === 'processing');
+                    if(processingFile) processingFile.status = 'done';
+                    handleFileSelect([]); // Update UI queue icons
+
+                    if (!processingFile) return;
+
+                    const fileName = processingFile.name;
+                    const blobUrl = URL.createObjectURL(processingFile);
+                    const playerID = 'audio_player_' + Math.random().toString(36).slice(2, 11);
+                    
+                    const formatFloatTime = (secs) => {
+                        const m = Math.floor(secs / 60).toString().padStart(2, '0');
+                        const s = Math.floor(secs % 60).toString().padStart(2, '0');
+                        return `${m}:${s}`;
+                    };
+                    
+                    let interactiveHtml = '';
+                    let clipboardTextWithTimestamps = '';
+                    
+                    if (msg.result.chunks && msg.result.chunks.length > 0) {
+                        interactiveHtml = msg.result.chunks.map(c => {
+                            const start = c.timestamp[0];
+                            const timeStr = `[${formatFloatTime(start)}]`;
+                            return `<span class="cursor-pointer hover:bg-brand-900/50 hover:text-brand-300 rounded px-1 transition-colors border-b border-transparent hover:border-brand-500 block mb-2" onclick="playAudio('${playerID}', ${start})"><span class="text-[10px] text-brand-500 font-mono font-bold mr-2 select-none">${timeStr}</span><span class="text-slate-200">${escapeHTML(c.text)}</span></span>`;
+                        }).join('');
+                        
+                        clipboardTextWithTimestamps = msg.result.chunks.map(c => `[${formatFloatTime(c.timestamp[0])}] ${c.text.trim()}`).join('\n');
+                    } else {
+                        interactiveHtml = escapeHTML(msg.result.text || "No speech detected.");
+                        clipboardTextWithTimestamps = msg.result.text || "";
+                    }
+
+                    const simpleTextForClipboard = `${clipboardTextWithTimestamps}\n\n`;
+                    const htmlBlock = `
+                        <div class="transcript-card mb-10 relative group bg-fluency-panel p-6 rounded-2xl border border-fluency-border shadow-md" data-rawtext="${encodeURIComponent(simpleTextForClipboard)}">
+                            <div class="flex items-center justify-between mb-4 border-b border-slate-700/50 pb-3">
+                                <h2 class="text-brand-400 font-bold text-lg flex items-center gap-2"><i data-lucide="file-audio" class="w-5 h-5"></i> ${escapeHTML(fileName)}</h2>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs text-slate-500 font-medium tracking-wide border border-slate-700 py-1 px-2 rounded-lg bg-slate-800/50 hidden sm:inline-block">Analyzed ${new Date().toLocaleString()}</span>
+                                    <a href="${blobUrl}" download="${fileName}" class="text-brand-400/50 hover:text-brand-400 hover:bg-brand-900/30 p-1.5 rounded-lg transition-colors border border-transparent hover:border-brand-500/30" title="Download Audio">
+                                        <i data-lucide="download" class="w-4 h-4"></i>
+                                    </a>
+                                    <button onclick="const card = this.closest('.transcript-card'); const audio = card.querySelector('audio'); if(audio) URL.revokeObjectURL(audio.src); card.remove(); if(document.querySelectorAll('.transcript-card').length === 0) { document.getElementById('empty-state').classList.remove('hidden'); document.getElementById('preview-wrapper').classList.add('hidden'); }" class="text-red-400/50 hover:text-red-400 hover:bg-red-900/30 p-1.5 rounded-lg transition-colors border border-transparent hover:border-red-500/30" title="Delete Recording">
+                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <audio id="${playerID}" src="${blobUrl}" controls class="w-full h-[40px] mb-5 rounded-lg opacity-80 hover:opacity-100 transition-opacity outline-none custom-audio"></audio>
+                            <h3 class="text-xs uppercase tracking-wider text-slate-500 mb-2 font-bold">Transcription (Click to Listen)</h3>
+                            <div class="text-slate-200 leading-relaxed font-sans tracking-wide text-lg text-justify p-5 bg-fluency-base rounded-xl border border-fluency-border shadow-inner">
+                                ${interactiveHtml}
+                            </div>
+                            <div class="absolute -left-1.5 top-8 bottom-8 w-1 bg-brand-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        </div>
+                    `;
+                    
+                    appendToDocumentRaw(htmlBlock, simpleTextForClipboard);
+                    autoCopyAndDownload(simpleTextForClipboard, "Transcription");
+                    processNextFile();
+                    
+                } else if (msg.type === 'error') {
+                    activeTranscriptionBox.classList.add('hidden');
+                    activeTextParagraph.textContent = '';
+                    
+                    const processingFile = selectedFiles.find(f => f.status === 'processing');
+                    if(processingFile) processingFile.status = 'error';
+                    handleFileSelect([]);
+
+                    const fileName = escapeHTML(processingFile ? processingFile.name : 'Unknown');
+                    const errorMsg = escapeHTML(msg.error);
+                    const errorHtml = `
+                        <div class="mb-10 bg-fluency-panel p-6 rounded-2xl border border-red-900/50 shadow-md">
+                            <div class="flex items-center mb-4 border-b border-slate-700/50 pb-3">
+                                <h2 class="text-red-400 font-bold text-lg flex items-center gap-2"><i data-lucide="alert-triangle" class="w-5 h-5"></i> Error Processing ${fileName}</h2>
+                            </div>
+                            <div class="text-slate-300">Engine Failure: ${errorMsg}</div>
+                        </div>
+                    `;
+                    appendToDocumentRaw(errorHtml, `Error Processing ${fileName}: ${errorMsg}`);
+                    processNextFile();
+                }
+            };
+        };
+
+        const processNextFile = () => {
+            const nextIndex = selectedFiles.findIndex(f => f.status === 'pending');
+            
+            if (nextIndex === -1) {
+                isProcessing = false;
+                transcribeBtn.disabled = false;
+                updateSystemStatus('ready', 'System Idle (Online)');
+                updateProgress('', 0, false);
+                transcribeBtn.innerHTML = '<i data-lucide="check" class="w-5 h-5"></i> Process Complete';
+                lucide.createIcons();
+                showToast("All documents compiled successfully.");
+                return;
+            }
+
+            isProcessing = true;
+            const currentFile = selectedFiles[nextIndex];
+            currentFile.status = 'processing';
+            
+            updateSystemStatus('working', `Decoding Node (${nextIndex + 1}/${selectedFiles.length})`);
+            updateProgress(`Decoding ${currentFile.name}...`, 100);
+            
+            transcribeBtn.disabled = true;
+            transcribeBtn.innerHTML = '<div class="loader !w-5 !h-5 !border-2 !border-brand-300 border-t-white mr-2"></div> Extracting...';
+
+            activeTranscriptionBox.classList.remove('hidden');
+            activeTextParagraph.textContent = ''; 
+
+            const fileReader = new FileReader();
+            fileReader.onload = async (e) => {
+                try {
+                    const arrayBuffer = e.target.result;
+                    const audioContext = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
+                    const audioBuffer = await audioContext.decodeAudioData(arrayBuffer).catch(err => { throw new Error("Audio format unsupported or corrupted.") });
+                    const float32Data = audioBuffer.getChannelData(0);
+                    const clonedData = float32Data.slice(); // Deep clone to avoid buffer detachment
+                    
+                    worker.postMessage({ 
+                        type: 'transcribe', 
+                        audioData: clonedData, 
+                        fileIndex: nextIndex 
+                    });
+                    
+                } catch (error) {
+                    currentFile.status = 'error';
+                    const mdBlock = `<div class="mb-10 text-red-400">Error Decoder: Failed to parse raw audio stream for ${currentFile.name}</div>`;
+                    appendToDocumentRaw(mdBlock, "Error Decoding Audio");
+                    
+                    activeTranscriptionBox.classList.add('hidden');
+                    processNextFile();
+                }
+            };
+            fileReader.readAsArrayBuffer(currentFile);
+        };
+
+        transcribeBtn.addEventListener('click', () => {
+            if (isProcessing) return;
+            
+            const pendingExist = selectedFiles.some(f => f.status === 'pending');
+            if(!pendingExist) {
+                showToast("No pending files to process.", true);
+                return;
+            }
+            
+            transcribeBtn.disabled = true;
+            transcribeBtn.innerHTML = '<div class="loader !w-5 !h-5 !border-2 !border-brand-300 border-t-white mr-2"></div> Engaging Engine...';
+            
+            if (!worker || currentLoadedModel !== modelSelector.value) {
+                if (window.isLoadingModel) return;
+                window.isLoadingModel = true;
+
+                currentLoadedModel = modelSelector.value;
+                if (worker) worker.terminate();
+                initializeWorker();
+                
+                updateSystemStatus('downloading', 'Requesting Node Assignment...');
+                updateProgress('Connecting...', 0);
+                
+                // Detection for Connection Hang
+                setTimeout(() => {
+                    if (!isWorkerLoaded) {
+                        updateSystemStatus('offline', 'Still waiting for AI script...');
+                        updateProgress('Connection slow - trying again...', 50);
+                        window.isLoadingModel = false;
+                    }
+                }, 8000);
+
+                worker.postMessage({ type: 'load', model: currentLoadedModel });
+            } else if (!isWorkerLoaded) {
+                updateProgress('Awaiting Knowledge Graph...', 50);
+            } else {
+                processNextFile();
+            }
+        });
+    </script>
+</body>
+</html>

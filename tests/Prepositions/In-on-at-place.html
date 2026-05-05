@@ -1,0 +1,726 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fluency Bridge | In, On, At (Location)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:ital,wght@1,600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #060B19;
+            --bg-card: #111A2C;
+            --primary: #2563EB;
+            --input-bg: #080D1A;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-deep);
+            color: white;
+            -webkit-font-smoothing: antialiased;
+        }
+        .font-serif-italic {
+            font-family: 'Playfair Display', serif;
+        }
+        .hide-scroll::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scroll {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .glass-panel {
+            background-color: var(--bg-card);
+            backdrop-filter: blur(8px);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+        }
+        .input-dark {
+            background-color: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .input-dark:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+        .active-tab {
+            border-bottom: 2px solid var(--primary);
+            color: white;
+        }
+        .inactive-tab {
+            color: #9ca3af; /* text-gray-400 */
+        }
+        
+        /* Print Styles */
+        @media print {
+            body { background: white !important; color: black !important; }
+            .no-print { display: none !important; }
+            .glass-panel { background: white !important; border: 1px solid #ccc !important; box-shadow: none !important; }
+            * { color: black !important; }
+            a { text-decoration: underline; color: blue !important; }
+            .fixed { position: static !important; }
+        }
+    </style>
+</head>
+<body class="min-h-screen relative pb-24 overflow-x-hidden">
+
+    <!-- Global Background Gradient -->
+    <div class="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#131E3A] via-[#060B19] to-transparent pointer-events-none -z-10 no-print"></div>
+
+    <!-- Header / Logo -->
+    <header class="w-full p-4 md:p-6 flex justify-between items-center sticky top-0 z-40 bg-[#060B19]/80 backdrop-blur-md border-b border-white/5 no-print">
+        <div class="flex flex-col">
+            <div class="tracking-[0.3em] text-[10px] text-gray-300 uppercase">F L U E N C Y</div>
+            <div class="text-white text-4xl italic font-serif-italic leading-none">bridge</div>
+        </div>
+        <div class="flex flex-col items-end">
+            <div class="text-xs text-gray-400 uppercase tracking-widest">Session Time</div>
+            <div id="global-timer" class="text-lg font-bold text-white font-mono">00:00</div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="w-full px-4 md:px-6 mt-4 flex space-x-6 border-b border-white/5 no-print overflow-x-auto hide-scroll">
+        <button onclick="switchTab('notes')" id="tab-notes" class="active-tab pb-2 text-sm md:text-base font-semibold whitespace-nowrap transition-colors">Revise Topic</button>
+        <button onclick="switchTab('quiz')" id="tab-quiz" class="inactive-tab pb-2 text-sm md:text-base font-semibold whitespace-nowrap transition-colors hover:text-white">Assessment</button>
+        <button onclick="switchTab('reallife')" id="tab-reallife" class="inactive-tab pb-2 text-sm md:text-base font-semibold whitespace-nowrap transition-colors hover:text-white">Real-Life Usage</button>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="w-full max-w-4xl mx-auto p-4 md:p-6 mt-2">
+
+        <!-- NOTES SECTION -->
+        <section id="notes-section" class="space-y-6">
+            <div class="glass-panel rounded-2xl p-6">
+                <div class="flex justify-between items-start mb-6">
+                    <h1 class="text-2xl md:text-3xl font-bold text-white">Location Prepositions: In On At</h1>
+                    <button onclick="window.print()" class="no-print bg-white/5 border border-white/10 hover:bg-white/10 text-white p-2 rounded-xl text-sm transition flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                        Print Notes
+                    </button>
+                </div>
+                
+                <div class="bg-[#080D1A] rounded-xl p-4 mb-6 border border-white/5">
+                    <h2 class="text-sm text-gray-400 uppercase tracking-widest mb-2">Prerequisites (Zaroori Concepts)</h2>
+                    <p class="text-sm text-gray-300">Is topic ko samajhne ke liye aapko inka basic idea hona chahiye:</p>
+                    <div class="flex gap-4 mt-2">
+                        <a href="https://www.google.com/search?q=English+Grammar+Nouns" target="_blank" class="text-[#2563EB] hover:text-blue-400 text-sm underline flex items-center gap-1">Nouns (Sangya) <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg></a>
+                        <a href="https://www.google.com/search?q=English+Grammar+Verbs" target="_blank" class="text-[#2563EB] hover:text-blue-400 text-sm underline flex items-center gap-1">Verbs (Kriya) <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg></a>
+                    </div>
+                </div>
+
+                <div class="bg-white/5 rounded-xl p-4 mb-8">
+                    <h3 class="text-white font-semibold mb-2">Table of Contents</h3>
+                    <ul class="text-sm text-gray-400 space-y-1 list-disc pl-5">
+                        <li><a href="#concept-in" class="hover:text-white">1. Use of 'In' (Enclosed Spaces)</a></li>
+                        <li><a href="#concept-on" class="hover:text-white">2. Use of 'On' (Surfaces & Lines)</a></li>
+                        <li><a href="#concept-at" class="hover:text-white">3. Use of 'At' (Specific Points)</a></li>
+                        <li><a href="#nuances" class="hover:text-white">4. Deep Nuances & Logical Differences</a></li>
+                        <li><a href="#mistakes" class="hover:text-white">5. Top Mistakes People Make</a></li>
+                    </ul>
+                </div>
+
+                <div class="space-y-8 text-gray-300 leading-relaxed text-sm md:text-base">
+                    
+                    <!-- Section IN -->
+                    <div id="concept-in" class="border-l-2 border-[#2563EB] pl-4">
+                        <h2 class="text-xl text-white font-bold mb-2">1. The Preposition 'IN' (Enclosed Spaces)</h2>
+                        <p class="mb-2"><strong>Basic Logic:</strong> Jab koi cheez kisi 3D space, area, ya boundaries ke andar ho, tab hum 'IN' use karte hain. Socho jaise koi cheez ek box ke andar band hai.</p>
+                        <ul class="list-disc pl-5 space-y-2 mt-4 text-gray-400">
+                            <li><strong class="text-white">Rooms/Buildings:</strong> I am <span class="text-white font-semibold">in</span> the room. (Room ek enclosed jagah hai)</li>
+                            <li><strong class="text-white">Cities/Countries (Bade areas):</strong> He lives <span class="text-white font-semibold">in</span> Mumbai. She is <span class="text-white font-semibold">in</span> India. (Bade borders ke andar)</li>
+                            <li><strong class="text-white">Containers/Liquids:</strong> The keys are <span class="text-white font-semibold">in</span> my pocket. The fish is <span class="text-white font-semibold">in</span> the water.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Section ON -->
+                    <div id="concept-on" class="border-l-2 border-[#2563EB] pl-4">
+                        <h2 class="text-xl text-white font-bold mb-2">2. The Preposition 'ON' (Surfaces)</h2>
+                        <p class="mb-2"><strong>Basic Logic:</strong> Jab koi cheez kisi flat ya vertical surface ko touch kar rahi ho aur uske upar tiki ho. Boundary nahi hai, bas contact hai.</p>
+                        <ul class="list-disc pl-5 space-y-2 mt-4 text-gray-400">
+                            <li><strong class="text-white">Flat Surfaces:</strong> The book is <span class="text-white font-semibold">on</span> the table. The picture is <span class="text-white font-semibold">on</span> the wall.</li>
+                            <li><strong class="text-white">Streets/Roads:</strong> The shop is <span class="text-white font-semibold">on</span> MG Road. (Road ek lambi line/surface ki tarah treat hoti hai)</li>
+                            <li><strong class="text-white">Public Transport:</strong> I am <span class="text-white font-semibold">on</span> the bus / train / plane. (Logic: Agar aap us gaadi mein khade hokar chal sakte hain, toh 'ON' lagta hai).</li>
+                        </ul>
+                    </div>
+
+                    <!-- Section AT -->
+                    <div id="concept-at" class="border-l-2 border-[#2563EB] pl-4">
+                        <h2 class="text-xl text-white font-bold mb-2">3. The Preposition 'AT' (Specific Points)</h2>
+                        <p class="mb-2"><strong>Basic Logic:</strong> Jab hum ek exact point, location ya aisi jagah ki baat karein jise hum nakshay (map) par ek dot ki tarah dekhte hain.</p>
+                        <ul class="list-disc pl-5 space-y-2 mt-4 text-gray-400">
+                            <li><strong class="text-white">Specific Locations:</strong> I am waiting <span class="text-white font-semibold">at</span> the bus stop. Someone is <span class="text-white font-semibold">at</span> the door.</li>
+                            <li><strong class="text-white">Events/Group activities:</strong> We met <span class="text-white font-semibold">at</span> a party. He is <span class="text-white font-semibold">at</span> the concert.</li>
+                            <li><strong class="text-white">Addresses:</strong> She lives <span class="text-white font-semibold">at</span> 45 Park Street. (Exact number pata hai toh At, warna sirf street ho toh On).</li>
+                        </ul>
+                    </div>
+
+                    <!-- Nuances -->
+                    <div id="nuances" class="bg-[#080D1A] rounded-xl p-5 border border-white/5">
+                        <h2 class="text-lg text-white font-bold mb-4 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-[#2563EB]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            Key Nuances & Logical Differences
+                        </h2>
+                        <div class="space-y-4 text-gray-400 text-sm">
+                            <div>
+                                <strong class="text-white">"In the hospital" vs "At the hospital"</strong><br>
+                                Agar koi mareez (patient) ki tarah admit hai: "He is <span class="text-white">in</span> the hospital."<br>
+                                Agar aap kisi se milne gaye hain (visitor): "I am <span class="text-white">at</span> the hospital."
+                            </div>
+                            <div>
+                                <strong class="text-white">Vehicles (Car vs Bus)</strong><br>
+                                Jin gadiyon mein aapko jhuk kar ghusna pade aur chal na sakein (Car, Taxi, Helicopter) -> <span class="text-white">IN</span> (In a car).<br>
+                                Jin gadiyon ki chat unchi ho aur chal sakein (Bus, Train, Airplane) -> <span class="text-white">ON</span> (On a bus).
+                            </div>
+                            <div>
+                                <strong class="text-white">Corner (In vs At)</strong><br>
+                                Kamre ka kona (enclosed): <span class="text-white">In the corner of the room.</span><br>
+                                Sadak ka kona (point): <span class="text-white">At the corner of the street.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mistakes -->
+                    <div id="mistakes" class="bg-red-900/10 border border-red-500/20 rounded-xl p-5">
+                        <h2 class="text-lg text-red-400 font-bold mb-4">Top Mistakes Indian Speakers Make</h2>
+                        <ul class="space-y-3 text-sm">
+                            <li class="flex flex-col gap-1">
+                                <span class="text-gray-400">❌ I live <span class="line-through">at</span> Mumbai.</span>
+                                <span class="text-green-400">✅ I live <b>in</b> Mumbai. (City bada area hai, specific point nahi).</span>
+                            </li>
+                            <li class="flex flex-col gap-1">
+                                <span class="text-gray-400">❌ I am <span class="line-through">in</span> the bus.</span>
+                                <span class="text-green-400">✅ I am <b>on</b> the bus. (Bus mein chal sakte hain).</span>
+                            </li>
+                            <li class="flex flex-col gap-1">
+                                <span class="text-gray-400">❌ Put the pen <span class="line-through">in</span> the table.</span>
+                                <span class="text-green-400">✅ Put the pen <b>on</b> the table. (Table surface hai, uske andar nahi daal rahe).</span>
+                            </li>
+                            <li class="flex flex-col gap-1">
+                                <span class="text-gray-400">❌ Someone is knocking <span class="line-through">on</span> the door.</span>
+                                <span class="text-green-400">✅ Someone is knocking <b>at</b> the door. (Door ek location point ki tarah use ho raha hai).</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
+
+                <div class="mt-8 flex justify-center no-print">
+                    <button onclick="switchTab('quiz')" class="bg-[#2563EB] hover:bg-blue-600 text-white font-bold py-3 px-8 rounded-xl shadow-lg transition-all w-full md:w-auto text-center">
+                        Jump to Assessment
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- QUIZ SECTION -->
+        <section id="quiz-section" class="hidden">
+            <div id="quiz-start" class="glass-panel rounded-2xl p-6 text-center">
+                <h2 class="text-2xl font-bold text-white mb-2">Location Prepositions Assessment</h2>
+                <p class="text-gray-400 text-sm mb-6">10 random questions aayenge (out of 100+ pool). Dhyan se padhein, focus on the logic behind In, On, At.</p>
+                <button onclick="startQuiz()" class="bg-[#2563EB] hover:bg-blue-600 text-white font-bold py-3 px-8 rounded-xl shadow-lg transition-all">
+                    Start Assessment
+                </button>
+            </div>
+
+            <div id="quiz-active" class="hidden">
+                <div class="flex justify-between items-center mb-4 text-sm text-gray-400">
+                    <span>Question <span id="q-current" class="text-white font-bold">1</span>/10</span>
+                    <span class="bg-white/10 px-3 py-1 rounded-full">Score: <span id="q-score" class="text-[#2563EB] font-bold">0</span></span>
+                </div>
+                
+                <!-- Progress Bar -->
+                <div class="w-full bg-white/10 rounded-full h-2 mb-6">
+                    <div id="quiz-progress" class="bg-[#2563EB] h-2 rounded-full transition-all duration-300" style="width: 10%"></div>
+                </div>
+
+                <div class="glass-panel rounded-2xl p-6 mb-6">
+                    <h3 id="question-text" class="text-lg md:text-xl font-semibold text-white mb-6">Question text goes here?</h3>
+                    <div id="options-container" class="space-y-3">
+                        <!-- Options injected via JS -->
+                    </div>
+                </div>
+
+                <div id="explanation-box" class="hidden glass-panel rounded-2xl p-6 border-l-4">
+                    <p id="explanation-text" class="text-gray-300 text-sm md:text-base"></p>
+                    <button onclick="nextQuestion()" class="mt-4 bg-[#2563EB] hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-xl transition-all w-full">
+                        Next Question
+                    </button>
+                </div>
+            </div>
+
+            <div id="quiz-results" class="hidden glass-panel rounded-2xl p-6 text-center">
+                <h2 class="text-3xl font-bold text-white mb-2">Assessment Complete</h2>
+                <div class="py-8 space-y-4">
+                    <div class="text-6xl font-bold text-[#2563EB]" id="final-score">8/10</div>
+                    <p class="text-gray-400">Total Score</p>
+                    <div class="flex justify-center gap-8 mt-6 border-t border-white/5 pt-6">
+                        <div>
+                            <div class="text-xl text-white font-mono" id="final-time">00:00</div>
+                            <div class="text-xs text-gray-500 uppercase">Time Taken</div>
+                        </div>
+                        <div>
+                            <div class="text-xl text-white font-mono" id="final-efficiency">80%</div>
+                            <div class="text-xs text-gray-500 uppercase">Efficiency</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="space-y-3 mt-6">
+                    <button onclick="startQuiz()" class="bg-[#2563EB] hover:bg-blue-600 text-white font-bold py-3 px-8 rounded-xl transition-all w-full">
+                        Practice Another 10 Questions
+                    </button>
+                    <button onclick="downloadAnki()" class="input-dark hover:text-white text-gray-300 font-semibold py-3 px-8 rounded-xl transition-all w-full flex items-center justify-center gap-2">
+                        Download 100 Qs Anki Deck (CSV)
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- REAL LIFE USAGE SECTION -->
+        <section id="reallife-section" class="hidden space-y-6">
+            <div class="glass-panel rounded-2xl p-6">
+                <div class="flex justify-between items-end mb-6">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">Daily Life Scenarios</h2>
+                        <p class="text-gray-400 text-sm mt-1">Indian middle-class daily life examples. Padh ke logic samjhein.</p>
+                    </div>
+                    <button onclick="loadRealLifeBatch()" class="bg-[#2563EB] text-white p-2 rounded-xl text-sm hover:bg-blue-600 transition">
+                        Shuffle Next 5
+                    </button>
+                </div>
+
+                <div id="reallife-container" class="space-y-4">
+                    <!-- Preloaded via JS -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer / Bottom Nav -->
+    <footer class="fixed bottom-0 left-0 w-full bg-[#060B19]/90 backdrop-blur-md border-t border-white/5 p-4 z-50 no-print">
+        <div class="max-w-4xl mx-auto flex justify-between items-center px-2">
+            <button onclick="switchTab('notes')" class="text-gray-400 hover:text-white transition flex items-center gap-2 text-sm font-medium">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                <span class="hidden md:inline">Home / Notes</span>
+            </button>
+            
+            <div class="flex gap-4">
+                <button onclick="downloadAnki()" title="Download Anki Flashcards" class="text-gray-400 hover:text-white transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                </button>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // --- DATA LAYER ---
+        
+        // Exactly 100 Unique Questions for Anki and Assessment (No commas inside strings to ensure Anki CSV format strictness)
+        // Format: [Question, OptionA, OptionB, OptionC, CorrectIndex, Explanation]
+        const rawQuizData = [
+            ["Where is your book?", "In the table", "On the table", "At the table", 1, "Table ek surface hai isliye ON lagega"],
+            ["She is waiting ___ the bus stop.", "in", "on", "at", 2, "Bus stop ek specific point hai isliye AT lagega"],
+            ["I live ___ India.", "in", "on", "at", 0, "India ek desh hai (enclosed territory) isliye IN lagega"],
+            ["Someone is knocking ___ the door.", "in", "on", "at", 2, "Door yaha ek specific location point ki tarah use hua hai isliye AT"],
+            ["The picture is hanging ___ the wall.", "in", "on", "at", 1, "Wall ek vertical surface hai isliye ON"],
+            ["We are sitting ___ the room.", "in", "on", "at", 0, "Room ek enclosed space (chaar deewari) hai isliye IN"],
+            ["He is currently ___ the bus traveling to Delhi.", "in", "on", "at", 1, "Bus badi gaadi hai jisme chal sakte hain isliye ON"],
+            ["She left her purse ___ the taxi.", "in", "on", "at", 0, "Taxi choti gaadi hai jisme chal nahi sakte isliye IN"],
+            ["I will meet you ___ the party.", "in", "on", "at", 2, "Party ek event ya gathering point hai isliye AT"],
+            ["Look at the stars ___ the sky.", "in", "on", "at", 0, "Sky ek 3D vast space mana jata hai isliye IN"],
+            ["Are you ___ home?", "in", "on", "at", 2, "Home ko usually specific location point mante hain isliye AT"],
+            ["The keys are ___ my pocket.", "in", "on", "at", 0, "Pocket ek band jagah (enclosure) hai isliye IN"],
+            ["The shop is ___ MG Road.", "in", "on", "at", 1, "Road ek lambi line/surface hai isliye ON"],
+            ["They live ___ 45 Baker Street.", "in", "on", "at", 2, "Exact address (number ke sath) point hota hai isliye AT"],
+            ["The cat is sleeping ___ the carpet.", "in", "on", "at", 1, "Carpet ek flat surface hai isliye ON"],
+            ["She is swimming ___ the pool.", "in", "on", "at", 0, "Pool ka paani ek volume (3D space) hai isliye IN"],
+            ["I saw the news ___ the television.", "in", "on", "at", 1, "TV screen ek surface/electronic platform hai isliye ON"],
+            ["He works ___ an IT company.", "in", "on", "at", 0, "Company as an organization/building ke andar isliye IN"],
+            ["We stayed ___ the Taj Hotel.", "in", "on", "at", 2, "Hotel as a specific stop/point in journey isliye AT"],
+            ["Put the clothes ___ the cupboard.", "in", "on", "at", 0, "Cupboard ek band jagah hai isliye IN"],
+            ["The stain is ___ your shirt.", "in", "on", "at", 1, "Shirt ka kapda surface hai isliye ON"],
+            ["I am reading a story ___ the newspaper.", "in", "on", "at", 0, "Newspaper ke pages ke andar content hota hai isliye IN"],
+            ["There is a lot of traffic ___ the bridge.", "in", "on", "at", 1, "Bridge ek surface hai isliye ON"],
+            ["He is standing ___ the entrance.", "in", "on", "at", 2, "Entrance exact point hai isliye AT"],
+            ["The food is ___ the plate.", "in", "on", "at", 1, "Plate surface hai isliye ON"],
+            ["I am ___ work right now.", "in", "on", "at", 2, "Work ek state/location of duty hai isliye AT"],
+            ["Write your name ___ the top of the page.", "in", "on", "at", 2, "Top/Bottom page ka specific point hota hai isliye AT"],
+            ["There is a mistake ___ page 5.", "in", "on", "at", 1, "Page as a surface count hota hai isliye ON"],
+            ["She has a ring ___ her finger.", "in", "on", "at", 1, "Finger surface hai jiske upar ring pehni hai isliye ON"],
+            ["They are hiding ___ the cave.", "in", "on", "at", 0, "Cave (gufa) enclosed hai isliye IN"],
+            ["I left my glasses ___ the desk.", "in", "on", "at", 1, "Desk surface hai isliye ON"],
+            ["He is sitting ___ his desk working.", "in", "on", "at", 2, "Desk ke paas baithna (location point) isliye AT"],
+            ["She lives ___ a small village.", "in", "on", "at", 0, "Village area/boundary hai isliye IN"],
+            ["The kids are playing ___ the street.", "in", "on", "at", 0, "Street ke boundaries (buildings) ke beech isliye IN (American/British diff)"],
+            ["Turn left ___ the next traffic light.", "in", "on", "at", 2, "Traffic light point on map hai isliye AT"],
+            ["I found this ___ the internet.", "in", "on", "at", 1, "Internet electronic platform/surface hai isliye ON"],
+            ["My birthday is ___ October.", "in", "on", "at", 0, "Months/Years ke liye IN lagta hai (Time rule but good to know)"],
+            ["We are sitting ___ the floor.", "in", "on", "at", 1, "Floor surface hai isliye ON"],
+            ["He is ___ the hospital because he is sick.", "in", "on", "at", 0, "Admit hone par IN the hospital bolte hain"],
+            ["I am ___ the hospital to visit my friend.", "in", "on", "at", 2, "Visitor ki tarah jane par AT bolte hain"],
+            ["The author's name is ___ the cover of the book.", "in", "on", "at", 1, "Cover surface hai isliye ON"],
+            ["There is water ___ the bottle.", "in", "on", "at", 0, "Bottle enclosed container hai isliye IN"],
+            ["Is correct to say 'I am in the bus' if you can walk inside it?", "Yes", "No", "Depends", 1, "Nahi jab gaadi me chal sakein toh ON lagta hai"],
+            ["Which is correct?", "At Mumbai", "In Mumbai", "On Mumbai", 1, "Mumbai bada city hai isliye IN aayega"],
+            ["We arrived ___ the airport late.", "in", "on", "at", 2, "Airport specific point/stop hai isliye AT"],
+            ["She is standing ___ the queue.", "in", "on", "at", 0, "Queue line ke andar khade hote hain isliye IN"],
+            ["There is a fly ___ the ceiling.", "in", "on", "at", 1, "Ceiling (chat) surface hai isliye ON"],
+            ["I am studying ___ university.", "in", "on", "at", 2, "University institution/location point hai isliye AT"],
+            ["Keep your bags ___ the floor.", "in", "on", "at", 1, "Floor surface hai isliye ON"],
+            ["He was born ___ 1990.", "in", "on", "at", 0, "Years ke liye IN lagta hai"],
+            ["The movie is playing ___ the cinema.", "in", "on", "at", 2, "Cinema specific location hai isliye AT"],
+            ["She has a scar ___ her face.", "in", "on", "at", 1, "Face surface hai isliye ON"],
+            ["I am ___ a meeting right now.", "in", "on", "at", 0, "Meeting ek enclosed time/event hai (In is also common here) isliye IN"],
+            ["Someone is waiting ___ the reception.", "in", "on", "at", 2, "Reception specific point in building hai isliye AT"],
+            ["The dog is sleeping ___ the bed.", "in", "on", "at", 1, "Bed surface hai isliye ON"],
+            ["There is a mirror ___ the bathroom.", "in", "on", "at", 0, "Bathroom room hai isliye IN"],
+            ["She is working ___ her laptop.", "in", "on", "at", 1, "Laptop/Computer par kaam karte waqt ON lagate hain"],
+            ["We are having dinner ___ a restaurant.", "in", "on", "at", 2, "Restaurant specific location hai isliye AT"],
+            ["Put the letter ___ the envelope.", "in", "on", "at", 0, "Envelope band jagah hai isliye IN"],
+            ["The label is ___ the bottle.", "in", "on", "at", 1, "Label bottle ki surface par chipka hota hai isliye ON"],
+            ["I am standing ___ the crossroads.", "in", "on", "at", 2, "Crossroads (chauraha) ek exact point hai isliye AT"],
+            ["He is reading a book ___ the garden.", "in", "on", "at", 0, "Garden ke boundaries hote hain isliye IN"],
+            ["There is snow ___ the roof.", "in", "on", "at", 1, "Roof surface hai isliye ON"],
+            ["I bought this shirt ___ a sale.", "in", "on", "at", 0, "Sale ek condition/event hai isliye IN"],
+            ["Let's meet ___ the station.", "in", "on", "at", 2, "Station ek transport point hai isliye AT"],
+            ["The files are ___ the computer.", "in", "on", "at", 1, "Computer storage/platform ko ON ki tarah treat karte hain"],
+            ["She is standing ___ the middle of the room.", "in", "on", "at", 0, "Middle of an enclosed space isliye IN"],
+            ["Write your answer ___ the blank space.", "in", "on", "at", 0, "Space ke andar likhte hain isliye IN"],
+            ["I am sitting ___ the sofa.", "in", "on", "at", 1, "Sofa surface hai isliye ON"],
+            ["He is ___ the top of the mountain.", "in", "on", "at", 2, "Top specific point hai isliye AT"],
+            ["We live ___ the 3rd floor.", "in", "on", "at", 1, "Floor level surface hai isliye ON"],
+            ["The money is ___ my wallet.", "in", "on", "at", 0, "Wallet band jagah hai isliye IN"],
+            ["I saw him ___ the match.", "in", "on", "at", 2, "Match event/point hai isliye AT"],
+            ["There is a spider ___ the wall.", "in", "on", "at", 1, "Wall surface hai isliye ON"],
+            ["She is sitting ___ the armchair.", "in", "on", "at", 0, "Armchair aapko gher leti hai (encloses you) isliye IN"],
+            ["I am ___ the train station.", "in", "on", "at", 2, "Station specific point hai isliye AT"],
+            ["The information is ___ the website.", "in", "on", "at", 1, "Website electronic page/surface hai isliye ON"],
+            ["He is swimming ___ the sea.", "in", "on", "at", 0, "Sea vast volume of water hai isliye IN"],
+            ["I am looking ___ the menu.", "in", "on", "at", 2, "Look ke sath AT lagta hai (verb preposition combo)"],
+            ["The book is ___ my bag.", "in", "on", "at", 0, "Bag enclosed space hai isliye IN"],
+            ["They are playing ___ the playground.", "in", "on", "at", 0, "Playground area hai isliye IN"],
+            ["I heard it ___ the radio.", "in", "on", "at", 1, "Radio electronic broadcast platform hai isliye ON"],
+            ["I will see you ___ Monday.", "in", "on", "at", 1, "Days ke liye ON lagta hai"],
+            ["Let's stop ___ the next petrol pump.", "in", "on", "at", 2, "Petrol pump route par ek point hai isliye AT"],
+            ["She is standing ___ the balcony.", "in", "on", "at", 1, "Balcony attached surface hai isliye ON"],
+            ["The kids are playing ___ the park.", "in", "on", "at", 0, "Park area hai isliye IN"],
+            ["He threw the ball ___ me.", "in", "on", "at", 2, "Target point karne ke liye AT"],
+            ["The boat is floating ___ the water.", "in", "on", "at", 1, "Pani ki surface par isliye ON"],
+            ["We are stuck ___ traffic.", "in", "on", "at", 0, "Traffic cars ka ghera hai isliye IN"],
+            ["The clock is ___ the wall.", "in", "on", "at", 1, "Wall surface hai isliye ON"],
+            ["I am ___ the supermarket.", "in", "on", "at", 2, "Supermarket as a destination point isliye AT"],
+            ["Keep the milk ___ the fridge.", "in", "on", "at", 0, "Fridge band dibba hai isliye IN"],
+            ["I stepped ___ a bug.", "in", "on", "at", 1, "Bug surface par tha aur paer rakha isliye ON"],
+            ["He is ___ his desk.", "in", "on", "at", 2, "Desk ke paas location isliye AT"],
+            ["The mirror is ___ the bathroom.", "in", "on", "at", 0, "Bathroom room hai isliye IN"],
+            ["I read it ___ a book.", "in", "on", "at", 0, "Book pages ka enclosure hai isliye IN"],
+            ["The ship is ___ the ocean.", "in", "on", "at", 1, "Ocean ki surface par chal rahi hai isliye ON"],
+            ["We had lunch ___ a cafe.", "in", "on", "at", 2, "Cafe destination point hai isliye AT"],
+            ["She works ___ a farm.", "in", "on", "at", 1, "Farm zameen/surface mana jata hai isliye ON"],
+            ["I am ___ trouble.", "in", "on", "at", 0, "Trouble abstract enclosed state hai isliye IN"]
+        ];
+
+        // Format: [Scenario (___ for blank), CorrectAns, Explanation]
+        const rawRealLifeData = [
+            ["Subah uth kar dekha toh phone ___ the table tha.", "on", "Table ek surface hai."],
+            ["Bhai mai ___ the bus hu thodi der me call karta hu.", "on", "Bus me chal sakte hain isliye ON aayega in nahi."],
+            ["Mummy sabzi lane gaye hain she is ___ the market.", "at", "Market ek destination point ki tarah use ho raha hai."],
+            ["Keys mil nahi rahi thi fir dekha toh vo ___ my pocket thi.", "in", "Pocket ek band jagah hai."],
+            ["Office pahunch gaya hu I am ___ my desk.", "at", "Desk ke paas chair par baithne ki position ko AT bolte hain."],
+            ["Train late hai hum sab ___ the platform wait kar rahe hain.", "on", "Platform ek flat surface hai jiske upar khade hote hain."],
+            ["Aadhar card ki detail ___ page 2 likhi hai.", "on", "Document ya page ko surface mana jata hai."],
+            ["Ghar aa jao I am waiting ___ the door.", "at", "Door ek specific point location hai."],
+            ["Chalo weekend par milte hain ___ the new mall.", "at", "Mall as a meeting point."],
+            ["Bike ki chabi ___ the bed kyu rakhi hai?", "on", "Bed ek surface hai."],
+            ["Barish ho rahi hai mai ___ the car baitha hu.", "in", "Car chhoti gaadi hai jisme chal nahi sakte isliye IN."],
+            ["Fridge check kar vegetables are ___ the bottom drawer.", "in", "Drawer ek enclosed dabba hai."],
+            ["Address dhyan se dekh shop is ___ Main Street.", "on", "Street ke naam ke sath ON lagta hai."],
+            ["Mujhe ye shoes online ___ Amazon ache lage.", "on", "Amazon ek website/electronic platform hai."],
+            ["Kal function hai I will see you ___ the party.", "at", "Party ek event point hai."],
+            ["Remote kaha hai? It is ___ the sofa.", "on", "Sofa surface hai."],
+            ["Bhaiya ne paise ___ the envelope rakhe hain.", "in", "Envelope band jagah hai."],
+            ["Sir ne kaha tha sign ___ the bottom of the page karna.", "at", "Bottom ek specific point/hissa hai page ka."],
+            ["Traffic bahut tha we were stuck ___ the jam.", "in", "Jam ke beech me fasa hona (enclosed by cars)."],
+            ["Galti se coffee gir gayi ___ my new shirt.", "on", "Shirt cloth surface hai."],
+            ["Sham ko milte hain ___ the coffee shop.", "at", "Coffee shop location point."],
+            ["Bhai I am ___ Delhi right now kal wapas aunga.", "in", "Delhi bada city hai (enclosed border)."],
+            ["TV ka remote ___ the TV unit rakha hai.", "on", "TV unit ki surface par."],
+            ["Mai abhi ___ work hu baad me call karta hu.", "at", "Work yaha duty location hai."],
+            ["Aapka naam list me hai look ___ the board.", "at", "Look verb ke sath direction point karne ke liye AT."],
+            ["Paani ki bottle ___ the fridge rakh do.", "in", "Fridge container hai."],
+            ["Mere pass cash nahi hai sab paise ___ the bank hain.", "in", "Bank institution building hai."],
+            ["Kal match hai we will watch it ___ the stadium.", "at", "Stadium specific event location hai."],
+            ["Bhai tu kaha hai? Mai ___ the bus stop khada hu.", "at", "Bus stop specific point on map hai."],
+            ["Ye photo dekho he is the one ___ the middle.", "in", "Middle ek hissa (area) hai."],
+            ["Mai ne tumhe message bheja tha ___ WhatsApp.", "on", "App/Platform ke liye ON."],
+            ["Ghar me koi nahi hai sab log ___ a wedding gaye hain.", "at", "Wedding event hai."],
+            ["Towel kahan hai? It is hanging ___ the bathroom door.", "on", "Door ki surface par tanga hai."],
+            ["Kutta bed ke niche nahi hai he is sleeping ___ the carpet.", "on", "Carpet flat surface hai."],
+            ["Mummy is cooking food ___ the kitchen.", "in", "Kitchen ek room hai (chaar deewarein)."],
+            ["Chalo lunch karte hain food is ___ the table.", "on", "Table flat surface hai."],
+            ["Train chhutne wali hai get ___ the train fast!", "on", "Train me chalkar baithte hain."],
+            ["Bhai airport pahunch gaya? I am already ___ the airport.", "at", "Airport ek stop/point hai travel me."],
+            ["School ki chutti ho gayi bache are playing ___ the playground.", "in", "Playground boundaries wala area hai."],
+            ["Main apni car ___ the parking lot khadi kar di hai.", "in", "Parking lot designated area hai."],
+            ["Movie ticket book kar li kya? We are standing ___ the counter.", "at", "Counter specific waiting point hai."],
+            ["AC theek nahi chal raha problem ___ the wiring hogi.", "in", "Wiring andar hoti hai."],
+            ["Diwali ki safai karni hai the dust is ___ the fan.", "on", "Fan ki blades surface hoti hain."],
+            ["Mujhe kal doctor se milna hai I will be ___ the clinic.", "at", "Clinic location point hai."],
+            ["Sari zaruri files are saved ___ the computer.", "on", "Computer digital space ko ON mante hain."],
+            ["Mere saare kapde are ___ the cupboard.", "in", "Cupboard ek storage space hai."],
+            ["Chatri le lo barish ho rahi hai you will get wet ___ the rain.", "in", "Rain ko environment/volume mante hain."],
+            ["Zameen gili hai don't sit ___ the floor.", "on", "Floor surface hai."],
+            ["I read the news ___ today's newspaper.", "in", "Newspaper content pages ke andar hota hai."],
+            ["Wait karo mai bas ___ the lift hu upar aa raha hu.", "in", "Lift chota dabba hai jisme fasa mehsoos hota hai."]
+        ];
+
+        // Process data into objects
+        const quizDB = rawQuizData.map(q => ({
+            question: q[0],
+            options: [q[1], q[2], q[3]],
+            correct: q[4],
+            correctText: q[q[4]+1], // get string value
+            explanation: q[5]
+        }));
+
+        const realLifeDB = rawRealLifeData.map(r => ({
+            scenario: r[0],
+            ans: r[1],
+            expl: r[2]
+        }));
+
+        // --- STATE ---
+        let currentSection = 'notes';
+        let globalSeconds = 0;
+        let timerInterval;
+        
+        let quizState = {
+            activePool: [],
+            currentIndex: 0,
+            score: 0,
+            timeStarted: 0
+        };
+
+        // --- UTILS ---
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // --- INIT & TIMER ---
+        window.onload = () => {
+            timerInterval = setInterval(() => {
+                globalSeconds++;
+                const mins = String(Math.floor(globalSeconds / 60)).padStart(2, '0');
+                const secs = String(globalSeconds % 60).padStart(2, '0');
+                document.getElementById('global-timer').innerText = `${mins}:${secs}`;
+            }, 1000);
+            loadRealLifeBatch();
+        };
+
+        // --- NAVIGATION ---
+        function switchTab(tabId) {
+            currentSection = tabId;
+            
+            // Hide all
+            document.getElementById('notes-section').classList.add('hidden');
+            document.getElementById('quiz-section').classList.add('hidden');
+            document.getElementById('reallife-section').classList.add('hidden');
+            
+            // Update tabs
+            ['notes', 'quiz', 'reallife'].forEach(t => {
+                const btn = document.getElementById(`tab-${t}`);
+                if(t === tabId) {
+                    btn.classList.add('active-tab');
+                    btn.classList.remove('inactive-tab');
+                } else {
+                    btn.classList.remove('active-tab');
+                    btn.classList.add('inactive-tab');
+                }
+            });
+
+            // Show selected
+            document.getElementById(`${tabId}-section`).classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // --- QUIZ LOGIC ---
+        function startQuiz() {
+            // Pick 10 random questions
+            const shuffled = shuffleArray([...quizDB]);
+            quizState.activePool = shuffled.slice(0, 10);
+            quizState.currentIndex = 0;
+            quizState.score = 0;
+            quizState.timeStarted = globalSeconds;
+
+            document.getElementById('quiz-start').classList.add('hidden');
+            document.getElementById('quiz-results').classList.add('hidden');
+            document.getElementById('quiz-active').classList.remove('hidden');
+            
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const q = quizState.activePool[quizState.currentIndex];
+            
+            document.getElementById('q-current').innerText = quizState.currentIndex + 1;
+            document.getElementById('q-score').innerText = quizState.score;
+            document.getElementById('quiz-progress').style.width = `${((quizState.currentIndex) / 10) * 100}%`;
+            
+            document.getElementById('question-text').innerText = q.question;
+            document.getElementById('explanation-box').classList.add('hidden');
+            
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+            
+            // Render options
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'w-full text-left p-4 rounded-xl input-dark text-white font-medium transition-all duration-200';
+                btn.innerText = opt;
+                btn.onclick = () => checkAnswer(idx, btn);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selectedIndex, btnElement) {
+            const q = quizState.activePool[quizState.currentIndex];
+            const isCorrect = selectedIndex === q.correct;
+            
+            // Disable all buttons
+            const buttons = document.getElementById('options-container').children;
+            for(let b of buttons) {
+                b.onclick = null;
+                b.classList.remove('hover:bg-white/10');
+                b.classList.add('opacity-50');
+            }
+
+            if (isCorrect) {
+                btnElement.classList.replace('input-dark', 'bg-green-600');
+                btnElement.classList.replace('opacity-50', 'opacity-100');
+                quizState.score++;
+                document.getElementById('q-score').innerText = quizState.score;
+            } else {
+                btnElement.classList.replace('input-dark', 'bg-red-600');
+                btnElement.classList.replace('opacity-50', 'opacity-100');
+                // Highlight correct one
+                buttons[q.correct].classList.replace('input-dark', 'bg-green-600/50');
+                buttons[q.correct].classList.replace('opacity-50', 'opacity-100');
+            }
+
+            // Show explanation
+            const explBox = document.getElementById('explanation-box');
+            explBox.classList.remove('hidden');
+            explBox.classList.remove('border-green-500', 'border-red-500', 'bg-green-900/20', 'bg-red-900/20');
+            
+            if(isCorrect) {
+                explBox.classList.add('border-green-500', 'bg-green-900/20');
+            } else {
+                explBox.classList.add('border-red-500', 'bg-red-900/20');
+            }
+            
+            document.getElementById('explanation-text').innerHTML = `<strong>Reasoning:</strong> ${q.explanation}`;
+        }
+
+        function nextQuestion() {
+            quizState.currentIndex++;
+            if (quizState.currentIndex >= 10) {
+                showResults();
+            } else {
+                renderQuestion();
+            }
+        }
+
+        function showResults() {
+            document.getElementById('quiz-active').classList.add('hidden');
+            document.getElementById('quiz-results').classList.remove('hidden');
+            
+            document.getElementById('final-score').innerText = `${quizState.score}/10`;
+            
+            const timeTaken = globalSeconds - quizState.timeStarted;
+            const mins = String(Math.floor(timeTaken / 60)).padStart(2, '0');
+            const secs = String(timeTaken % 60).padStart(2, '0');
+            document.getElementById('final-time').innerText = `${mins}:${secs}`;
+            
+            // Efficiency calculation
+            const eff = Math.round((quizState.score / 10) * 100);
+            document.getElementById('final-efficiency').innerText = `${eff}%`;
+        }
+
+        // --- REAL LIFE SECTION ---
+        function loadRealLifeBatch() {
+            const container = document.getElementById('reallife-container');
+            container.innerHTML = '';
+            
+            const shuffled = shuffleArray([...realLifeDB]);
+            const batch = shuffled.slice(0, 5);
+            
+            batch.forEach((item, index) => {
+                const parts = item.scenario.split('___');
+                
+                const card = document.createElement('div');
+                card.className = 'bg-[#080D1A] rounded-xl p-4 border border-white/5';
+                card.innerHTML = `
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div class="text-lg text-white font-medium flex-1 leading-relaxed">
+                            ${parts[0]} <span id="rl-ans-${index}" class="text-[#2563EB] font-bold mx-1 border-b border-dashed border-[#2563EB] px-2 blur-[5px] transition-all duration-300 select-none">___</span> ${parts[1]}
+                        </div>
+                        <button onclick="toggleRealLife(${index}, '${item.ans}', this)" class="shrink-0 bg-white/10 hover:bg-white/20 p-2 rounded-lg transition" title="Show Answer">
+                            <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                        </button>
+                    </div>
+                    <div id="rl-expl-${index}" class="hidden mt-3 text-sm text-gray-400 border-t border-white/5 pt-3">
+                        <strong class="text-white">Logic:</strong> ${item.expl}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function toggleRealLife(index, answer, btn) {
+            const ansSpan = document.getElementById(`rl-ans-${index}`);
+            const explDiv = document.getElementById(`rl-expl-${index}`);
+            
+            if (ansSpan.classList.contains('blur-[5px]')) {
+                ansSpan.innerText = answer.toUpperCase();
+                ansSpan.classList.remove('blur-[5px]');
+                explDiv.classList.remove('hidden');
+                btn.innerHTML = `<svg class="w-5 h-5 text-[#2563EB]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path></svg>`;
+            } else {
+                ansSpan.innerText = "___";
+                ansSpan.classList.add('blur-[5px]');
+                explDiv.classList.add('hidden');
+                btn.innerHTML = `<svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>`;
+            }
+        }
+
+        // --- EXPORT TOOLS ---
+        function downloadAnki() {
+            // Format strictly as "Question,Answer\n"
+            let csvContent = "";
+            quizDB.forEach(q => {
+                // Remove any commas that might accidentally break CSV format
+                let safeQ = q.question.replace(/,/g, '');
+                let safeA = q.correctText.replace(/,/g, '');
+                csvContent += `${safeQ},${safeA}\n`;
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", "FluencyBridge_InOnAt_Anki.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>
+
+```

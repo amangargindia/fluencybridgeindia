@@ -1,0 +1,749 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fluency Bridge - Until vs Till</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:ital,wght@1,600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/lucide.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #060B19;
+            color: white;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .font-serif {
+            font-family: 'Playfair Display', serif;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #060B19;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #111A2C;
+            border-radius: 4px;
+        }
+        .mind-map ul {
+            list-style-type: none;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+        .mind-map ul::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .mind-map li {
+            position: relative;
+            margin-bottom: 0.75rem;
+        }
+        .mind-map li::before {
+            content: "";
+            position: absolute;
+            left: -1.5rem;
+            top: 0.6rem;
+            width: 1rem;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .glass-input {
+            background-color: #080D1A;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.2s ease;
+        }
+        .glass-input:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        .glass-input.selected {
+            background-color: #2563EB;
+            border-color: #2563EB;
+            color: white;
+        }
+        .glass-input.correct {
+            background-color: #059669;
+            border-color: #059669;
+        }
+        .glass-input.wrong {
+            background-color: #DC2626;
+            border-color: #DC2626;
+        }
+        .tab-btn.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        .hidden-section {
+            display: none;
+        }
+        /* Strict Anki format block */
+        #anki-code-block {
+            white-space: pre;
+            overflow-x: auto;
+            font-family: monospace;
+            background: #080D1A;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        @media print {
+            body {
+                background-color: #060B19 !important;
+                color: white !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .print-only {
+                display: block !important;
+            }
+            .bg-\\[\\#111A2C\\] {
+                background-color: #111A2C !important;
+            }
+            .bg-\\[\\#080D1A\\] {
+                background-color: #080D1A !important;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col relative pb-24">
+    <!-- Global Lighting / Blur Effect -->
+    <div class="fixed inset-0 z-0 bg-gradient-to-br from-[#131E3A] to-transparent opacity-60 backdrop-blur-3xl pointer-events-none"></div>
+
+    <!-- Main Content Container -->
+    <div class="relative z-10 w-full max-w-3xl mx-auto flex-1 flex flex-col">
+        
+        <!-- Header -->
+        <header class="p-4 sm:p-6 flex justify-between items-start no-print">
+            <div>
+                <div class="tracking-[0.3em] text-[10px] text-gray-300 uppercase leading-tight">F L U E N C Y</div>
+                <div class="text-white text-4xl italic font-serif leading-tight mt-1">bridge</div>
+            </div>
+            <div class="text-right flex flex-col items-end">
+                <div id="timer" class="text-gray-400 text-sm font-mono bg-[#080D1A] px-3 py-1 rounded-lg border border-white/5 mb-1">00:00</div>
+                <div class="text-xs text-gray-400">Score: <span id="overall-score" class="text-white font-bold text-sm">0</span></div>
+                <div class="text-[10px] text-gray-500 mt-1">Efficiency: <span id="efficiency-score">0%</span></div>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="px-4 sm:px-6 mb-6 overflow-x-auto whitespace-nowrap no-print no-scrollbar">
+            <div class="flex gap-3">
+                <button onclick="switchTab('notes')" id="tab-notes" class="tab-btn active text-sm font-semibold text-gray-400 bg-[#080D1A] border border-white/5 rounded-xl px-5 py-2.5 transition-all hover:text-white">Notes</button>
+                <button onclick="switchTab('story')" id="tab-story" class="tab-btn text-sm font-semibold text-gray-400 bg-[#080D1A] border border-white/5 rounded-xl px-5 py-2.5 transition-all hover:text-white">Story</button>
+                <button onclick="switchTab('quiz')" id="tab-quiz" class="tab-btn text-sm font-semibold text-gray-400 bg-[#080D1A] border border-white/5 rounded-xl px-5 py-2.5 transition-all hover:text-white">Quiz (100 Qs)</button>
+                <button onclick="switchTab('real-life')" id="tab-real-life" class="tab-btn text-sm font-semibold text-gray-400 bg-[#080D1A] border border-white/5 rounded-xl px-5 py-2.5 transition-all hover:text-white">Real Life</button>
+            </div>
+        </nav>
+
+        <!-- Container for all views -->
+        <main class="flex-1 px-4 sm:px-6">
+
+            <!-- ================= NOTES SECTION ================= -->
+            <section id="notes-section" class="mb-10">
+                <div class="bg-[#111A2C] border-t border-white/5 rounded-3xl p-5 sm:p-6 shadow-2xl">
+                    <div class="flex justify-between items-center mb-6">
+                        <h1 class="text-2xl font-bold text-white">Until vs. Till</h1>
+                        <div class="flex gap-2 no-print">
+                            <button onclick="window.print()" class="text-gray-400 hover:text-white p-2 rounded-lg bg-white/5 transition-colors">
+                                <i data-lucide="printer" class="w-5 h-5"></i>
+                            </button>
+                            <button onclick="switchTab('quiz')" class="bg-[#2563EB] text-white text-sm font-semibold px-4 py-2 rounded-xl transition-all hover:bg-blue-500 shadow-lg shadow-blue-500/20">
+                                Start Quiz
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Table of Contents -->
+                    <div class="bg-[#080D1A] border border-white/5 rounded-xl p-4 mb-6">
+                        <h2 class="text-sm font-bold text-gray-400 mb-3 uppercase tracking-wider">Table of Contents</h2>
+                        <ul class="text-sm space-y-2 text-gray-300">
+                            <li><a href="#prerequisites" class="hover:text-white transition-colors">1. Prerequisites (Pehle kya pata hona chahiye)</a></li>
+                            <li><a href="#core-concept" class="hover:text-white transition-colors">2. Core Concept & Logic</a></li>
+                            <li><a href="#differences" class="hover:text-white transition-colors">3. Key Differences (Formality & Spelling)</a></li>
+                            <li><a href="#mind-map" class="hover:text-white transition-colors">4. Logical Mind Map</a></li>
+                            <li><a href="#top-mistakes" class="hover:text-white transition-colors">5. Top Mistakes (Until vs By)</a></li>
+                            <li><a href="#user-examples" class="hover:text-white transition-colors">6. Detailed Examples</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="space-y-8 text-gray-300 text-sm leading-relaxed">
+                        
+                        <div id="prerequisites">
+                            <h2 class="text-lg font-bold text-white mb-2">1. Prerequisites</h2>
+                            <p class="mb-2">Inhe samajhne ke liye ye concepts clear hone chahiye:</p>
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li><a href="https://www.google.com/search?q=prepositions+of+time" target="_blank" class="text-[#2563EB] hover:underline font-semibold">Prepositions of Time</a>: Jo words batate hain ki action KAB hua (e.g. in, on, at, by, until).</li>
+                            </ul>
+                        </div>
+
+                        <div id="core-concept">
+                            <h2 class="text-lg font-bold text-white mb-2">2. Core Concept (Hinglish)</h2>
+                            <p class="mb-3">Dono <strong>"Until"</strong> aur <strong>"Till"</strong> synonyms (paryayvachi) hain. Dono ka exact ek hi matlab hai: <strong>"Jab tak"</strong> ya <strong>"Us samay tak"</strong>.</p>
+                            <p class="mb-3">Ye batate hain ki koi action ek specific time point tak lagaatar chalega aur wahan ja kar ruk jayega. Ye basically "How long?" (Kitni der?) ka answer dete hain.</p>
+                            
+                            <div class="bg-[#080D1A] p-4 rounded-xl border border-white/5 mt-4">
+                                <h3 class="text-white font-bold mb-2">Meaning Check:</h3>
+                                <p class="text-gray-400">✅ I will stay here <strong>until</strong> 5:00 PM.</p>
+                                <p class="text-gray-400">✅ I will stay here <strong>till</strong> 5:00 PM.</p>
+                                <p class="mt-2 text-xs text-[#2563EB] font-bold">Dono ka meaning exactly same hai: Main 5 baje tak yahin rukunga.</p>
+                            </div>
+                        </div>
+
+                        <div id="differences">
+                            <h2 class="text-lg font-bold text-white mb-3">3. Key Differences</h2>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div class="bg-[#080D1A] p-4 rounded-xl border border-white/5">
+                                    <h3 class="text-[#2563EB] font-bold mb-2 text-base">A. Formality (Kahan use karein)</h3>
+                                    <ul class="space-y-2">
+                                        <li><strong class="text-white">Until:</strong> Formal (Office mails, exams, essays).</li>
+                                        <li><strong class="text-white">Till:</strong> Informal (Doston se baat, WhatsApp, casual talk).</li>
+                                    </ul>
+                                </div>
+                                <div class="bg-[#080D1A] p-4 rounded-xl border border-white/5">
+                                    <h3 class="text-[#2563EB] font-bold mb-2 text-base">B. Sentence Placement</h3>
+                                    <ul class="space-y-2">
+                                        <li><strong class="text-white">Until:</strong> Sentence ke start mein use karna normal hai. (e.g., <em>Until it stops raining, stay inside.</em>)</li>
+                                        <li><strong class="text-white">Till:</strong> Sentence ke start mein lagana ajeeb aur stylistically weak maana jata hai. Avoid it.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="mind-map">
+                            <h2 class="text-lg font-bold text-white mb-3">4. Logical Mind Map & Spelling Rule</h2>
+                            <div class="mind-map bg-white/5 p-4 rounded-xl mb-4">
+                                <ul>
+                                    <li><strong class="text-white">Spelling (The "L" Count) - MOST COMMON MISTAKE</strong>
+                                        <ul>
+                                            <li><strong class="text-[#2563EB]">Until</strong> → Sirf <strong class="text-white">EK "L"</strong> hota hai end mein. (Not Untill)</li>
+                                            <li><strong class="text-[#2563EB]">Till</strong> → Isme <strong class="text-white">DO "L"</strong> hote hain end mein.</li>
+                                            <li><strong class="text-red-400">'Til</strong> → Ye gaano (poetry/songs) mein use hota hai. Formal english mein ye galat spelling mani jati hai. Use mat karo.</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div id="top-mistakes">
+                            <h2 class="text-lg font-bold text-white mb-2 text-red-400">5. Top Mistakes: Until vs. By</h2>
+                            <p class="mb-3">Log aksar "By" aur "Until" mein confuse hote hain. Inka fark clear hona zaruri hai:</p>
+                            <ul class="space-y-3">
+                                <li class="bg-[#080D1A] p-4 rounded-lg border border-red-500/20">
+                                    <span class="text-white font-bold block mb-2">Rule: Until = Continuous Action | By = Deadline</span>
+                                    <p class="text-gray-400 mb-2"><strong>Until:</strong> Action us time tak <em>lagaatar</em> chalega.</p>
+                                    <p class="text-gray-400 mb-2"><strong>By:</strong> Action us time se <em>pehle ya exactly us time par khatam</em> ho chuka hoga (deadline).</p>
+                                    
+                                    <div class="mt-4 border-t border-white/5 pt-3">
+                                        <p class="text-sm"><em>Mistake:</em> The rat will have died until 6 pm. ❌ (Galat, rat marta nahi rahega lagaatar)</p>
+                                        <p class="text-sm mt-1"><em>Correction:</em> The rat will have died <strong class="text-green-400">by</strong> 6 pm. ✅ (6 baje tak deadline par mar chuka hoga)</p>
+                                    </div>
+                                    <div class="mt-2 border-t border-white/5 pt-3">
+                                        <p class="text-sm"><em>Mistake:</em> I will study by 7 pm. ❌ (Galat, main 7 baje deadline pe nahi, balki lagaatar padhunga)</p>
+                                        <p class="text-sm mt-1"><em>Correction:</em> I will study <strong class="text-green-400">till/until</strong> 7 pm. ✅ (7 baje tak continue karunga)</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div id="user-examples">
+                            <h2 class="text-lg font-bold text-white mb-2">6. Real Examples Analysed</h2>
+                            
+                            <div class="space-y-4">
+                                <div>
+                                    <p class="font-bold text-white">Scenario 1: Class timing</p>
+                                    <p class="bg-[#080D1A] p-3 rounded-lg mt-1 border border-white/5">
+                                        The class will go on <strong class="text-[#2563EB]">till</strong> 6 pm.<br>
+                                        <span class="text-gray-400 text-xs mt-1 block">Logic: Class 6 baje tak continuously chalegi. Till ya Until dono sahi hain. Till informal/normal conversation ke liye acha hai.</span>
+                                    </p>
+                                </div>
+
+                                <div>
+                                    <p class="font-bold text-white">Scenario 2: Sentence Starting</p>
+                                    <p class="bg-[#080D1A] p-3 rounded-lg mt-1 border border-white/5">
+                                        <strong class="text-[#2563EB]">Until</strong> the result is declared I cannot apply for the job.<br>
+                                        <span class="text-gray-400 text-xs mt-1 block">Logic: Sentence start ho raha hai, isliye 'Until' better choice hai. 'Till' yahan weak lagega.</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= STORY SECTION ================= -->
+            <section id="story-section" class="hidden-section mb-10">
+                <div class="bg-[#111A2C] border-t border-white/5 rounded-3xl p-5 sm:p-6 shadow-2xl">
+                    <h1 class="text-2xl font-bold text-white mb-6">The Night Shift</h1>
+                    <div class="text-gray-300 text-sm leading-loose space-y-4">
+                        <p>It was month-end at the bank. The manager announced, "<strong class="text-white">Until</strong> all the accounts are balanced no one leaves the office." Everyone groaned. Usually they only worked <strong class="text-white">till</strong> 6:00 PM.</p>
+                        
+                        <p>Rahul asked his colleague "Will we be here <strong class="text-white">till</strong> midnight?" His colleague sighed. "Probably. But my wife told me to finish the work <strong class="text-[#2563EB]">by</strong> 9:00 PM (deadline). If I don't go home <strong class="text-white">till</strong> then she will be angry."</p>
+                        
+                        <p><strong class="text-white">Until</strong> the food delivery arrived the team felt exhausted. They ate their dinner and drank coffee <strong class="text-white">till</strong> 10:00 PM. Finally the manager stood up.</p>
+
+                        <p>"Okay team you have worked hard <strong class="text-white">until</strong> now. You can go. Make sure the rest of the files are submitted <strong class="text-[#2563EB]">by</strong> tomorrow morning." They didn't stop celebrating <strong class="text-white">till</strong> they reached their cars.</p>
+                        
+                        <div class="bg-[#080D1A] p-4 rounded-xl border border-white/5 mt-6">
+                            <h3 class="text-white font-bold mb-2">Observation:</h3>
+                            <ul class="list-disc pl-5 space-y-1 text-gray-400">
+                                <li>Notice how <strong class="text-white">Until</strong> is used at the start of sentences ("Until all the accounts...", "Until the food...").</li>
+                                <li>Notice the spelling: <strong>Until</strong> (One L), <strong>till</strong> (Two Ls).</li>
+                                <li>Notice how <strong class="text-[#2563EB]">by</strong> is used for a deadline ("by 9:00 PM", "by tomorrow morning"), while till/until are used for continuous action.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= QUIZ SECTION ================= -->
+            <section id="quiz-section" class="hidden-section mb-10">
+                <div class="bg-[#111A2C] border-t border-white/5 rounded-3xl p-5 sm:p-6 shadow-2xl">
+                    <div class="flex justify-between items-center mb-6 flex-wrap gap-4">
+                        <h1 class="text-2xl font-bold text-white">Dynamic Quiz</h1>
+                        <div class="flex gap-2">
+                            <button onclick="showAnkiModal()" class="bg-[#080D1A] border border-white/10 text-gray-300 text-sm px-4 py-2 rounded-xl transition-all hover:text-white hover:bg-white/10 flex items-center gap-2">
+                                <i data-lucide="download" class="w-4 h-4 inline"></i> Anki Deck
+                            </button>
+                            <button onclick="initQuiz()" class="bg-[#2563EB] text-white text-sm font-semibold px-4 py-2 rounded-xl transition-all hover:bg-blue-500 shadow-lg shadow-blue-500/20">
+                                Shuffle & Restart
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Progress bar -->
+                    <div class="w-full bg-white/10 rounded-full h-2 mb-6">
+                        <div id="quiz-progress" class="bg-[#2563EB] h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                    </div>
+
+                    <p class="text-xs text-gray-400 mb-6 text-center">Answer 10 random questions from our bank of 100.</p>
+
+                    <div id="quiz-container" class="space-y-6">
+                        <!-- Quiz questions injected here via JS -->
+                    </div>
+                    
+                    <div id="quiz-results" class="hidden text-center mt-8 border-t border-white/10 pt-6">
+                        <h2 class="text-2xl font-bold text-white mb-2">Quiz Complete!</h2>
+                        <p class="text-gray-400 mb-6">You scored <span id="session-score" class="text-[#2563EB] font-bold text-xl">0</span> out of 10.</p>
+                        <button onclick="initQuiz()" class="bg-[#2563EB] text-white text-sm font-semibold px-6 py-3 rounded-xl transition-all hover:bg-blue-500 shadow-lg shadow-blue-500/20">
+                            Practice 10 More Questions
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= REAL LIFE SECTION ================= -->
+            <section id="real-life-section" class="hidden-section mb-10">
+                <div class="bg-[#111A2C] border-t border-white/5 rounded-3xl p-5 sm:p-6 shadow-2xl">
+                    <div class="flex justify-between items-center mb-6">
+                        <h1 class="text-2xl font-bold text-white">Real Life Usage</h1>
+                        <button onclick="initRealLife()" class="bg-[#080D1A] border border-white/10 text-gray-300 text-sm px-4 py-2 rounded-xl transition-all hover:text-white hover:bg-white/10 flex items-center gap-2">
+                            <i data-lucide="refresh-cw" class="w-4 h-4 inline"></i> Shuffle 5
+                        </button>
+                    </div>
+                    <p class="text-sm text-gray-400 mb-6">Daily life scenarios for an Indian setting. Try to translate them yourself then click the eye icon to reveal the answer.</p>
+                    
+                    <div id="real-life-container" class="space-y-4">
+                        <!-- Scenarios injected here -->
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Anki Modal -->
+        <div id="anki-modal" class="fixed inset-0 z-[100] hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+            <div class="bg-[#111A2C] border border-white/10 rounded-3xl w-full max-w-2xl max-h-[80vh] flex flex-col shadow-2xl">
+                <div class="p-6 border-b border-white/5 flex justify-between items-center">
+                    <h2 class="text-xl font-bold text-white">Anki Flashcards Data</h2>
+                    <button onclick="closeAnkiModal()" class="text-gray-400 hover:text-white">
+                        <i data-lucide="x" class="w-6 h-6"></i>
+                    </button>
+                </div>
+                <div class="p-6 overflow-y-auto flex-1">
+                    <p class="text-sm text-gray-400 mb-4">Here is the strictly formatted CSV block. No commas inside questions or answers. One comma per line. You can copy this code block or download it directly as a CSV file.</p>
+                    <div id="anki-code-block" class="text-xs text-gray-300 mb-4 h-64 overflow-y-auto"></div>
+                </div>
+                <div class="p-6 border-t border-white/5 flex justify-end gap-3">
+                    <button onclick="closeAnkiModal()" class="px-4 py-2 rounded-xl text-sm font-semibold text-gray-400 hover:text-white transition-all">Close</button>
+                    <button onclick="downloadAnkiCSV()" class="bg-[#2563EB] text-white text-sm font-semibold px-6 py-2 rounded-xl transition-all hover:bg-blue-500">Download CSV</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sticky Footer -->
+        <footer class="fixed bottom-0 left-0 w-full bg-[#060B19]/90 backdrop-blur-md border-t border-white/5 p-4 z-50 no-print">
+            <div class="max-w-3xl mx-auto flex justify-between items-center px-4">
+                <button onclick="switchTab('notes')" class="text-gray-400 hover:text-white flex flex-col items-center gap-1 transition-colors">
+                    <i data-lucide="home" class="w-5 h-5"></i>
+                    <span class="text-[10px] uppercase tracking-wider">Home</span>
+                </button>
+                <button onclick="goBackTab()" class="text-gray-400 hover:text-white flex flex-col items-center gap-1 transition-colors">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                    <span class="text-[10px] uppercase tracking-wider">Back</span>
+                </button>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        function safeCreateIcons() {
+            try {
+                if (typeof lucide !== 'undefined') {
+                    lucide.createIcons();
+                }
+            } catch (error) {
+                console.warn("Icons failed to load continuing execution.", error);
+            }
+        }
+
+        let timerSeconds = 0;
+        let overallScore = 0;
+        let totalQuestionsAttempted = 0;
+        let currentTab = 'notes';
+        let tabHistory = ['notes'];
+        
+        let currentQuizQuestions = [];
+        let sessionScore = 0;
+        let answeredInSession = 0;
+
+        // Timer
+        setInterval(() => {
+            timerSeconds++;
+            const mins = Math.floor(timerSeconds / 60).toString().padStart(2, '0');
+            const secs = (timerSeconds % 60).toString().padStart(2, '0');
+            const timerEl = document.getElementById('timer');
+            if(timerEl) timerEl.innerText = `${mins}:${secs}`;
+        }, 1000);
+
+        function updateScoreDisplay() {
+            const overallEl = document.getElementById('overall-score');
+            const effEl = document.getElementById('efficiency-score');
+            
+            if(overallEl) overallEl.innerText = overallScore;
+            let efficiency = totalQuestionsAttempted === 0 ? 0 : Math.round((overallScore / totalQuestionsAttempted) * 100);
+            if(effEl) effEl.innerText = `${efficiency}%`;
+        }
+
+        // Navigation
+        function switchTab(tabId) {
+            document.querySelectorAll('section').forEach(sec => sec.classList.add('hidden-section'));
+            const targetSection = document.getElementById(`${tabId}-section`);
+            if(targetSection) targetSection.classList.remove('hidden-section');
+            
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            const targetBtn = document.getElementById(`tab-${tabId}`);
+            if(targetBtn) targetBtn.classList.add('active');
+
+            if(currentTab !== tabId) {
+                tabHistory.push(currentTab);
+                currentTab = tabId;
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function goBackTab() {
+            if(tabHistory.length > 0) {
+                let prevTab = tabHistory.pop();
+                currentTab = prevTab;
+                
+                document.querySelectorAll('section').forEach(sec => sec.classList.add('hidden-section'));
+                const targetSection = document.getElementById(`${prevTab}-section`);
+                if(targetSection) targetSection.classList.remove('hidden-section');
+                
+                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                const targetBtn = document.getElementById(`tab-${prevTab}`);
+                if(targetBtn) targetBtn.classList.add('active');
+                
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        // ================= DATA GENERATION ================= //
+        // Strict comma avoidance for Anki export formatting
+        const quizBank = [];
+        
+        // Block 1: Spelling (25 Qs)
+        const contexts1 = ["Wait here", "Keep studying", "Do not talk", "Stay inside", "Work hard"];
+        for(let i=0; i<25; i++) {
+            let ctx = contexts1[i % contexts1.length];
+            quizBank.push({
+                q: `Choose the correct spelling: ${ctx} ___ I return.`,
+                options: ['until', 'untill'],
+                ans: 'until',
+                reason: `Until always has exactly ONE L at the end.`
+            });
+        }
+
+        // Block 2: Spelling Till vs Til (25 Qs)
+        const times = ["6 pm", "midnight", "tomorrow", "Sunday", "the end"];
+        for(let i=0; i<25; i++) {
+            let t = times[i % times.length];
+            quizBank.push({
+                q: `Which spelling is correct for formal or standard writing? I will wait ___ ${t}.`,
+                options: ['till', 'til'],
+                ans: 'till',
+                reason: `Till has TWO Ls. Til with one L is used in poetry but is incorrect in standard prose.`
+            });
+        }
+
+        // Block 3: Sentence Placement Formality (25 Qs)
+        const events = ["the rain stops", "the boss arrives", "the bell rings", "the exam ends", "the doors open"];
+        for(let i=0; i<25; i++) {
+            let ev = events[i % events.length];
+            quizBank.push({
+                q: `Which word is better to start this sentence? ___ ${ev} we cannot leave.`,
+                options: ['Until', 'Till'],
+                ans: 'Until',
+                reason: `Until is preferred at the start of a sentence. Starting with Till is stylistically weak.`
+            });
+        }
+
+        // Block 4: Until vs By (Deadline vs Continuous) (25 Qs)
+        for(let i=0; i<25; i++) {
+            let isDeadline = i % 2 === 0;
+            if(isDeadline) {
+                quizBank.push({
+                    q: `The project must be submitted ___ Friday morning.`,
+                    options: ['until', 'by'],
+                    ans: 'by',
+                    reason: `Submitting is a one-time action and Friday is a deadline. We use By for deadlines.`
+                });
+            } else {
+                quizBank.push({
+                    q: `The shop will remain open ___ 9 PM tonight.`,
+                    options: ['until', 'by'],
+                    ans: 'until',
+                    reason: `Remaining open is a continuous action that goes up to 9 PM. We use Until for continuous actions.`
+                });
+            }
+        }
+
+        // Final sanity check to remove any stray commas or colons for Anki
+        quizBank.forEach(q => {
+            q.q = q.q.replace(/[,:;\n]/g, '');
+            q.ans = q.ans.replace(/[,:;\n]/g, '');
+            q.reason = q.reason.replace(/[,:;\n]/g, '');
+            q.options = q.options.map(opt => opt.replace(/[,:;\n]/g, ''));
+        });
+
+        const realLifeBank = [];
+        const baseRealLife = [
+            {h: "Mai 7 baje tak padhai karunga", e: "I will study till 7 pm.", r: "Study continuous action hai till use hoga"},
+            {h: "Jab tak tumhara result nahi aata tension mat lo", e: "Do not take tension until your result comes.", r: "Sentence ke bich me or start me until better lagta hai formal way me"},
+            {h: "Baarish rukne tak hum tapri par ruke", e: "We stayed at the tapri till the rain stopped.", r: "Staying at tapri is continuous so till is used"},
+            {h: "Chuha 6 baje tak mar chuka hoga", e: "The rat will have died by 6 pm.", r: "Dying is not continuous yaha 6 baje deadline hai isliye by use hoga"},
+            {h: "Jab tak boss nahi aate aaram karo", e: "Relax till the boss arrives.", r: "Relax is continuous up to a point"},
+            {h: "Mera intezar karna jab tak mai call na karu", e: "Wait for me until I call you.", r: "Until emphasizes the exact point the waiting stops"},
+            {h: "Kal subah tak ye file mujhe chahiye", e: "I need this file by tomorrow morning.", r: "Need it by implies a deadline before tomorrow morning"},
+            {h: "Hum raat 12 baje tak movie dekhenge", e: "We will watch the movie till midnight.", r: "Watching is a continuous verb"},
+            {h: "Jab tak class chal rahi hai phone silent rakho", e: "Keep your phone on silent until the class is over.", r: "Formal instruction so until is better"},
+            {h: "Sunday tak payment clear ho jayegi", e: "The payment will be cleared by Sunday.", r: "Payment clear hona is one time action deadline is Sunday"}
+        ];
+        
+        for(let i=0; i<50; i++) {
+            let base = baseRealLife[i % baseRealLife.length];
+            realLifeBank.push({
+                scenario: `${base.h} (Var ${i+1})`,
+                english: base.e.replace(/[,]/g, ''),
+                explanation: base.r.replace(/[,]/g, '')
+            });
+        }
+
+        // ================= LOGIC ================= //
+        function shuffleArray(array) {
+            let currentIndex = array.length, randomIndex;
+            while (currentIndex !== 0) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+                [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+            }
+            return array;
+        }
+
+        function initQuiz() {
+            sessionScore = 0;
+            answeredInSession = 0;
+            
+            const resultsEl = document.getElementById('quiz-results');
+            const containerEl = document.getElementById('quiz-container');
+            const progressEl = document.getElementById('quiz-progress');
+            
+            if(!containerEl) return;
+
+            if(resultsEl) resultsEl.classList.add('hidden');
+            containerEl.classList.remove('hidden');
+            if(progressEl) progressEl.style.width = '0%';
+            
+            shuffleArray(quizBank);
+            currentQuizQuestions = quizBank.slice(0, 10);
+            
+            containerEl.innerHTML = '';
+            
+            currentQuizQuestions.forEach((q, index) => {
+                const qDiv = document.createElement('div');
+                qDiv.className = 'bg-[#080D1A] p-4 sm:p-5 rounded-2xl border border-white/5 shadow-inner mb-4';
+                qDiv.id = `q-${index}`;
+                
+                let optionsHtml = '';
+                q.options.forEach(opt => {
+                    optionsHtml += `<button onclick="answerQuestion(${index}, '${opt}')" class="glass-input w-full text-left p-3 rounded-xl mt-2 text-sm text-gray-300 font-medium">${opt}</button>`;
+                });
+
+                qDiv.innerHTML = `
+                    <div class="text-xs text-gray-500 mb-2 font-bold tracking-wider uppercase">Question ${index + 1} of 10</div>
+                    <div class="text-white font-semibold mb-4 text-sm sm:text-base leading-relaxed">${q.q}</div>
+                    <div id="options-${index}" class="space-y-2">${optionsHtml}</div>
+                    <div id="reason-${index}" class="hidden mt-4 p-3 rounded-xl text-sm bg-[#111A2C] border border-white/5 text-gray-300 border-l-4 border-l-[#2563EB]"></div>
+                `;
+                containerEl.appendChild(qDiv);
+            });
+        }
+
+        function answerQuestion(qIndex, selectedOption) {
+            const question = currentQuizQuestions[qIndex];
+            const optionsContainer = document.getElementById(`options-${qIndex}`);
+            const reasonContainer = document.getElementById(`reason-${qIndex}`);
+            
+            if(optionsContainer.dataset.answered === "true") return;
+            optionsContainer.dataset.answered = "true";
+
+            const buttons = optionsContainer.querySelectorAll('button');
+            let isCorrect = selectedOption === question.ans;
+            
+            totalQuestionsAttempted++;
+            answeredInSession++;
+
+            if(isCorrect) {
+                overallScore++;
+                sessionScore++;
+            }
+
+            buttons.forEach(btn => {
+                btn.disabled = true;
+                btn.classList.remove('hover:bg-white/10');
+                if(btn.innerText === question.ans) {
+                    btn.classList.add('correct', 'text-white');
+                } else if(btn.innerText === selectedOption && !isCorrect) {
+                    btn.classList.add('wrong', 'text-white');
+                } else {
+                    btn.classList.add('opacity-50');
+                }
+            });
+
+            reasonContainer.innerHTML = `<span class="font-bold ${isCorrect ? 'text-green-400' : 'text-red-400'}">${isCorrect ? 'Correct!' : 'Incorrect.'}</span> ${question.reason}`;
+            reasonContainer.classList.remove('hidden');
+
+            updateScoreDisplay();
+            
+            const progressEl = document.getElementById('quiz-progress');
+            if(progressEl) progressEl.style.width = `${(answeredInSession / 10) * 100}%`;
+
+            if(answeredInSession === 10) {
+                setTimeout(() => {
+                    document.getElementById('quiz-container').classList.add('hidden');
+                    document.getElementById('session-score').innerText = sessionScore;
+                    document.getElementById('quiz-results').classList.remove('hidden');
+                }, 1000);
+            }
+        }
+
+        // Anki Code Block Export
+        function getAnkiCSVString() {
+            let csvContent = "";
+            quizBank.forEach(q => {
+                let safeQ = q.q.replace(/[,:;\n]/g, '').trim();
+                let safeAns = q.ans.replace(/[,:;\n]/g, '').trim();
+                csvContent += `${safeQ},${safeAns}\n`;
+            });
+            return csvContent;
+        }
+
+        function showAnkiModal() {
+            const modal = document.getElementById('anki-modal');
+            const codeBlock = document.getElementById('anki-code-block');
+            codeBlock.innerText = getAnkiCSVString();
+            modal.classList.remove('hidden');
+        }
+
+        function closeAnkiModal() {
+            document.getElementById('anki-modal').classList.add('hidden');
+        }
+
+        function downloadAnkiCSV() {
+            const csvContent = getAnkiCSVString();
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", "fluency_bridge_until_till.csv");
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function initRealLife() {
+            const container = document.getElementById('real-life-container');
+            if(!container) return;
+
+            shuffleArray(realLifeBank);
+            const batch = realLifeBank.slice(0, 5);
+            
+            container.innerHTML = '';
+            
+            batch.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'bg-[#080D1A] p-4 sm:p-5 rounded-2xl border border-white/5 shadow-inner';
+                div.innerHTML = `
+                    <div class="flex justify-between items-start gap-4">
+                        <p class="text-white text-sm font-medium leading-relaxed">${item.scenario}</p>
+                        <button onclick="revealRealLife(${index})" class="text-gray-400 hover:text-white transition-colors bg-[#111A2C] border border-white/5 p-2 rounded-lg flex-shrink-0 shadow-sm">
+                            <i data-lucide="eye" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                    <div id="rl-reveal-${index}" class="hidden mt-4 pt-4 border-t border-white/10">
+                        <p class="text-[#2563EB] font-bold text-sm mb-1">${item.english}</p>
+                        <p class="text-xs text-gray-400">${item.explanation}</p>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+            safeCreateIcons();
+        }
+
+        function revealRealLife(index) {
+            const el = document.getElementById(`rl-reveal-${index}`);
+            if(el) el.classList.toggle('hidden');
+        }
+
+        function runApp() {
+            try {
+                initQuiz();
+                initRealLife();
+                safeCreateIcons();
+            } catch (e) {
+                console.error("Initialization error:", e);
+            }
+        }
+
+        // Run immediately safely
+        runApp();
+        
+    </script>
+</body>
+</html>
+
+```
