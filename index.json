@@ -1,86 +1,86 @@
 [
   {
-    "title": "Fluency Bridge | Present Simple Mistakes",
+    "title": "Present Simple Mistakes",
     "slug": "mistakes-in-present-simple",
     "folder": "mistakes",
     "category": "Mistakes"
   },
   {
-    "title": "Fluency Bridge | In, On, At (Location)",
+    "title": "In, On, At (Location)",
     "slug": "In-on-at-place",
-    "folder": "tests",
+    "folder": "tests/Prepositions",
     "category": "Tests"
   },
   {
-    "title": "Fluency Bridge | To vs Towards",
+    "title": "To vs Towards",
     "slug": "To&towards",
-    "folder": "tests",
+    "folder": "tests/Prepositions",
     "category": "Tests"
   },
   {
-    "title": "Fluency Bridge | Above vs Over & Below vs Under",
+    "title": "Above vs Over & Below vs Under",
     "slug": "above-over-under-below",
-    "folder": "tests",
+    "folder": "tests/Prepositions",
     "category": "Tests"
   },
   {
-    "title": "FLUENCY bridge | Among vs Between",
+    "title": "Among vs Between",
     "slug": "amongvsbetween",
-    "folder": "tests",
+    "folder": "tests/Prepositions",
     "category": "Tests"
   },
   {
-    "title": "Fluency Bridge - Grammar Revision",
+    "title": "Grammar Revision",
     "slug": "duringwhile",
-    "folder": "tests",
+    "folder": "tests/Prepositions",
     "category": "Tests"
   },
   {
-    "title": "Fluency Bridge | Grammar Assessment",
+    "title": "Grammar Assessment",
     "slug": "inatfornight",
-    "folder": "tests",
+    "folder": "tests/Prepositions",
     "category": "Tests"
   },
   {
-    "title": "Fluency Bridge - Prepositions of Time",
+    "title": "Prepositions of Time",
     "slug": "inonatfortime",
-    "folder": "tests",
+    "folder": "tests/Prepositions",
     "category": "Tests"
   },
   {
     "title": "Fluency Bridge: Into & Inside",
     "slug": "intoinside",
-    "folder": "tests",
+    "folder": "tests/Prepositions",
     "category": "Tests"
   },
   {
     "title": "Fluency | Prepositions: Next to & Beside",
     "slug": "nexttoandbeside",
-    "folder": "tests",
+    "folder": "tests/Prepositions",
     "category": "Tests"
   },
   {
     "title": "FluencyBridge - Master Since & For",
     "slug": "sincefor",
-    "folder": "tests",
+    "folder": "tests/Prepositions",
     "category": "Tests"
   },
   {
-    "title": "Fluency Bridge - Through vs Across",
+    "title": "Through vs Across",
     "slug": "throughacross",
-    "folder": "tests",
+    "folder": "tests/Prepositions",
     "category": "Tests"
   },
   {
-    "title": "Fluency Bridge - Until vs Till",
+    "title": "Until vs Till",
     "slug": "tilluntil",
-    "folder": "tests",
+    "folder": "tests/Prepositions",
     "category": "Tests"
   },
   {
-    "title": "Fluency Bridge | Few & Little Nuance",
+    "title": "Few & Little Nuance",
     "slug": "little-alittle-few-afew",
-    "folder": "tests",
+    "folder": "tests/determiner/quantifier",
     "category": "Tests"
   },
   {
@@ -90,7 +90,7 @@
     "category": "Tests"
   },
   {
-    "title": "Fluency Bridge - English Mastery",
+    "title": "English Mastery",
     "slug": "presentcontinuoustest",
     "folder": "tests",
     "category": "Tests"
@@ -102,19 +102,19 @@
     "category": "Tests"
   },
   {
-    "title": "FB Internal Tools - Class Notes Creator",
+    "title": "Class Notes Creator",
     "slug": "docxtopdf",
     "folder": "tools",
     "category": "Tools"
   },
   {
-    "title": "FB Internal Tools - PDF to EPUB",
+    "title": "PDF to EPUB",
     "slug": "pdftoepub",
     "folder": "tools",
     "category": "Tools"
   },
   {
-    "title": "FB Internal Tools - Transcription Engine",
+    "title": "Transcription Engine",
     "slug": "transcription",
     "folder": "tools",
     "category": "Tools"
@@ -126,7 +126,7 @@
     "category": "Tools"
   },
   {
-    "title": "VocabPod Builder - FB Internal Tools",
+    "title": "VocabPod Builder",
     "slug": "vocabpodgenerator",
     "folder": "tools",
     "category": "Tools"
