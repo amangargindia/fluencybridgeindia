@@ -1,0 +1,724 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fluency Bridge | Few & Little Nuance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:ital,wght@1,600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    colors: {
+                        brand: {
+                            dark: '#060B19',
+                            card: '#111A2C',
+                            input: '#080D1A',
+                            accent: '#2563EB',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                background-color: #060B19 !important;
+                color: white !important;
+            }
+            #footer-nav, #print-btn, #anki-btn, #start-quiz-btn {
+                display: none !important;
+            }
+            .no-print { display: none !important; }
+            .print-card {
+                break-inside: avoid;
+                page-break-inside: avoid;
+                border: 1px solid rgba(255,255,255,0.2) !important;
+            }
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #060B19; }
+        ::-webkit-scrollbar-thumb { background: #111A2C; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #2563EB; }
+    </style>
+</head>
+<body class="bg-brand-dark text-white font-sans antialiased min-h-screen flex flex-col items-center relative overflow-x-hidden selection:bg-brand-accent selection:text-white">
+
+    <!-- Global Background & Blur -->
+    <div class="fixed inset-0 z-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#131E3A] to-brand-dark opacity-80 pointer-events-none blur-2xl"></div>
+
+    <!-- Main Mobile-First Wrapper -->
+    <div class="w-full max-w-lg mx-auto min-h-screen flex flex-col relative z-10 pb-24">
+        
+        <!-- Header -->
+        <header class="flex justify-between items-center p-5 pt-8 print-card">
+            <div class="flex flex-col">
+                <span class="tracking-[0.3em] text-[10px] text-gray-300 font-bold uppercase">F l u e n c y</span>
+                <span class="text-white text-4xl italic font-serif leading-none mt-1">bridge</span>
+            </div>
+            <div class="text-right">
+                <div class="text-[10px] text-gray-400 uppercase tracking-wider">Session Time</div>
+                <div id="timer-display" class="font-mono font-semibold text-lg text-white">00:00</div>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main id="app-content" class="flex-1 w-full px-4 sm:px-6 flex flex-col gap-6">
+            <!-- Content Injected via JS -->
+        </main>
+
+    </div>
+
+    <!-- Sticky Footer -->
+    <footer id="footer-nav" class="fixed bottom-0 w-full max-w-lg mx-auto bg-brand-dark/90 backdrop-blur-md border-t border-white/5 flex justify-around p-4 z-50 rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
+        <button onclick="navigateBack()" class="flex flex-col items-center justify-center text-gray-400 hover:text-white transition-colors p-2 rounded-xl hover:bg-white/5 w-16">
+            <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            <span class="text-[10px] font-semibold">Back</span>
+        </button>
+        <button onclick="navigateTo('home')" class="flex flex-col items-center justify-center text-gray-400 hover:text-white transition-colors p-2 rounded-xl hover:bg-white/5 w-16">
+            <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+            <span class="text-[10px] font-semibold">Home</span>
+        </button>
+    </footer>
+
+<script>
+/* ==========================================
+   APP DATA - DEEPLY UPDATED FOR SUFFICIENCY/INSUFFICIENCY NUANCE
+========================================== */
+
+const DURATION_START = Date.now();
+let viewHistory = ['home'];
+let quizTimer;
+let currentQuizData = [];
+let currentQuizIndex = 0;
+let userScore = 0;
+let usageCurrentIndex = 0;
+
+// Reusable UI Components
+const cardClass = "bg-brand-card border-t border-white/5 shadow-2xl rounded-2xl p-6 print-card relative";
+const btnPrimary = "w-full bg-brand-accent text-white rounded-xl py-3 px-6 font-bold shadow-lg shadow-blue-500/20 hover:bg-blue-500 transition-all active:scale-95 text-center block";
+const optionClass = "w-full text-left bg-brand-input border border-white/5 rounded-xl p-4 hover:bg-white/10 transition-colors font-medium text-white shadow-sm flex items-center justify-between";
+
+// 50 Real Life Scenarios focused on Perspective & Sufficiency
+const realLifeScenarios = [
+    { s: "Checking bank balance before an expensive dinner", en: "I have little money for this restaurant.", exp: "Uncountable. The speaker views the money as INSUFFICIENT for the expensive dinner (negative attitude)." },
+    { s: "Finding change in pocket for a tea stall", en: "I have a little money; I can buy us chai.", exp: "Uncountable. The speaker views the money as SUFFICIENT for tea (positive attitude focusing on presence)." },
+    { s: "Commuting during peak hour delays", en: "There is little traffic moving forward.", exp: "Uncountable. Negative attitude: the movement is insufficient, emphasizing the lack of progress." },
+    { s: "Making just one cup of coffee", en: "There is a little milk left in the fridge.", exp: "Uncountable. Positive attitude: it is sufficient for the one cup needed." },
+    { s: "Job hunting in a bad economy", en: "Few companies are hiring right now.", exp: "Countable. Negative attitude: the number of companies is insufficient compared to the demand." },
+    { s: "Taking a quick break at work", en: "I have a little time before my next meeting.", exp: "Uncountable. Positive attitude: the speaker is happy there is sufficient time for a short break." },
+    { s: "Exam preparation panic for a failing student", en: "I have little hope of passing.", exp: "Uncountable. Negative attitude: the amount of hope is insufficient to feel confident." },
+    { s: "Moving to a new city but not entirely alone", en: "I know a few people here.", exp: "Countable. Positive attitude: the speaker is comforted by the presence of a sufficient number of contacts." },
+    { s: "Cooking a recipe that lacks flavor", en: "Add a little salt to the dish.", exp: "Uncountable. Positive attitude: adding a sufficient, small amount will fix the presence of flavor." },
+    { s: "A boring movie in the theater", en: "Few people stayed till the end.", exp: "Countable. Negative attitude: highlighting the lack of an audience; an insufficient number to consider it a success." },
+    { s: "A patient not responding to medicine", en: "There is little improvement in his health.", exp: "Uncountable. Negative attitude: the improvement is insufficient for recovery." },
+    { s: "Seeking guidance from a mentor", en: "Can you give me a little advice?", exp: "Uncountable. Positive attitude: asking for a sufficient amount of guidance to proceed." },
+    { s: "A notoriously difficult university test", en: "Few students passed the exam.", exp: "Countable. Negative attitude: the pass rate is insufficient, highlighting a widespread failure." },
+    { s: "Making a small salad", en: "I bought a few tomatoes.", exp: "Countable. Positive attitude: a sufficient number of tomatoes for the salad." },
+    { s: "Dealing with a constantly buffering video", en: "I have little patience left for this lag.", exp: "Uncountable. Negative attitude: the remaining patience is insufficient to continue waiting." },
+    { s: "Packing for a short weekend trip", en: "I packed a few shirts for the trip.", exp: "Countable. Positive attitude: a sufficient amount of clothing for a short duration." },
+    { s: "Keeping a surprise party secret", en: "Few people know about this plan.", exp: "Countable. Negative attitude towards the spread of info (which is good for a secret): highlighting the lack of knowledge among the masses." },
+    { s: "Customizing a beverage", en: "I like a little sugar in my tea.", exp: "Uncountable. Positive attitude: the speaker desires a sufficient presence of sweetness." },
+    { s: "Apologizing for needing an extension", en: "I need a little more time to finish.", exp: "Uncountable. Positive attitude: the speaker believes a small, sufficient addition of time will solve the problem." },
+    { s: "Researching a highly obscure topic", en: "There are few books on this topic.", exp: "Countable. Negative attitude: the resources are insufficient for thorough research." },
+    { s: "Feeling parched after a walk", en: "Can I have a little water?", exp: "Uncountable. Positive attitude: asking for a sufficient quantity to quench thirst." },
+    { s: "Reviewing an otherwise good essay", en: "There are a few errors in your paper.", exp: "Countable. Positive attitude: acknowledging the presence of errors, but implying they are manageable/sufficiently small in scope to fix." },
+    { s: "Rejecting an unqualified candidate", en: "He has little experience in coding.", exp: "Uncountable. Negative attitude: the experience is deemed insufficient for the job requirements." },
+    { s: "Hosting a modest family get-together", en: "A few relatives visited us yesterday.", exp: "Countable. Positive attitude: emphasizing the pleasant presence of a sufficient number of guests." },
+    { s: "Farmers facing a drought", en: "We received little rain this year.", exp: "Uncountable. Negative attitude: the rainfall was insufficient for the crops." },
+    { s: "Playing a basic song on the guitar", en: "I know a few chords.", exp: "Countable. Positive attitude: the speaker knows enough (sufficient) chords to play a basic tune." },
+    { s: "Following a strict fitness regime", en: "She eats little junk food.", exp: "Uncountable. Negative attitude towards the food (which is healthy): emphasizing the active lack or insufficiency of junk food in her diet." },
+    { s: "Building an emergency fund slowly", en: "I save a little money every month.", exp: "Uncountable. Positive attitude: focusing on the consistent presence and sufficient accumulation of savings." },
+    { s: "Diagnosing a highly specialized medical issue", en: "Few doctors can cure this.", exp: "Countable. Negative attitude: the number of capable doctors is severely insufficient." },
+    { s: "Having a light evening snack", en: "I ate a few biscuits.", exp: "Countable. Positive attitude: a sufficient number to satisfy mild hunger." },
+    { s: "A cold, unfeeling response to tragedy", en: "He showed little sympathy for them.", exp: "Uncountable. Negative attitude: the amount of sympathy was shockingly insufficient." },
+    { s: "Waiting for a mildly delayed train", en: "The train is a little late.", exp: "Uncountable (time aspect). Positive attitude: acknowledging the delay, but viewing it as manageable/sufficiently small to not ruin plans." },
+    { s: "Trying to enter a VIP only area", en: "Few members are allowed inside.", exp: "Countable. Negative attitude: the accessibility is highly insufficient for the general public." },
+    { s: "Clarifying details after a meeting", en: "I have a few questions for you.", exp: "Countable. Positive attitude: focusing on the presence of a manageable, sufficient number of inquiries." },
+    { s: "Trying to fit a 5th person in a small car", en: "There is little room in the car.", exp: "Uncountable (space). Negative attitude: the space is physically insufficient to accommodate them comfortably." },
+    { s: "Coaching a nervous beginner", en: "She needs a little encouragement.", exp: "Uncountable. Positive attitude: the coach believes a sufficient amount of support will fix the issue." },
+    { s: "Farming in a harsh desert environment", en: "Few plants grow here.", exp: "Countable. Negative attitude: the environment is hostile, making the plant life insufficient for agriculture." },
+    { s: "Following a baking recipe", en: "Add a few drops of vanilla.", exp: "Countable. Positive attitude: a sufficient number of drops to create the desired flavor profile." },
+    { s: "A prosecutor dropping a weak case", en: "The police have little evidence.", exp: "Uncountable. Negative attitude: the evidence is insufficient to secure a conviction." },
+    { s: "A brief vacation", en: "We stayed for a few days.", exp: "Countable. Positive attitude: a sufficient duration for a short break." },
+    { s: "A team losing 5-0 in the final minute", en: "There is little chance of winning.", exp: "Uncountable. Negative attitude: the probability is entirely insufficient to maintain hope." },
+    { s: "Adjusting a mildly bland soup", en: "Add a little pepper.", exp: "Uncountable. Positive attitude: suggesting a sufficient addition to improve taste." },
+    { s: "Sharing a very controversial thought", en: "Few people agree with me.", exp: "Countable. Negative attitude: the support is insufficient; the speaker feels isolated." },
+    { s: "Showing off a hobby collection", en: "I have a few rare stamps.", exp: "Countable. Positive attitude: proud of the presence of a sufficient number of valuable items." },
+    { s: "Collapsing after a marathon", en: "I have little energy left.", exp: "Uncountable. Negative attitude: the remaining energy is insufficient to take another step." },
+    { s: "Catching up with an old acquaintance", en: "We chatted for a few minutes.", exp: "Countable. Positive attitude: a sufficient amount of time to exchange pleasantries." },
+    { s: "A secretive corporation", en: "They share little information.", exp: "Uncountable. Negative attitude: the transparency is severely insufficient." },
+    { s: "Enhancing the taste of a salad", en: "Squeeze a little lemon.", exp: "Uncountable. Positive attitude: a sufficient amount to add the right zest." },
+    { s: "An IQ test meant to stump adults", en: "Few kids could solve it.", exp: "Countable. Negative attitude: highlighting that the success rate among kids was insufficient." },
+    { s: "Brainstorming when plan A fails", en: "We have a few options left.", exp: "Countable. Positive attitude: maintaining optimism that the remaining alternatives are sufficient to find a solution." }
+];
+
+// 100 Quiz Questions focusing on Sufficiency vs Insufficiency
+const fullQuizDB = [
+    { q: "I have ___ friends so I feel very lonely.", a: "few", type: "mcq", opts: ["few", "a few", "little", "a little"], exp: "Friends are countable. 'Lonely' implies the speaker views the number of friends as INSUFFICIENT. Negative attitude." },
+    { q: "She has ___ time left so she cannot help you.", a: "little", type: "mcq", opts: ["few", "a few", "little", "a little"], exp: "Time is uncountable. 'Cannot help' implies the time is INSUFFICIENT for the task. Negative attitude." },
+    { q: "Can you lend me ___ dollars? I just need to buy lunch.", a: "a few", type: "mcq", opts: ["few", "a few", "little", "a little"], exp: "Dollars are countable. Asking for a loan implies the speaker views the amount as SUFFICIENT to achieve the goal (buying lunch). Positive attitude." },
+    { q: "There is ___ milk in the fridge; we can make tea.", a: "a little", type: "mcq", opts: ["few", "a few", "little", "a little"], exp: "Milk is uncountable. 'We can make tea' means the speaker views the amount as SUFFICIENT. Positive attitude." },
+    { q: "He is highly anti-social and goes to ___ parties.", a: "few", type: "mcq", opts: ["few", "a few", "little", "a little"], exp: "Parties are countable. 'Anti-social' highlights an INSUFFICIENT or actively lacking social life. Negative attitude." },
+    { q: "I have ___ hope that he will recover; the doctors have given up.", a: "little", type: "mcq", opts: ["few", "a few", "little", "a little"], exp: "Hope is uncountable. 'Doctors giving up' implies the hope is INSUFFICIENT. Negative attitude." },
+    { q: "We stayed in Paris for ___ days and saw all the main sights.", a: "a few", type: "mcq", opts: ["few", "a few", "little", "a little"], exp: "Days are countable. Seeing the sights implies the time spent was viewed as SUFFICIENT and positive." },
+    { q: "I need ___ help with this math problem; I'm almost done.", a: "a little", type: "mcq", opts: ["few", "a few", "little", "a little"], exp: "Help is uncountable. 'Almost done' implies only a SUFFICIENT, small amount of assistance is needed. Positive attitude." },
+    { q: "Sadly, ___ politicians are truly honest these days.", a: "few", type: "mcq", opts: ["few", "a few", "little", "a little"], exp: "Politicians are countable. 'Sadly' sets a negative attitude, highlighting that the number of honest ones is INSUFFICIENT." },
+    { q: "They have ___ knowledge of the subject, which is why they failed the interview.", a: "little", type: "mcq", opts: ["few", "a few", "little", "a little"], exp: "Knowledge is uncountable. Failing implies the knowledge was INSUFFICIENT for the requirement. Negative attitude." },
+    
+    // True/False or correct/incorrect styled
+    { q: "Sentence check: 'I have a little cars.'", a: "wrong", type: "tf", opts: ["correct", "wrong"], exp: "Cars are countable. 'Little' is strictly for uncountable nouns. It should be 'a few cars'." },
+    { q: "Sentence check: 'She needs few money to buy the book.'", a: "wrong", type: "tf", opts: ["correct", "wrong"], exp: "Money is uncountable (we count rupees, not 'moneys'). It should be 'a little money' because she views it as sufficient to buy the book." },
+    { q: "Sentence check: 'There are a few birds on the tree.'", a: "correct", type: "tf", opts: ["correct", "wrong"], exp: "Birds are countable. 'A few' correctly emphasizes the presence of a sufficient/notable number of birds." },
+    { q: "Sentence check: 'Add few sugar to my tea.'", a: "wrong", type: "tf", opts: ["correct", "wrong"], exp: "Sugar is uncountable. Furthermore, if you want sugar added, you view it positively (sufficient addition), so it must be 'a little sugar'." },
+    { q: "Sentence check: 'He has little patience for fools.'", a: "correct", type: "tf", opts: ["correct", "wrong"], exp: "Patience is uncountable. 'Little' correctly shows a negative attitude: his patience is INSUFFICIENT." },
+    { q: "Sentence check: 'A little students came to the poorly advertised class.'", a: "wrong", type: "tf", opts: ["correct", "wrong"], exp: "Students are countable. Since the attendance was poor (insufficient), it should simply be 'few students', not 'a little'." },
+    { q: "Sentence check: 'I speak a little Spanish, enough to order food.'", a: "correct", type: "tf", opts: ["correct", "wrong"], exp: "Language ability is uncountable. 'Enough to order' means the speaker views their knowledge as SUFFICIENT. Positive attitude." },
+    { q: "Sentence check: 'Few rain fell yesterday during the drought.'", a: "wrong", type: "tf", opts: ["correct", "wrong"], exp: "Rain is uncountable. To express an insufficient amount during a drought, it must be 'little rain'." },
+    { q: "Sentence check: 'I bought a few books to read on the train.'", a: "correct", type: "tf", opts: ["correct", "wrong"], exp: "Books are countable. The speaker views the amount as SUFFICIENT for the journey. Positive attitude." },
+    { q: "Sentence check: 'He drinks little water, which is why he is always dehydrated.'", a: "correct", type: "tf", opts: ["correct", "wrong"], exp: "Water is uncountable. 'Dehydrated' implies the intake is INSUFFICIENT. Negative attitude." },
+
+    // Deepening Nuance MCQs
+    { q: "She has ___ enemies because she treats everyone with respect.", a: "few", type: "mcq", opts: ["few", "a few", "little", "a little"], exp: "Enemies are countable. Treating people with respect means enemies are actively lacking (insufficient number to be a problem). Negative tonality applied to a bad thing." },
+    { q: "I have ___ patience left for your nonsense; one more word and I'm leaving.", a: "little", type: "mcq", opts: ["few", "a few", "little", "a little"], exp: "Patience is uncountable. The threat of leaving implies the patience is INSUFFICIENT. Negative attitude." },
+    { q: "Can I ask you ___ questions to clarify this topic?", a: "a few", type: "mcq", opts: ["few", "a few", "little", "a little"], exp: "Questions are countable. The speaker views the questions as a SUFFICIENT means to get clarity. Positive attitude." },
+    { q: "We have ___ food left; let us share it so we don't starve.", a: "a little", type: "mcq", opts: ["few", "a few", "little", "a little"], exp: "Food is uncountable. 'Let us share' shows the speaker views the food as SUFFICIENT to prevent starvation. Positive attitude." },
+    { q: "Very ___ people attended the boring, unadvertised lecture.", a: "few", type: "mcq", opts: ["few", "a few", "little", "a little"], exp: "People are countable. 'Boring/unadvertised' sets a negative tone; the attendance was INSUFFICIENT." },
+    { q: "There is ___ space in this tiny, claustrophobic room.", a: "little", type: "mcq", opts: ["few", "a few", "little", "a little"], exp: "Space is uncountable. 'Claustrophobic' strongly implies the space is INSUFFICIENT. Negative attitude." },
+    { q: "I found ___ coins in my pocket, just enough for the vending machine.", a: "a few", type: "mcq", opts: ["few", "a few", "little", "a little"], exp: "Coins are countable. 'Just enough' means the speaker views the amount as SUFFICIENT. Positive attitude." },
+    { q: "Add ___ salt to the soup to enhance the flavor.", a: "a little", type: "mcq", opts: ["few", "a few", "little", "a little"], exp: "Salt is uncountable. The speaker views the addition as a SUFFICIENT way to improve the dish. Positive attitude." },
+    { q: "___ students passed the extremely hard, unfair test.", a: "few", type: "mcq", opts: ["few", "a few", "little", "a little"], exp: "Students are countable. 'Extremely hard/unfair' implies the pass rate was INSUFFICIENT. Negative attitude." },
+    { q: "She felt ___ regret about leaving her toxic job; she was actually relieved.", a: "little", type: "mcq", opts: ["few", "a few", "little", "a little"], exp: "Regret is uncountable. 'Relieved' means regret is INSUFFICIENT/lacking. Negative attitude towards the emotion." },
+    { q: "I know ___ Spanish words, so I can at least greet the locals.", a: "a few", type: "mcq", opts: ["few", "a few", "little", "a little"], exp: "Words are countable. 'Can at least greet' means the speaker views their vocabulary as SUFFICIENT for the task. Positive attitude." },
+    { q: "He gave me ___ good advice that really helped me succeed.", a: "a little", type: "mcq", opts: ["few", "a few", "little", "a little"], exp: "Advice is uncountable. 'Helped me succeed' means the advice was viewed as SUFFICIENT and positive." },
+    { q: "There are ___ apples left in the basket; we can make a pie.", a: "a few", type: "mcq", opts: ["few", "a few", "little", "a little"], exp: "Apples are countable. 'Can make a pie' means the amount is viewed as SUFFICIENT. Positive attitude." },
+    { q: "We made ___ progress on the project today, so we are on schedule.", a: "a little", type: "mcq", opts: ["few", "a few", "little", "a little"], exp: "Progress is uncountable. 'On schedule' means the progress was SUFFICIENT. Positive attitude." },
+    { q: "___ doctors understand this highly obscure, rare disease.", a: "few", type: "mcq", opts: ["few", "a few", "little", "a little"], exp: "Doctors are countable. 'Obscure/rare' implies the medical knowledge pool is INSUFFICIENT. Negative attitude." },
+    { q: "I have ___ interest in politics; I find it completely exhausting.", a: "little", type: "mcq", opts: ["few", "a few", "little", "a little"], exp: "Interest is uncountable. 'Exhausting' implies the speaker's interest is actively lacking or INSUFFICIENT. Negative attitude." },
+    { q: "She bought ___ dresses for the trip, enough to wear a new one each day.", a: "a few", type: "mcq", opts: ["few", "a few", "little", "a little"], exp: "Dresses are countable. 'Enough' explicitly states the amount is viewed as SUFFICIENT. Positive attitude." },
+    { q: "I need ___ rest before we continue, just a quick 10-minute nap.", a: "a little", type: "mcq", opts: ["few", "a few", "little", "a little"], exp: "Rest is uncountable. A 10-minute nap is viewed as a SUFFICIENT amount to continue. Positive attitude." },
+    { q: "___ cars were on the road late at night, making it feel like a ghost town.", a: "few", type: "mcq", opts: ["few", "a few", "little", "a little"], exp: "Cars are countable. 'Ghost town' implies the presence of cars was INSUFFICIENT. Negative attitude." },
+    { q: "He drank ___ water during the desert hike and suffered heatstroke.", a: "little", type: "mcq", opts: ["few", "a few", "little", "a little"], exp: "Water is uncountable. 'Suffered heatstroke' implies the intake was dangerously INSUFFICIENT. Negative attitude." },
+    { q: "We spent ___ hours playing games and had a great evening.", a: "a few", type: "mcq", opts: ["few", "a few", "little", "a little"], exp: "Hours are countable. 'Great evening' implies the time spent was SUFFICIENT for enjoyment. Positive attitude." },
+    { q: "There is ___ chance of rain tomorrow, enough to warrant carrying an umbrella.", a: "a little", type: "mcq", opts: ["few", "a few", "little", "a little"], exp: "Chance is uncountable here. 'Warrant carrying an umbrella' means the probability is SUFFICIENT to act upon. Positive attitude." },
+    { q: "___ cities are as crowded and chaotic as Tokyo during rush hour.", a: "few", type: "mcq", opts: ["few", "a few", "little", "a little"], exp: "Cities are countable. The comparison highlights that the number of similar cities is INSUFFICIENT/rare. Negative attitude." },
+    { q: "She showed ___ enthusiasm for the idea, yawning the entire time.", a: "little", type: "mcq", opts: ["few", "a few", "little", "a little"], exp: "Enthusiasm is uncountable. 'Yawning' implies the enthusiasm was INSUFFICIENT. Negative attitude." },
+    { q: "I took ___ photos at the event to remember the night by.", a: "a few", type: "mcq", opts: ["few", "a few", "little", "a little"], exp: "Photos are countable. The speaker views the number taken as SUFFICIENT to preserve memories. Positive attitude." },
+    { q: "He added ___ humor to his speech, which kept the audience engaged.", a: "a little", type: "mcq", opts: ["few", "a few", "little", "a little"], exp: "Humor is uncountable. 'Kept audience engaged' implies the humor was SUFFICIENT. Positive attitude." },
+    { q: "___ restaurants serve authentic vegan food in this small meat-loving town.", a: "few", type: "mcq", opts: ["few", "a few", "little", "a little"], exp: "Restaurants are countable. The context implies the availability is INSUFFICIENT. Negative attitude." },
+    { q: "I have ___ doubt about his honesty; I trust him with my life.", a: "little", type: "mcq", opts: ["few", "a few", "little", "a little"], exp: "Doubt is uncountable. 'Trust him with my life' means doubt is lacking/INSUFFICIENT. Negative attitude applied to doubt." },
+    { q: "She wrote ___ letters to her friends while traveling abroad.", a: "a few", type: "mcq", opts: ["few", "a few", "little", "a little"], exp: "Letters are countable. The speaker views the act of writing as a SUFFICIENT effort to keep in touch. Positive attitude." },
+    { q: "We received ___ help from the government after the flood, feeling completely abandoned.", a: "little", type: "mcq", opts: ["few", "a few", "little", "a little"], exp: "Help is uncountable. 'Abandoned' implies the assistance was highly INSUFFICIENT. Negative attitude." }
+];
+
+// Procedurally generate the remaining 50 questions focusing heavily on Sufficiency vs Insufficiency
+const extraNouns = [
+    {n: "chairs", type: "c", pos: "I brought ___ chairs, enough for everyone to sit.", neg: "There are ___ chairs in the room; most people have to stand."},
+    {n: "sugar", type: "u", pos: "Add ___ sugar to it, just enough to make it sweet.", neg: "There is ___ sugar left; we can't even make one cup of tea."},
+    {n: "ideas", type: "c", pos: "He gave ___ ideas that saved the brainstorming session.", neg: "We had ___ ideas, so the project stalled completely."},
+    {n: "confidence", type: "u", pos: "She gained ___ confidence after the compliment.", neg: "He has ___ confidence left after failing repeatedly."},
+    {n: "songs", type: "c", pos: "I sang ___ songs that the crowd enjoyed.", neg: "I know ___ songs by that artist; I can't go to their concert."},
+    {n: "butter", type: "u", pos: "I need ___ butter to grease the pan properly.", neg: "We have ___ butter left; the cake will be dry."},
+    {n: "tickets", type: "c", pos: "I bought ___ tickets so our whole family can go.", neg: "There are ___ tickets left; the event is practically sold out."},
+    {n: "furniture", type: "u", pos: "We bought ___ furniture to make the living room cozy.", neg: "There is ___ furniture in the house; our voices echo off the walls."},
+    {n: "clouds", type: "c", pos: "I see ___ clouds; it might provide some shade.", neg: "There are ___ clouds in the sky; the sun is blazing hot."},
+    {n: "sand", type: "u", pos: "There is ___ sand in my shoes making it slightly uncomfortable.", neg: "There is ___ sand on this rocky beach to build a castle."},
+    {n: "mistakes", type: "c", pos: "I made ___ mistakes, but I still got an A grade.", neg: "He made ___ mistakes; his paper was practically flawless."},
+    {n: "courage", type: "u", pos: "It takes ___ courage to speak up in a meeting.", neg: "He showed ___ courage and abandoned his team in danger."},
+    {n: "toys", type: "c", pos: "The kid has ___ toys to keep him occupied for the afternoon.", neg: "Those poor kids have ___ toys to play with in the shelter."},
+    {n: "luggage", type: "u", pos: "I have ___ luggage, just enough for the weekend.", neg: "He brought ___ luggage, practically moving in with us!"},
+    {n: "rules", type: "c", pos: "There are ___ rules to follow to keep things safe.", neg: "There are ___ rules here; it is absolute chaos."},
+    {n: "dust", type: "u", pos: "There is ___ dust on the table; let me wipe it.", neg: "There is ___ dust in this clean room; it's pristine."},
+    {n: "gifts", type: "c", pos: "I got ___ gifts that made me feel appreciated.", neg: "He received ___ gifts on his forgotten birthday, making him sad."},
+    {n: "information", type: "u", pos: "I found ___ information to start the essay.", neg: "They gave ___ information to the police, hindering the case."},
+    {n: "pens", type: "c", pos: "Can I borrow ___ pens for the exam?", neg: "I have ___ pens left; they all ran out of ink."},
+    {n: "luck", type: "u", pos: "I need ___ luck to pass this difficult interview.", neg: "He had ___ luck and lost his entire life savings."},
+    {n: "bottles", type: "c", pos: "Bring ___ bottles of water for the hike.", neg: "There are ___ bottles left in the store; a shortage is happening."},
+    {n: "oil", type: "u", pos: "Use ___ oil to fry the onions.", neg: "There is ___ oil in the engine; it's going to seize."},
+    {n: "trees", type: "c", pos: "We planted ___ trees to provide some shade.", neg: "There are ___ trees in the desert; it's mostly barren sand."},
+    {n: "music", type: "u", pos: "Play ___ music to set the mood for dinner.", neg: "There is ___ music I actually enjoy on the radio nowadays."},
+    {n: "keys", type: "c", pos: "I lost ___ keys, but luckily I have spares.", neg: "He has ___ keys; he relies entirely on digital locks."}
+];
+
+extraNouns.forEach(item => {
+    // Add positive tonality question (Sufficiency)
+    fullQuizDB.push({
+        q: item.pos,
+        a: item.type === "c" ? "a few" : "a little",
+        type: "mcq",
+        opts: ["few", "a few", "little", "a little"],
+        exp: `${item.n.charAt(0).toUpperCase() + item.n.slice(1)} is ${item.type === 'c' ? 'countable' : 'uncountable'}. Context implies the speaker views the amount as SUFFICIENT (Positive attitude focusing on presence).`
+    });
+    // Add negative tonality question (Insufficiency)
+    fullQuizDB.push({
+        q: item.neg,
+        a: item.type === "c" ? "few" : "little",
+        type: "mcq",
+        opts: ["few", "a few", "little", "a little"],
+        exp: `${item.n.charAt(0).toUpperCase() + item.n.slice(1)} is ${item.type === 'c' ? 'countable' : 'uncountable'}. Context implies the speaker views the amount as INSUFFICIENT or lacking (Negative attitude focusing on absence).`
+    });
+});
+
+/* ==========================================
+   ROUTING & RENDER ENGINE
+========================================== */
+function navigateTo(view) {
+    if (viewHistory[viewHistory.length - 1] !== view) {
+        viewHistory.push(view);
+    }
+    renderView(view);
+}
+
+function navigateBack() {
+    if (viewHistory.length > 1) {
+        viewHistory.pop();
+        renderView(viewHistory[viewHistory.length - 1]);
+    }
+}
+
+function renderView(view) {
+    const app = document.getElementById('app-content');
+    app.innerHTML = '';
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    switch(view) {
+        case 'home': app.innerHTML = getHomeHTML(); break;
+        case 'notes': app.innerHTML = getNotesHTML(); break;
+        case 'story': app.innerHTML = getStoryHTML(); break;
+        case 'usage': app.innerHTML = getUsageHTML(); break;
+        case 'quizSetup': app.innerHTML = getQuizSetupHTML(); break;
+        case 'quizActive': renderQuizEngine(app); break;
+        case 'quizResults': app.innerHTML = getResultsHTML(); break;
+    }
+}
+
+/* ==========================================
+   VIEW TEMPLATES
+========================================== */
+
+function getHomeHTML() {
+    return `
+        <div class="space-y-4">
+            <h1 class="text-3xl font-bold text-white mb-2 tracking-tight">Master Quantifiers</h1>
+            <p class="text-gray-400 text-sm mb-6">Discover the true psychological nuance of Few vs. Little—it's not about "having vs. not having," it's about Sufficiency vs. Insufficiency.</p>
+            
+            <button onclick="navigateTo('notes')" class="${cardClass} w-full flex items-center justify-between hover:bg-white/5 transition-all cursor-pointer text-left">
+                <div>
+                    <h2 class="text-lg font-bold text-white">1. Deep Theory & Notes</h2>
+                    <p class="text-xs text-gray-400 mt-1">Hinglish explanations breaking down the "Sufficiency" mindset.</p>
+                </div>
+                <svg class="w-6 h-6 text-brand-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            </button>
+            
+            <button onclick="navigateTo('story')" class="${cardClass} w-full flex items-center justify-between hover:bg-white/5 transition-all cursor-pointer text-left">
+                <div>
+                    <h2 class="text-lg font-bold text-white">2. Contextual Story</h2>
+                    <p class="text-xs text-gray-400 mt-1">Read a short story focusing on speaker attitudes.</p>
+                </div>
+                <svg class="w-6 h-6 text-brand-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            </button>
+
+            <button onclick="navigateTo('usage')" class="${cardClass} w-full flex items-center justify-between hover:bg-white/5 transition-all cursor-pointer text-left">
+                <div>
+                    <h2 class="text-lg font-bold text-white">3. Real Life Usage</h2>
+                    <p class="text-xs text-gray-400 mt-1">50 practical scenarios analyzing the speaker's perspective.</p>
+                </div>
+                <svg class="w-6 h-6 text-brand-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            </button>
+
+            <button onclick="navigateTo('quizSetup')" class="${cardClass} w-full flex items-center justify-between hover:bg-white/5 transition-all cursor-pointer text-left border-l-4 border-l-brand-accent">
+                <div>
+                    <h2 class="text-lg font-bold text-white">4. Take Assessment</h2>
+                    <p class="text-xs text-gray-400 mt-1">10 random questions out of 100 deep-reasoning questions.</p>
+                </div>
+                <svg class="w-6 h-6 text-brand-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            </button>
+        </div>
+    `;
+}
+
+function getNotesHTML() {
+    return `
+        <div class="space-y-6">
+            <div class="flex justify-between items-center no-print">
+                <h1 class="text-2xl font-bold">Concept Notes</h1>
+                <div class="flex gap-2">
+                    <button id="anki-btn" onclick="downloadAnki()" class="bg-gray-800 text-xs text-white px-3 py-1.5 rounded-lg hover:bg-gray-700 transition">Anki CSV</button>
+                    <button id="print-btn" onclick="window.print()" class="bg-brand-accent text-xs text-white px-3 py-1.5 rounded-lg hover:bg-blue-500 transition">Print</button>
+                </div>
+            </div>
+
+            <div class="${cardClass}">
+                <h2 class="text-xl font-bold text-brand-accent mb-4">Table of Contents</h2>
+                <ul class="list-disc pl-5 text-sm text-gray-300 space-y-2">
+                    <li><a href="#prereq" class="hover:text-white">1. Prerequisites (Countable vs Uncountable)</a></li>
+                    <li><a href="#concept" class="hover:text-white">2. The Core Matrix</a></li>
+                    <li><a href="#nuance" class="hover:text-white font-semibold text-blue-400">3. The True Nuance: Sufficiency vs Insufficiency</a></li>
+                    <li><a href="#mistakes" class="hover:text-white">4. Top Mistakes</a></li>
+                </ul>
+            </div>
+
+            <div id="prereq" class="${cardClass}">
+                <h2 class="text-lg font-bold mb-3 border-b border-white/10 pb-2">1. Prerequisites</h2>
+                <p class="text-sm text-gray-300 mb-3">Ye topic <strong>Determiners & Quantifiers</strong> grammar category ke under aata hai. Isko samajhne ke liye aapko "Countable and Uncountable Nouns" aana chahiye.</p>
+                <a href="https://www.google.com/search?q=countable+and+uncountable+nouns+grammar" target="_blank" class="inline-block bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-xs text-blue-400 hover:bg-white/10 transition">
+                    🔍 Search: Countable vs Uncountable
+                </a>
+                <ul class="mt-4 list-disc pl-5 text-sm text-gray-300 space-y-1">
+                    <li><strong>Countable:</strong> Jinhe gin sakte ho (1 apple, 2 apples). E.g., Friends, Cars, Rupees, Questions.</li>
+                    <li><strong>Uncountable:</strong> Jinhe sirf map ya taul sakte ho, gin nahi sakte. E.g., Water, Time, Money, Knowledge, Hope.</li>
+                </ul>
+            </div>
+
+            <div id="concept" class="${cardClass}">
+                <h2 class="text-lg font-bold mb-3 border-b border-white/10 pb-2">2. The Core Matrix</h2>
+                <div class="grid grid-cols-2 gap-4 text-sm mt-4">
+                    <div class="bg-brand-input p-3 rounded-lg border border-white/5">
+                        <strong class="text-brand-accent block mb-1">Countable (Gin sakte hain)</strong>
+                        <ul class="text-gray-300 space-y-1">
+                            <li>• Few</li>
+                            <li>• A few</li>
+                        </ul>
+                    </div>
+                    <div class="bg-brand-input p-3 rounded-lg border border-white/5">
+                        <strong class="text-brand-accent block mb-1">Uncountable (Gin nahi sakte)</strong>
+                        <ul class="text-gray-300 space-y-1">
+                            <li>• Little</li>
+                            <li>• A little</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div id="nuance" class="${cardClass}">
+                <h2 class="text-lg font-bold mb-3 border-b border-white/10 pb-2">3. The True Nuance: Sufficiency vs Insufficiency</h2>
+                <p class="text-sm text-gray-300 mb-4 bg-blue-900/20 p-3 rounded-lg border border-blue-500/20">
+                    <strong>Sabse badi mistake:</strong> Log sochte hain 'Few/Little' ka matlab zero ya "existence vs non-existence" hai. <strong>Wrong!</strong><br><br>
+                    Actually, it is entirely about the <strong>Speaker's Perspective (Attitude)</strong>. Two people can have the exact same amount of something, but use different words based on whether they feel it is <em>Sufficient (enough)</em> or <em>Insufficient (lacking)</em>.
+                </p>
+                
+                <div class="space-y-4">
+                    <div class="pl-4 border-l-2 border-green-500">
+                        <strong class="text-green-400">Positive Tonality: Focus on Sufficiency (A few / A little)</strong>
+                        <p class="text-xs text-gray-300 mt-1">Matlab: Speaker ka focus is baat par hai ki chiz <strong>majud (present) hai, aur itni hai ki kaam chal jayega (sufficient).</strong> The glass is half full.</p>
+                        <p class="text-xs text-gray-400 mt-2 p-2 bg-brand-input rounded border border-white/5 italic">
+                            Context: Auto ka kiraya ₹50 hai, aapki pocket mein ₹60 hain.<br>
+                            You say: "I have <strong>a little</strong> money." (Kaam ban jayega, sufficient amount).
+                        </p>
+                    </div>
+
+                    <div class="pl-4 border-l-2 border-red-500">
+                        <strong class="text-red-400">Negative Tonality: Focus on Insufficiency (Few / Little)</strong>
+                        <p class="text-xs text-gray-300 mt-1">Matlab: Speaker ka focus is baat par hai ki chiz <strong>jitni chahiye utni nahi hai (insufficient).</strong> The focus is on the lack or absence. The glass is half empty.</p>
+                        <p class="text-xs text-gray-400 mt-2 p-2 bg-brand-input rounded border border-white/5 italic">
+                            Context: Restaurant ka bill ₹500 hai, aapki pocket mein wahi ₹60 hain.<br>
+                            You say: "I have <strong>little</strong> money." (Paise physical exist karte hain, par situation ke hisab se INSUFFICIENT hain, kaam nahi chalega).
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="mistakes" class="${cardClass}">
+                <h2 class="text-lg font-bold mb-3 border-b border-white/10 pb-2 text-red-400">4. Top Mistakes</h2>
+                <ul class="text-sm text-gray-300 space-y-3">
+                    <li class="bg-brand-input p-3 rounded-lg border border-white/5">
+                        <span class="text-red-400 font-bold block mb-1">Mistake 1: Judging physically, not psychologically</span>
+                        <p class="text-xs">Never ask "how much is it?". Ask "is the speaker happy/satisfied with the amount?". If satisfied = A few/A little. If dissatisfied/complaining = Few/Little.</p>
+                    </li>
+                    <li class="bg-brand-input p-3 rounded-lg border border-white/5">
+                        <span class="text-red-400 font-bold block mb-1">Mistake 2: "Money" ko Countable man-na</span>
+                        <p class="text-xs">Log bolte hain "I have few money". Wrong! Rupees countable hain, par 'Money' as a broad concept uncountable hai. Correct: "I have little money."</p>
+                    </li>
+                    <li class="bg-brand-input p-3 rounded-lg border border-white/5">
+                        <span class="text-red-400 font-bold block mb-1">Mistake 3: Uncountable ke aage "Few" lagana</span>
+                        <p class="text-xs">"I need few time." Wrong. Time mapte hain (hours/mins mein), ginte nahi. Agar sufficient time chahiye toh: "I need a little time."</p>
+                    </li>
+                </ul>
+            </div>
+
+            <button onclick="navigateTo('quizSetup')" class="${btnPrimary} no-print">Go to Quiz</button>
+        </div>
+    `;
+}
+
+function getStoryHTML() {
+    return `
+        <div class="space-y-6">
+            <h1 class="text-2xl font-bold">Contextual Story</h1>
+            <p class="text-sm text-gray-400">Notice how the quantifiers reflect the character's psychological state: whether they feel they have 'enough' or 'not enough'.</p>
+            
+            <div class="${cardClass} text-sm leading-relaxed text-gray-300 space-y-4">
+                <p>Rahul was sitting in his room, staring at the clock. He felt he had <span class="text-brand-accent font-bold bg-blue-900/30 px-1 rounded">little</span> time left before his final exam. It wasn't that time didn't exist—he had three hours—but in his mind, it was severely <strong>insufficient</strong>. He had studied very <span class="text-brand-accent font-bold bg-blue-900/30 px-1 rounded">little</span> throughout the year, leaving him with an <strong>insufficient</strong> grasp of the concepts.</p>
+                
+                <p>He picked up his phone and scrolled through his contacts. Luckily, he had <span class="text-brand-accent font-bold bg-blue-900/30 px-1 rounded">a few</span> good friends he could call for help. The number wasn't huge, but to him, it was <strong>sufficient</strong> to provide comfort. He dialed Amit's number. "Amit, I need <span class="text-brand-accent font-bold bg-blue-900/30 px-1 rounded">a little</span> help with Physics," Rahul pleaded, hoping Amit would see it as a manageable, <strong>sufficiently small</strong> request.</p>
+
+                <p>Amit sighed. "<span class="text-brand-accent font-bold bg-blue-900/30 px-1 rounded">Few</span> students actually pass this professor's exam if they don't study daily, Rahul. The success rate is miserably <strong>insufficient</strong>. But okay, I have <span class="text-brand-accent font-bold bg-blue-900/30 px-1 rounded">a little</span> free time right now. It's <strong>enough</strong> to go over the basics. Come over."</p>
+
+                <p>When Rahul reached, he saw that Amit had prepared <span class="text-brand-accent font-bold bg-blue-900/30 px-1 rounded">a few</span> cheat sheets with formulas. "This gives me <span class="text-brand-accent font-bold bg-blue-900/30 px-1 rounded">a little</span> hope," Rahul smiled, his attitude shifting towards the positive. By the end of the night, Rahul made very <span class="text-brand-accent font-bold bg-blue-900/30 px-1 rounded">few</span> mistakes in his practice test—the errors were <strong>insufficient</strong> to cause failure. He realized that with <span class="text-brand-accent font-bold bg-blue-900/30 px-1 rounded">a little</span> effort (sufficient push) and <span class="text-brand-accent font-bold bg-blue-900/30 px-1 rounded">a few</span> good friends (sufficient support), you can survive anything.</p>
+            </div>
+            
+            <button onclick="navigateTo('quizSetup')" class="${btnPrimary}">Ready for the Quiz?</button>
+        </div>
+    `;
+}
+
+function getUsageHTML() {
+    let html = `
+        <div class="space-y-6">
+            <h1 class="text-2xl font-bold">Real Life Usage</h1>
+            <p class="text-sm text-gray-400 mb-4">50 scenarios focused on the speaker's perspective of Sufficiency. Press the eye to reveal answers.</p>
+            <div id="usage-container" class="space-y-4">
+    `;
+    
+    let items = realLifeScenarios.slice(usageCurrentIndex, usageCurrentIndex + 5);
+    items.forEach((item, idx) => {
+        let globalIdx = usageCurrentIndex + idx;
+        html += `
+            <div class="${cardClass} !p-4">
+                <p class="text-xs text-brand-accent uppercase font-bold tracking-wider mb-2">Scenario: ${item.s}</p>
+                <div class="relative">
+                    <div id="usage-ans-${globalIdx}" class="filter blur-md transition-all duration-300 select-none bg-brand-input border border-white/5 rounded-lg p-3">
+                        <p class="text-white text-sm font-semibold">${item.en}</p>
+                        <p class="text-xs text-gray-400 mt-2 border-t border-white/10 pt-2">${item.exp}</p>
+                    </div>
+                    <button onclick="document.getElementById('usage-ans-${globalIdx}').classList.remove('blur-md', 'select-none')" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-brand-dark/80 p-2 rounded-full text-white hover:bg-brand-accent transition shadow-lg">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                    </button>
+                </div>
+            </div>
+        `;
+    });
+
+    html += `</div>`;
+    
+    html += `
+        <div class="flex justify-between mt-4">
+            <button onclick="prevUsage()" class="bg-brand-input border border-white/10 px-4 py-2 rounded-xl text-sm ${usageCurrentIndex === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-white/10'}">Previous 5</button>
+            <span class="text-xs text-gray-500 self-center">${usageCurrentIndex + 1} - ${Math.min(usageCurrentIndex + 5, 50)} of 50</span>
+            <button onclick="nextUsage()" class="bg-brand-input border border-white/10 px-4 py-2 rounded-xl text-sm ${usageCurrentIndex >= 45 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-white/10'}">Next 5</button>
+        </div>
+    </div>`;
+    
+    return html;
+}
+
+function nextUsage() {
+    if (usageCurrentIndex < 45) {
+        usageCurrentIndex += 5;
+        renderView('usage');
+    }
+}
+
+function prevUsage() {
+    if (usageCurrentIndex > 0) {
+        usageCurrentIndex -= 5;
+        renderView('usage');
+    }
+}
+
+function getQuizSetupHTML() {
+    return `
+        <div class="space-y-6 text-center">
+            <div class="${cardClass} py-10">
+                <div class="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8 text-brand-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+                <h1 class="text-2xl font-bold mb-2">Psychological Assessment</h1>
+                <p class="text-sm text-gray-400 mb-6">10 random questions out of 100. Read the context carefully: Does the speaker view the amount as sufficient or insufficient?</p>
+                <button id="start-quiz-btn" onclick="startQuiz()" class="${btnPrimary} w-3/4 mx-auto">Start Quiz</button>
+            </div>
+            <button onclick="navigateTo('notes')" class="text-xs text-gray-500 hover:text-white underline">Wait, let me review the core nuance again</button>
+        </div>
+    `;
+}
+
+/* ==========================================
+   QUIZ ENGINE
+========================================== */
+
+function startQuiz() {
+    let shuffled = [...fullQuizDB].sort(() => 0.5 - Math.random());
+    currentQuizData = shuffled.slice(0, 10);
+    currentQuizIndex = 0;
+    userScore = 0;
+    navigateTo('quizActive');
+}
+
+function renderQuizEngine(container) {
+    let qData = currentQuizData[currentQuizIndex];
+    let progressPct = ((currentQuizIndex) / 10) * 100;
+
+    let html = `
+        <div class="space-y-6 w-full">
+            <!-- Progress Bar -->
+            <div class="w-full bg-white/10 rounded-full h-2 mb-6">
+                <div class="bg-brand-accent h-2 rounded-full transition-all duration-500" style="width: ${progressPct}%"></div>
+            </div>
+            
+            <div class="flex justify-between text-xs text-gray-400 mb-2 font-mono">
+                <span>Question ${currentQuizIndex + 1} of 10</span>
+                <span>${qData.type === 'tf' ? 'True/False Reasoning' : 'Multiple Choice'}</span>
+            </div>
+
+            <div class="${cardClass}">
+                <h2 class="text-lg font-semibold text-white leading-snug mb-6">${qData.q.replace('___', '<span class="inline-block w-12 border-b-2 border-brand-accent mx-1"></span>')}</h2>
+                
+                <div class="space-y-3" id="options-container">
+    `;
+
+    qData.opts.forEach(opt => {
+        html += `
+            <button onclick="handleAnswer('${opt}')" class="${optionClass} option-btn">
+                <span>${opt}</span>
+                <div class="w-5 h-5 rounded-full border border-white/20 flex items-center justify-center icon-box"></div>
+            </button>
+        `;
+    });
+
+    html += `
+                </div>
+                
+                <div id="explanation-box" class="hidden mt-6 p-4 rounded-xl bg-[#0a1122] border border-white/5 border-l-4 border-l-brand-accent">
+                    <p class="text-xs text-brand-accent font-bold mb-1 uppercase tracking-wider">Psychological Reasoning</p>
+                    <p class="text-sm text-gray-300" id="exp-text"></p>
+                    <button onclick="nextQuestion()" id="next-q-btn" class="mt-4 w-full bg-white/10 hover:bg-white/20 text-white rounded-lg py-2 text-sm transition">Next Question</button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    container.innerHTML = html;
+}
+
+function handleAnswer(selectedOpt) {
+    const btns = document.querySelectorAll('.option-btn');
+    btns.forEach(btn => {
+        btn.onclick = null;
+        btn.classList.add('cursor-not-allowed', 'opacity-50');
+    });
+
+    let qData = currentQuizData[currentQuizIndex];
+    let isCorrect = selectedOpt === qData.a;
+    
+    if (isCorrect) userScore++;
+
+    btns.forEach(btn => {
+        let spanTxt = btn.querySelector('span').innerText;
+        let iconBox = btn.querySelector('.icon-box');
+        
+        if (spanTxt === qData.a) {
+            btn.classList.remove('opacity-50', 'bg-brand-input');
+            btn.classList.add('bg-green-900/30', 'border-green-500/50', 'opacity-100');
+            iconBox.innerHTML = `<svg class="w-3 h-3 text-green-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>`;
+            iconBox.classList.add('border-green-500/50');
+        } else if (spanTxt === selectedOpt && !isCorrect) {
+            btn.classList.remove('opacity-50', 'bg-brand-input');
+            btn.classList.add('bg-red-900/30', 'border-red-500/50', 'opacity-100');
+            iconBox.innerHTML = `<svg class="w-3 h-3 text-red-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>`;
+            iconBox.classList.add('border-red-500/50');
+        }
+    });
+
+    document.getElementById('exp-text').innerText = qData.exp;
+    document.getElementById('explanation-box').classList.remove('hidden');
+    
+    setTimeout(() => {
+        document.getElementById('next-q-btn').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 100);
+}
+
+function nextQuestion() {
+    currentQuizIndex++;
+    if (currentQuizIndex < 10) {
+        renderView('quizActive');
+    } else {
+        navigateTo('quizResults');
+    }
+}
+
+function getResultsHTML() {
+    let sessionSecs = Math.floor((Date.now() - DURATION_START) / 1000);
+    let sessionMins = Math.floor(sessionSecs / 60);
+    let remSecs = sessionSecs % 60;
+    let efficiency = Math.round((userScore / 10) * 100);
+
+    return `
+        <div class="space-y-6 text-center">
+            <h1 class="text-2xl font-bold">Assessment Complete</h1>
+            
+            <div class="${cardClass} py-8">
+                <div class="text-[5rem] font-bold leading-none text-white tracking-tighter shadow-sm mb-2">
+                    ${userScore}<span class="text-3xl text-gray-500">/10</span>
+                </div>
+                <p class="text-sm text-gray-400 mb-8">Score</p>
+
+                <div class="grid grid-cols-2 gap-4 border-t border-white/10 pt-6">
+                    <div>
+                        <p class="text-2xl font-bold text-white">${efficiency}%</p>
+                        <p class="text-[10px] text-gray-500 uppercase tracking-wider">Accuracy</p>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-bold text-white">${sessionMins}m ${remSecs}s</p>
+                        <p class="text-[10px] text-gray-500 uppercase tracking-wider">Time on Page</p>
+                    </div>
+                </div>
+            </div>
+
+            <p class="text-sm text-gray-400">Remember, there are 100 questions baked in analyzing different psychological angles. Start a new quiz to practice different ones!</p>
+
+            <button onclick="startQuiz()" class="${btnPrimary}">Take Another Quiz</button>
+            <button onclick="navigateTo('home')" class="w-full bg-brand-input border border-white/10 text-white rounded-xl py-3 px-6 font-bold hover:bg-white/10 transition-all text-center block mt-3">Return to Home</button>
+        </div>
+    `;
+}
+
+/* ==========================================
+   UTILITIES
+========================================== */
+
+setInterval(() => {
+    let secs = Math.floor((Date.now() - DURATION_START) / 1000);
+    let m = Math.floor(secs / 60).toString().padStart(2, '0');
+    let s = (secs % 60).toString().padStart(2, '0');
+    document.getElementById('timer-display').innerText = `${m}:${s}`;
+}, 1000);
+
+// Anki CSV Generator (Strictly adhering to user rules: exactly "Question,Answer", no extra commas anywhere)
+function downloadAnki() {
+    let csvContent = "";
+    
+    fullQuizDB.forEach(q => {
+        let cleanQ = q.q.replace(/[,;:\n\r]/g, " ").trim();
+        let cleanA = q.a.replace(/[,;:\n\r]/g, " ").trim();
+        csvContent += `${cleanQ},${cleanA}\n`;
+    });
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", "few_little_sufficiency_anki.csv");
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+renderView('home');
+
+</script>
+</body>
+</html>
+
+
+```
