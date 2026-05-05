@@ -40,11 +40,12 @@ htmlFiles.forEach(filePath => {
     const relativePath = path.relative(BASE_DIR, filePath).replace(/\\/g, '/');
     
     const parts = relativePath.split('/');
-    const folder = parts[0];
+    const rootFolder = parts[0];
+    const folderPath = parts.slice(0, -1).join('/');
     const fileName = parts[parts.length - 1];
     
     const slug = fileName.replace('.html', '');
-    const category = capitalizeFirstLetter(folder);
+    const category = capitalizeFirstLetter(rootFolder);
     
     const content = fs.readFileSync(filePath, 'utf-8');
     const title = extractTitle(content);
@@ -52,7 +53,7 @@ htmlFiles.forEach(filePath => {
     indexData.push({
         title,
         slug,
-        folder,
+        folder: folderPath,
         category
     });
 });
