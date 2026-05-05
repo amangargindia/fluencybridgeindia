@@ -93,72 +93,74 @@
     </style>
 </head>
 
-<body class="bg-fluency-base text-slate-300 min-h-screen flex flex-col selection:bg-brand-500 selection:text-white relative overflow-x-hidden">
+<body class="bg-fluency-base text-slate-300 min-h-screen flex flex-col selection:bg-brand-500 selection:text-white relative">
 
-    <!-- Glowing Background Artifacts -->
-    <div class="hero-glow absolute top-[15%] left-1/2 -translate-x-1/2 h-[500px] w-[800px] bg-brand-600/5 blur-[120px] rounded-[100%] pointer-events-none"></div>
+    <div class="relative w-full overflow-hidden flex-1 flex flex-col">
+        <!-- Glowing Background Artifacts -->
+        <div class="hero-glow absolute top-[15%] left-1/2 -translate-x-1/2 h-[500px] w-full max-w-[800px] bg-brand-600/5 blur-[120px] rounded-[100%] pointer-events-none"></div>
 
-    <!-- MAIN CONTENT -->
-    <main class="max-w-5xl mx-auto w-full px-6 py-12 lg:py-20 relative z-10 flex-1">
-        
-        <!-- TOP HERO -->
-        <header class="text-center mb-16 relative">
-            <h1 class="text-5xl md:text-6xl tracking-tight leading-none mb-2">
-                <span class="block text-slate-100 font-extrabold tracking-[0.2em] mb-1">
-                    FLUENCY
-                </span>
-                <span class="block text-white text-[4rem] md:text-[5.5rem] bg-gradient-to-r from-brand-400 to-white bg-clip-text text-transparent pb-2" style="font-family: 'Playfair Display', serif; font-style: italic; font-weight: 600;">
-                    bridge
-                </span>
-            </h1>
-            <p class="text-brand-400/80 font-medium tracking-wide uppercase text-xs md:text-sm mt-4 flex items-center justify-center gap-2">
-                <i data-lucide="sparkles" class="w-4 h-4 text-brand-500"></i>
-                Build precision. Eliminate confusion.
-                <i data-lucide="sparkles" class="w-4 h-4 text-brand-500"></i>
-            </p>
-        </header>
+        <!-- MAIN CONTENT -->
+        <main class="max-w-5xl mx-auto w-full px-4 sm:px-6 py-12 lg:py-20 relative z-10 flex-1">
+            
+            <!-- TOP HERO -->
+            <header class="text-center mb-16 relative">
+                <h1 class="text-5xl md:text-6xl tracking-tight leading-none mb-2">
+                    <span class="block text-slate-100 font-extrabold tracking-[0.2em] mb-1 text-4xl md:text-5xl">
+                        FLUENCY
+                    </span>
+                    <span class="block text-white text-[3.5rem] md:text-[5.5rem] bg-gradient-to-r from-brand-400 to-white bg-clip-text text-transparent pb-2" style="font-family: 'Playfair Display', serif; font-style: italic; font-weight: 600;">
+                        bridge
+                    </span>
+                </h1>
+                <p class="text-brand-400/80 font-medium tracking-wide uppercase text-xs md:text-sm mt-4 flex items-center justify-center gap-2">
+                    <i data-lucide="sparkles" class="w-4 h-4 text-brand-500"></i>
+                    Build precision. Eliminate confusion.
+                    <i data-lucide="sparkles" class="w-4 h-4 text-brand-500"></i>
+                </p>
+            </header>
 
-        <!-- FILTERS AND SEARCH -->
-        <div class="mb-10 flex flex-col md:flex-row gap-4 max-w-2xl mx-auto">
-            <div class="relative flex-1 group">
-                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500 group-focus-within:text-brand-400 transition-colors">
-                    <i data-lucide="search" class="w-5 h-5"></i>
+            <!-- FILTERS AND SEARCH -->
+            <div class="mb-10 flex flex-col md:flex-row gap-4 max-w-2xl mx-auto">
+                <div class="relative flex-1 group">
+                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500 group-focus-within:text-brand-400 transition-colors">
+                        <i data-lucide="search" class="w-5 h-5"></i>
+                    </div>
+                    <input id="search" type="text" placeholder="Search experiences, tools, and tests..."
+                        class="w-full bg-fluency-panel border border-fluency-border text-slate-200 placeholder-slate-500 rounded-xl py-3 pl-11 pr-4 focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all shadow-inner">
                 </div>
-                <input id="search" type="text" placeholder="Search experiences, tools, and tests..."
-                    class="w-full bg-fluency-panel border border-fluency-border text-slate-200 placeholder-slate-500 rounded-xl py-3 pl-11 pr-4 focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all shadow-inner">
-            </div>
-            <div class="relative inline-block w-full md:w-48 group">
-                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500 group-focus-within:text-brand-400 transition-colors">
-                    <i data-lucide="sort-asc" class="w-4 h-4"></i>
-                </div>
-                <select id="sort" class="w-full appearance-none bg-fluency-panel border border-fluency-border text-slate-200 rounded-xl py-3 pl-10 pr-10 focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all cursor-pointer font-medium text-sm">
-                    <option value="default">Default Sort</option>
-                    <option value="az">A → Z</option>
-                    <option value="za">Z → A</option>
-                </select>
-                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-500">
-                    <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                <div class="relative inline-block w-full md:w-48 group">
+                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500 group-focus-within:text-brand-400 transition-colors">
+                        <i data-lucide="sort-asc" class="w-4 h-4"></i>
+                    </div>
+                    <select id="sort" class="w-full appearance-none bg-fluency-panel border border-fluency-border text-slate-200 rounded-xl py-3 pl-10 pr-10 focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all cursor-pointer font-medium text-sm">
+                        <option value="default">Default Sort</option>
+                        <option value="az">A → Z</option>
+                        <option value="za">Z → A</option>
+                    </select>
+                    <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-500">
+                        <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- DYNAMIC CARDS CONTAINER -->
-        <div id="tools" class="space-y-12">
-            <!-- Loading State -->
-            <div class="flex justify-center items-center py-20 text-slate-500">
-                <i data-lucide="loader-2" class="w-8 h-8 animate-spin text-brand-500"></i>
+            <!-- DYNAMIC CARDS CONTAINER -->
+            <div id="tools" class="space-y-12">
+                <!-- Loading State -->
+                <div class="flex justify-center items-center py-20 text-slate-500">
+                    <i data-lucide="loader-2" class="w-8 h-8 animate-spin text-brand-500"></i>
+                </div>
             </div>
-        </div>
-    </main>
+        </main>
+    </div>
 
     <!-- FLOATING CONTACT BUTTON -->
-    <a href="/contactus.html" class="fixed bottom-6 right-6 z-40 w-14 h-14 rounded-full bg-brand-600 hover:bg-brand-500 shadow-[0_0_20px_rgba(37,99,235,0.4)] flex items-center justify-center text-2xl transition-all hover:scale-105 active:scale-95 group">
+    <a href="/contactus.html" class="fixed bottom-6 right-4 md:right-6 z-40 w-12 h-12 md:w-14 md:h-14 rounded-full bg-brand-600 hover:bg-brand-500 shadow-[0_0_20px_rgba(37,99,235,0.4)] flex items-center justify-center text-xl md:text-2xl transition-all hover:scale-105 active:scale-95 group">
         📞
     </a>
 
     <!-- FLOATING RANDOM TOPIC BUTTON -->
-    <button onclick="openRandomizer()" class="fixed bottom-6 left-6 z-50 h-14 px-6 rounded-full bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 shadow-[0_0_25px_rgba(79,70,229,0.5)] flex items-center justify-center gap-3 text-white transition-all hover:scale-105 active:scale-95 group border border-indigo-400/40 font-bold tracking-wide">
-        <i data-lucide="dices" class="w-6 h-6 group-hover:rotate-[360deg] transition-transform duration-700"></i>
+    <button onclick="openRandomizer()" class="fixed bottom-6 left-4 md:left-6 z-50 h-12 px-4 md:h-14 md:px-6 rounded-full bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 shadow-[0_0_25px_rgba(79,70,229,0.5)] flex items-center justify-center gap-2 md:gap-3 text-white transition-all hover:scale-105 active:scale-95 group border border-indigo-400/40 font-bold tracking-wide text-sm md:text-base">
+        <i data-lucide="dices" class="w-5 h-5 md:w-6 md:h-6 group-hover:rotate-[360deg] transition-transform duration-700"></i>
         <span>Random Topic</span>
     </button>
 
@@ -439,9 +441,14 @@
             
             // Setup initial track state if empty
             if (slotTrack.children.length === 0) {
-                slotTrack.innerHTML = '<div class="slot-item text-slate-500 font-medium">Click Spin Again to roll</div>';
+                slotTrack.innerHTML = '<div class="slot-item text-slate-500 font-medium">Loading...</div>';
                 slotTrack.style.transform = 'translateY(0)';
             }
+
+            // Auto-spin immediately when opened
+            setTimeout(() => {
+                if (!isSpinning) spinRandomizer();
+            }, 300);
         }
 
         function closeRandomizer() {
