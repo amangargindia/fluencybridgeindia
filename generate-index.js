@@ -51,7 +51,12 @@ htmlFiles.forEach(filePath => {
     const fileName = parts[parts.length - 1];
     
     const slug = fileName.replace('.html', '');
-    const category = capitalizeFirstLetter(rootFolder);
+    const rootGroup = capitalizeFirstLetter(rootFolder);
+    let category = rootGroup;
+    
+    if (rootFolder.toLowerCase() === 'notes' && parts.length > 2) {
+        category = capitalizeFirstLetter(parts[1]);
+    }
     
     const content = fs.readFileSync(filePath, 'utf-8');
     const title = extractTitle(content);
@@ -60,7 +65,8 @@ htmlFiles.forEach(filePath => {
         title,
         slug,
         folder: folderPath,
-        category
+        category,
+        rootGroup
     });
 });
 

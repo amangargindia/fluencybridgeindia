@@ -93,9 +93,24 @@
     </style>
 </head>
 
-<body class="bg-fluency-base text-slate-300 min-h-screen flex flex-col selection:bg-brand-500 selection:text-white relative">
+<body class="bg-fluency-base text-slate-300 min-h-screen flex flex-col selection:bg-brand-500 selection:text-white relative overflow-x-hidden">
 
-    <div class="relative w-full overflow-hidden flex-1 flex flex-col">
+    <!-- TOP NAVIGATION BAR -->
+    <nav class="sticky top-0 z-50 w-full bg-fluency-base/80 backdrop-blur-md border-b border-fluency-border">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-4 sm:gap-6 overflow-x-auto no-scrollbar">
+                <button onclick="setTab('Notes')" id="tab-Notes" class="tab-btn text-brand-400 font-bold transition-colors whitespace-nowrap">Notes</button>
+                <button onclick="setTab('Tools')" id="tab-Tools" class="tab-btn text-slate-400 hover:text-slate-200 transition-colors whitespace-nowrap">Tools</button>
+                <button onclick="setTab('Mistakes')" id="tab-Mistakes" class="tab-btn text-slate-400 hover:text-slate-200 transition-colors whitespace-nowrap">Mistakes</button>
+            </div>
+            <button onclick="openRandomizer()" class="h-10 px-4 rounded-full bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 shadow-md flex items-center gap-2 text-white transition-all hover:scale-105 active:scale-95 group border border-indigo-400/40 font-bold tracking-wide text-sm shrink-0">
+                <i data-lucide="dices" class="w-4 h-4 group-hover:rotate-[360deg] transition-transform duration-700"></i>
+                <span class="hidden sm:inline">Random Topic</span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="relative w-full flex-1 flex flex-col">
         <!-- Glowing Background Artifacts -->
         <div class="hero-glow absolute top-[15%] left-1/2 -translate-x-1/2 h-[500px] w-full max-w-[800px] bg-brand-600/5 blur-[120px] rounded-[100%] pointer-events-none"></div>
 
@@ -158,12 +173,6 @@
         📞
     </a>
 
-    <!-- FLOATING RANDOM TOPIC BUTTON -->
-    <button onclick="openRandomizer()" class="fixed bottom-6 left-4 md:left-6 z-50 h-12 px-4 md:h-14 md:px-6 rounded-full bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 shadow-[0_0_25px_rgba(79,70,229,0.5)] flex items-center justify-center gap-2 md:gap-3 text-white transition-all hover:scale-105 active:scale-95 group border border-indigo-400/40 font-bold tracking-wide text-sm md:text-base">
-        <i data-lucide="dices" class="w-5 h-5 md:w-6 md:h-6 group-hover:rotate-[360deg] transition-transform duration-700"></i>
-        <span>Random Topic</span>
-    </button>
-
     <!-- RANDOMIZER MODAL OVERLAY -->
     <div id="randomizer-modal" class="fixed inset-0 z-[60] bg-fluency-base/80 backdrop-blur-md hidden flex-col items-center justify-center opacity-0 transition-opacity duration-300">
         <div class="relative w-full max-w-md p-8 bg-gradient-to-br from-fluency-panel to-[#0a101f] border border-brand-500/30 rounded-3xl shadow-[0_0_50px_rgba(37,99,235,0.2)] flex flex-col items-center transform scale-95 transition-transform duration-300" id="randomizer-box">
@@ -216,6 +225,24 @@
         const sortSelect = document.getElementById("sort");
 
         let originalData = [];
+        let currentTab = "Notes";
+
+        function setTab(tab) {
+            currentTab = tab;
+            
+            // Update tab styles
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('text-brand-400', 'font-bold');
+                btn.classList.add('text-slate-400');
+            });
+            const activeBtn = document.getElementById('tab-' + tab);
+            if (activeBtn) {
+                activeBtn.classList.remove('text-slate-400');
+                activeBtn.classList.add('text-brand-400', 'font-bold');
+            }
+            
+            applyFilters();
+        }
 
         // Helper to pick category icons
         function getCategoryIcon(cat) {
@@ -306,7 +333,8 @@
                 const subfolders = {};
                 grouped[category].forEach(item => {
                     const parts = item.folder ? item.folder.split('/') : [];
-                    const subfolderName = parts.length > 1 ? parts.slice(1).join(' / ') : "Main";
+                    const startIndex = item.rootGroup === 'Notes' ? 2 : 1;
+                    const subfolderName = parts.length > startIndex ? parts.slice(startIndex).join(' / ') : "Main";
                     if (!subfolders[subfolderName]) subfolders[subfolderName] = [];
                     subfolders[subfolderName].push(item);
                 });
@@ -369,7 +397,7 @@
         }
 
         function applyFilters() {
-            let filtered = [...originalData];
+            let filtered = originalData.filter(item => item.rootGroup === currentTab);
             const query = searchInput.value.toLowerCase();
             
             if (query) {
@@ -394,7 +422,7 @@
             })
             .then(data => {
                 originalData = data;
-                render(originalData);
+                applyFilters();
             })
             .catch(err => {
                 console.error("Error loading JSON:", err);
@@ -437,7 +465,7 @@
                 randomBox.classList.add('scale-100');
             }, 10);
             
-            testItems = originalData.filter(item => item.category === 'Tests');
+            testItems = originalData.filter(item => item.rootGroup === 'Notes');
             
             // Setup initial track state if empty
             if (slotTrack.children.length === 0) {
