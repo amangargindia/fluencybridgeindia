@@ -1,0 +1,734 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fluency - Each & Every</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:ital,wght@1,600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    colors: {
+                        'brand-bg': '#060B19',
+                        'brand-card': '#111A2C',
+                        'brand-input': '#080D1A',
+                        'brand-accent': '#2563EB',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #060B19;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+        
+        /* Subtle radial gradient background */
+        .bg-glow {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 150vw;
+            height: 150vh;
+            background: radial-gradient(circle at center, rgba(19, 30, 58, 0.4) 0%, transparent 60%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease-in-out; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .nav-btn.active {
+            color: white;
+            border-bottom: 2px solid #2563EB;
+        }
+
+        @media print {
+            body { background: white !important; color: black !important; }
+            .bg-glow, nav, footer, .no-print { display: none !important; }
+            .brand-card { background: none !important; border: none !important; box-shadow: none !important; }
+            * { color: black !important; border-color: #ccc !important; }
+            a { text-decoration: none !important; color: black !important; }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center pb-24 selection:bg-brand-accent selection:text-white">
+
+    <div class="bg-glow no-print"></div>
+
+    <!-- Main Container -->
+    <main class="w-full max-w-2xl mx-auto p-4 md:p-6 mt-4 flex-grow flex flex-col">
+        
+        <!-- Header -->
+        <header class="flex justify-between items-start mb-8 no-print">
+            <div class="flex flex-col">
+                <span class="tracking-[0.3em] text-[10px] text-gray-400 uppercase font-bold">F L U E N C Y</span>
+                <span class="text-white text-4xl italic font-serif leading-none mt-1">bridge</span>
+            </div>
+            <div class="text-right bg-white/5 rounded-xl px-4 py-2 border border-white/5">
+                <div id="timer-display" class="text-lg font-bold text-white font-mono">00:00</div>
+                <div id="efficiency-display" class="text-[10px] text-gray-400 uppercase tracking-wider">Efficiency 0%</div>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="flex gap-6 overflow-x-auto pb-2 mb-6 border-b border-white/10 hide-scrollbar no-print w-full">
+            <button class="nav-btn active pb-2 text-sm font-semibold text-gray-400 hover:text-white transition-colors whitespace-nowrap" data-tab="notes">Notes</button>
+            <button class="nav-btn pb-2 text-sm font-semibold text-gray-400 hover:text-white transition-colors whitespace-nowrap" data-tab="story">Story</button>
+            <button class="nav-btn pb-2 text-sm font-semibold text-gray-400 hover:text-white transition-colors whitespace-nowrap" data-tab="quiz">Quiz Area</button>
+            <button class="nav-btn pb-2 text-sm font-semibold text-gray-400 hover:text-white transition-colors whitespace-nowrap" data-tab="irl">IRL Scenarios</button>
+        </nav>
+
+        <!-- Content Cards -->
+        <div class="brand-card bg-brand-card/80 backdrop-blur-md border-t border-white/5 rounded-3xl p-6 shadow-2xl flex-grow w-full relative">
+            
+            <!-- NOTES SECTION -->
+            <section id="notes" class="tab-content active space-y-6">
+                <div class="flex justify-between items-center border-b border-white/10 pb-4">
+                    <h1 class="text-2xl font-bold text-white">Each & Every (Determiners)</h1>
+                    <div class="flex gap-2 no-print">
+                        <button onclick="window.print()" class="p-2 bg-brand-input rounded-xl border border-white/5 hover:bg-white/10 transition text-gray-300 text-sm">Print</button>
+                        <button onclick="switchTab('quiz')" class="px-4 py-2 bg-brand-accent rounded-xl text-white text-sm font-bold shadow-lg">Start Quiz</button>
+                    </div>
+                </div>
+
+                <div class="text-sm text-gray-400 bg-brand-input p-4 rounded-xl border border-white/5">
+                    <span class="text-white font-semibold block mb-2">Prerequisites to understand first:</span>
+                    <ul class="list-disc pl-4 space-y-1">
+                        <li><a href="https://www.google.com/search?q=Singular+and+Plural+Nouns+English+Grammar" target="_blank" class="text-brand-accent hover:underline">Singular and Plural Nouns</a> (Ek vachan vs Bahu vachan)</li>
+                        <li><a href="https://www.google.com/search?q=Subject+Verb+Agreement+Rules" target="_blank" class="text-brand-accent hover:underline">Subject-Verb Agreement</a> (Singular subject takes singular verb)</li>
+                        <li><a href="https://www.google.com/search?q=Countable+vs+Uncountable+Nouns" target="_blank" class="text-brand-accent hover:underline">Countable vs Uncountable Nouns</a> (Jise gin sakte hain vs nahi gin sakte)</li>
+                    </ul>
+                </div>
+
+                <div class="space-y-4">
+                    <h2 class="text-xl font-bold text-white">1. Core Meaning & Difference</h2>
+                    <p class="text-gray-300 leading-relaxed">Dono ka matlab "har ek" hota hai par context alag hai.</p>
+                    <ul class="space-y-3 mt-2 text-sm text-gray-300">
+                        <li class="bg-white/5 p-3 rounded-lg border border-white/5"><strong class="text-white">EACH:</strong> Jab hum individual identity (alag-alag) par focus karte hain. Use for 2 or more things. <br><em class="text-gray-400">Example: Each hand has five fingers. (Dono haath alag-alag dekhe ja rahe hain).</em></li>
+                        <li class="bg-white/5 p-3 rounded-lg border border-white/5"><strong class="text-white">EVERY:</strong> Jab hum group ko as a whole (ek sath) dekhte hain like 'all'. Use for 3 or more things. <br><em class="text-gray-400">Example: Every student must wear a uniform. (Puri class ki baat ho rahi hai).</em></li>
+                    </ul>
+                </div>
+
+                <div class="space-y-4">
+                    <h2 class="text-xl font-bold text-white">2. Grammar Rules (Mind Map)</h2>
+                    <ul class="space-y-2 text-sm text-gray-300 ml-2 border-l-2 border-brand-accent pl-4">
+                        <li><strong class="text-white">Rule A (Always Singular):</strong> "Each" aur "Every" hamesha singular countable noun aur singular verb lete hain.<br>✅ <span class="text-green-400">Each boy is...</span> | ❌ <span class="text-red-400">Each boys are...</span></li>
+                        <li><strong class="text-white">Rule B (Each of):</strong> "Each of the" ke baad noun Plural aata hai lekin verb Singular hi rehti hai.<br>✅ <span class="text-green-400">Each of the boys is...</span> | ❌ <span class="text-red-400">Each of the boy is...</span></li>
+                        <li><strong class="text-white">Rule C (No Every of):</strong> "Every of" English grammar mein completely wrong hai. Iski jagah "Every one of" use karein.</li>
+                        <li><strong class="text-white">Rule D (Adverbs with Every):</strong> Almost practically nearly jaise words sirf "Every" ke sath aate hain "Each" ke sath nahi.<br>✅ <span class="text-green-400">Almost every car...</span> | ❌ <span class="text-red-400">Almost each car...</span></li>
+                        <li><strong class="text-white">Rule E (Abstract Nouns):</strong> "Every" abstract nouns (feelings reasons) ke sath lag sakta hai. "Each" nahi.<br>✅ <span class="text-green-400">He had every reason to be angry.</span></li>
+                    </ul>
+                </div>
+
+                <div class="space-y-4">
+                    <h2 class="text-xl font-bold text-red-400">3. Top Mistakes People Make</h2>
+                    <div class="grid gap-3">
+                        <div class="bg-brand-input p-3 rounded-xl border border-white/5 text-sm">
+                            <div class="text-red-400 font-bold mb-1">Mistake 1: Plural Verb Lagana</div>
+                            <div class="text-gray-400">"Each of my friends are going" bolna galat hai. "Each" pure sentence ko singular bana deta hai. <br><span class="text-white">Right: Each of my friends IS going.</span></div>
+                        </div>
+                        <div class="bg-brand-input p-3 rounded-xl border border-white/5 text-sm">
+                            <div class="text-red-400 font-bold mb-1">Mistake 2: Only 2 things ke liye Every lagana</div>
+                            <div class="text-gray-400">"He held a bag in every hand" galat hai kyunki insaan ke 2 hi haath hote hain aur Every minimum 3 ke liye lagta hai. <br><span class="text-white">Right: He held a bag in each hand.</span></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- STORY SECTION -->
+            <section id="story" class="tab-content space-y-6">
+                <div class="flex justify-between items-center border-b border-white/10 pb-4">
+                    <h1 class="text-2xl font-bold text-white">Contextual Story</h1>
+                </div>
+                <div class="prose prose-invert text-gray-300 leading-relaxed space-y-4">
+                    <p>It was Diwali season and <strong class="text-brand-accent">every</strong> house in our colony was decorated with lights. My mother gave us a list of tasks. She told us that <strong class="text-brand-accent">each</strong> person had to finish their chores before noon. <strong class="text-brand-accent">Each of</strong> my siblings took a different room to clean.</p>
+                    <p>I went to the market. <strong class="text-brand-accent">Almost every</strong> shop was crowded. I bought five boxes of sweets. I made sure that <strong class="text-brand-accent">each</strong> box contained fresh laddoos. The shopkeeper smiled and said he checks <strong class="text-brand-accent">each</strong> sweet carefully.</p>
+                    <p>By evening <strong class="text-brand-accent">every</strong> member of the family was exhausted. But <strong class="text-brand-accent">each</strong> face had a bright smile. We lit diyas in <strong class="text-brand-accent">every</strong> corner of the house holding a diya in <strong class="text-brand-accent">each</strong> hand carefully.</p>
+                </div>
+                <div class="bg-brand-input p-4 rounded-xl border border-white/5 text-sm text-gray-400 mt-6">
+                    <strong class="text-white">Analysis:</strong> Notice how "every house" talks about the whole colony as a group. But "each person" and "each box" focuses on the specific individual item. "Each hand" is used because a person has exactly two hands.
+                </div>
+            </section>
+
+            <!-- QUIZ SECTION -->
+            <section id="quiz" class="tab-content space-y-6">
+                
+                <!-- Start Screen -->
+                <div id="quiz-start" class="text-center py-10">
+                    <h1 class="text-3xl font-bold text-white mb-2">Knowledge Assessment</h1>
+                    <p class="text-gray-400 mb-8">10 randomly shuffled questions to test your grasp on the rules.</p>
+                    <button onclick="startQuiz()" class="px-8 py-4 bg-brand-accent rounded-xl text-white font-bold text-lg hover:bg-blue-600 transition shadow-lg w-full md:w-auto">Start Assessment</button>
+                    <div class="mt-8 flex justify-center">
+                        <button onclick="showAnki()" class="text-sm text-gray-400 hover:text-white underline">Download Anki Flashcards</button>
+                    </div>
+                </div>
+
+                <!-- Active Quiz Screen -->
+                <div id="quiz-active" class="hidden flex-col h-full">
+                    <div class="flex justify-between items-center mb-6">
+                        <span id="quiz-progress" class="text-sm font-bold text-gray-400">Question 1/10</span>
+                        <span id="quiz-score" class="text-sm font-bold text-brand-accent">Score: 0</span>
+                    </div>
+                    
+                    <!-- Progress bar -->
+                    <div class="w-full bg-white/10 h-2 rounded-full mb-8 overflow-hidden">
+                        <div id="quiz-bar" class="bg-brand-accent h-full w-[10%] rounded-full transition-all duration-300"></div>
+                    </div>
+
+                    <div id="question-text" class="text-xl font-bold text-white mb-8">Loading question...</div>
+                    
+                    <div id="options-container" class="space-y-3 mb-8">
+                        <!-- Options injected via JS -->
+                    </div>
+
+                    <div id="feedback-container" class="hidden p-4 rounded-xl text-sm font-medium mb-6">
+                        <div id="feedback-title" class="font-bold mb-1"></div>
+                        <div id="feedback-desc" class="opacity-90"></div>
+                    </div>
+
+                    <div class="mt-auto flex justify-end">
+                        <button id="next-btn" onclick="nextQuestion()" class="hidden px-6 py-3 bg-brand-accent rounded-xl text-white font-bold hover:bg-blue-600 transition">Next Question</button>
+                    </div>
+                </div>
+
+                <!-- Result Screen -->
+                <div id="quiz-result" class="hidden text-center py-10">
+                    <h1 class="text-3xl font-bold text-white mb-2">Assessment Complete</h1>
+                    <p class="text-gray-400 mb-6">Your score for this round:</p>
+                    <div id="final-score" class="text-6xl font-bold text-brand-accent mb-8">8/10</div>
+                    <button onclick="startQuiz()" class="px-8 py-4 bg-brand-accent rounded-xl text-white font-bold text-lg hover:bg-blue-600 transition shadow-lg w-full md:w-auto mb-4">Start Another Round</button>
+                    <p class="text-sm text-gray-400">Remember there are 100 questions baked in. Keep playing to practice new scenarios!</p>
+                </div>
+            </section>
+
+            <!-- IRL SCENARIOS SECTION -->
+            <section id="irl" class="tab-content space-y-6">
+                <div class="flex justify-between items-center border-b border-white/10 pb-4">
+                    <h1 class="text-2xl font-bold text-white">Real Life Usage</h1>
+                    <span class="text-sm text-gray-400">Indian Context</span>
+                </div>
+                
+                <div id="irl-container" class="space-y-4">
+                    <!-- Cards injected via JS -->
+                </div>
+
+                <div class="flex justify-center pt-4 border-t border-white/10">
+                    <button onclick="loadNextIrl()" class="px-6 py-3 bg-brand-input border border-white/5 rounded-xl text-white font-bold hover:bg-white/10 transition">Shuffle & Show Next 5</button>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="fixed bottom-0 w-full p-4 flex justify-between items-center text-gray-500 bg-[#060B19]/90 backdrop-blur-md border-t border-white/5 z-50 no-print px-8">
+        <button onclick="window.location.reload()" class="hover:text-white transition flex items-center gap-2 text-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+            Home
+        </button>
+        <button onclick="switchTab('notes')" class="hover:text-white transition flex items-center gap-2 text-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            Back to Notes
+        </button>
+    </footer>
+
+    <!-- Anki Modal (Hidden by default) -->
+    <div id="anki-modal-overlay" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
+        <div class="bg-brand-card w-full max-w-3xl rounded-3xl border border-white/10 p-6 flex flex-col max-h-[80vh]">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-white">Anki Flashcard Data</h2>
+                <button onclick="closeAnki()" class="text-gray-400 hover:text-white">✕</button>
+            </div>
+            <p class="text-sm text-gray-400 mb-4">Copy the text below and save as a .csv file to import into Anki. Formatted strictly as Question,Answer.</p>
+            <div class="bg-brand-input p-4 rounded-xl overflow-auto border border-white/5 flex-grow mb-4">
+                <pre><code id="anki-codeblock" class="text-sm font-mono text-gray-300"></code></pre>
+            </div>
+            <div class="flex justify-end gap-3">
+                <button onclick="closeAnki()" class="px-4 py-2 bg-brand-input rounded-xl text-white font-bold hover:bg-white/10">Close</button>
+                <button onclick="copyAnki()" class="px-4 py-2 bg-brand-accent rounded-xl text-white font-bold hover:bg-blue-600">Copy to Clipboard</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Logic -->
+    <script>
+        // --- DATA STORE ---
+
+        // 100 Unique Questions formatted as tight strings to optimize code footprint
+        // Format: "QuestionText|CorrectAnswerText|WrongOption|ExplanationInHinglish"
+        // NO COMMAS used in Q or A to perfectly satisfy the Anki CSV rule.
+        const rawQuizData = [
+            "Each boy is present or Each boy are present?|Each boy is present|Each boy are present|Each hamesha singular verb leta hai",
+            "I have a pen in every hand. Correct it.|I have a pen in each hand|I have a pen in all hand|Insaan ke sirf 2 haath hote hain aur Every minimum 3 ke liye lagta hai",
+            "Every of the students passed. Correct it.|Each of the students passed|All of the students passed|Every of English mein galat hota hai Each of use karein",
+            "Almost each car is red. Correct it.|Almost every car is red|Almost all car is red|Almost nearly practically sirf Every ke sath aate hain",
+            "He has every reason to be angry. Right or Wrong?|Right|Wrong|Every abstract nouns (reason) ke sath lag sakta hai",
+            "Each of the boxes are empty. Correct it.|Each of the boxes is empty|Each of the box is empty|Each of ke baad noun plural (boxes) par verb singular (is) aati hai",
+            "I visit my grandma each day. Or every day?|every day|each day|Every day routine aur group of days dikhata hai each day weird lagta hai",
+            "Each student must bring their book. Find error.|Each student must bring his or her book|Every student must bring their book|Each singular hai isliye pronoun bhi singular his/her hona chahiye",
+            "Nearly each person agreed. Correct it.|Nearly every person agreed|Nearly all person agreed|Nearly adverb hai jo strictly Every ko modify karta hai Each ko nahi",
+            "They each has a car. Correct it.|They each have a car|They each is a car|Jab Each plural subject (They) ke baad aaye toh verb plural hoti hai (Exception rule)",
+            "Every players played well. Find error.|Every player played well|All players played well|Every ke theek baad noun hamesha singular aata hai",
+            "Each side of the square is equal. Right or Wrong?|Right|Wrong|Square ki 4 alag alag sides focus ho rahi hain isliye Each sahi hai",
+            "Practically each boy ran. Correct it.|Practically every boy ran|Practically all boy ran|Practically ke sath Every aata hai",
+            "Each of the two boys are guilty. Correct it.|Each of the two boys is guilty|Both of the two boys is guilty|Each of lagne se subject singular ho gaya isliye is aayega",
+            "She wore rings on every finger. Right or Wrong?|Right|Wrong|Finger 10 hoti hain isliye every sahi hai halanki each bhi chalega",
+            "I liked every of the movies. Correct it.|I liked every one of the movies|I liked each of the movie|Every of galat phrase hai Every one of ya Each of lagayein",
+            "Every child need love. Find error.|Every child needs love|All child needs love|Every child singular subject hai toh verb needs aayegi",
+            "He knows each detail of the plan. Right or wrong?|Right|Wrong|Each detail individual parts par focus kar raha hai",
+            "Each of my parent is strict. Find error.|Each of my parents is strict|Every of my parents is strict|Each of ke baad hamesha plural noun (parents) aata hai",
+            "Almost every water is gone. Find error.|Almost all the water is gone|Almost each water is gone|Every countable nouns ke sath lagta hai water uncountable hai",
+            "She read each book in the library. Meaning?|She read them one by one|She read them all together|Each individual action par focus karta hai",
+            "We go there every three weeks. Right or wrong?|Right|Wrong|Every plural time periods (every 3 weeks) ke sath aa sakta hai to show frequency",
+            "Each of the dogs bark loudly. Find error.|Each of the dogs barks loudly|Every of the dogs barks loudly|Each singular hai isliye verb me s/es lagega (barks)",
+            "I have read every books. Find error.|I have read every book|I have read each books|Every ke turant baad aane wala noun hamesha singular hota hai",
+            "Each one of you are responsible. Correct it.|Each one of you is responsible|Every one of you are responsible|Each one singular subject banata hai isliye is aayega",
+            "It rained every day this week. Right or wrong?|Right|Wrong|Every day yahan series of days ko group me bata raha hai",
+            "Every of us knows the truth. Correct it.|Each of us knows the truth|All of us knows the truth|Every of ka use grammar me strictly mana hai",
+            "She gave a gift to each children. Find error.|She gave a gift to each child|She gave a gift to every children|Each ke sath hamesha singular noun (child) aayega",
+            "Without each exception he failed. Correct it.|Without every exception he failed|Without any exception he failed|Idiom Every exception hota hai Each nahi",
+            "Almost each house was painted. Correct it.|Almost every house was painted|Almost all house was painted|Almost word Every ko demand karta hai",
+            "The teacher gave a pen to each boy. Right or wrong?|Right|Wrong|Teacher ne alag alag har ladke ko pen diya yahi Each ka main kaam hai",
+            "Every student have a laptop. Correct it.|Every student has a laptop|Each student have a laptop|Every student subject hai isliye verb singular has aayegi",
+            "Each of the computers are broken. Correct it.|Each of the computers is broken|Every of the computers is broken|Each ki wajah se sentence singular ban gaya hai",
+            "He comes here every Sunday. Right or wrong?|Right|Wrong|Habit batane ke liye Every Sunday bilkul sahi hai",
+            "I check my phone practically each hour. Correct it.|I check my phone practically every hour|I check my phone practically all hour|Practically word sirf Every ke sath combine hota hai",
+            "Each member of the team play well. Find error.|Each member of the team plays well|Every member of the team play well|Each member singular hai toh verb plays hogi",
+            "There is a tree on each side of the road. Right or Wrong?|Right|Wrong|Road ki exactly 2 side hoti hain aur 2 ke liye Each lagta hai",
+            "Every of the flowers bloomed. Correct it.|Each of the flowers bloomed|Every flower bloomed|Every of is incorrect Each of is correct",
+            "He answered each question carefully. Right or Wrong?|Right|Wrong|Ek ek karke alag alag jawab diya isliye Each best hai",
+            "Nearly each seat was taken. Correct it.|Nearly every seat was taken|Nearly all seat was taken|Nearly adverb hai jo Each ke sath nahi lagta",
+            "Each men must do his duty. Find error.|Each man must do his duty|Every men must do his duty|Each ke theek baad noun strictly singular (man) hona chahiye",
+            "I have every respect for him. Right or Wrong?|Right|Wrong|Respect abstract noun hai aur Every abstract noun ke sath lag sakta hai",
+            "Each of the story is good. Find error.|Each of the stories is good|Every of the story is good|Each of the ke baad noun ka plural hona zaruri hai (stories)",
+            "Every student in the class are sitting. Correct it.|Every student in the class is sitting|Each student in the class are sitting|Every hamesha singular verb leta hai",
+            "Each has their own problems. Correct it.|Each has his own problems|Every has their own problems|Each singular pronoun (his/her) mangta hai not their",
+            "Almost every bird can fly. Right or Wrong?|Right|Wrong|Almost word Every ke sath perfectly fit hota hai",
+            "Each of the wheels are flat. Correct it.|Each of the wheels is flat|Every of the wheels is flat|Each of ki wajah se is aayega",
+            "She drank every milk. Find error.|She drank all the milk|She drank each milk|Milk uncountable hai Every sirf countable items ke liye lagta hai",
+            "Each worker get a bonus. Find error.|Each worker gets a bonus|Every worker get a bonus|Worker singular subject hai toh verb gets banegi",
+            "I know every one of them. Right or Wrong?|Right|Wrong|Every one of bilkul sahi phrase hai (Every of galat hota hai)",
+            "He visits every two months. Right or Wrong?|Right|Wrong|Plural time interval (two months) se pehle Every frequency batane ke liye aata hai",
+            "Practically each shop was closed. Correct it.|Practically every shop was closed|Practically all shop was closed|Practically ke sath Every compulsory hai",
+            "Each of the girl sang a song. Find error.|Each of the girls sang a song|Every of the girl sang a song|Each of ke baad noun plural hona chahiye (girls)",
+            "Every boys in the team is strong. Find error.|Every boy in the team is strong|Each boys in the team is strong|Every ke just baad noun singular hona chahiye",
+            "We each is ready. Correct it.|We each are ready|We every is ready|Exception We (plural pronoun) ke baad Each aaye toh verb plural are aati hai",
+            "Each of the apples are sweet. Correct it.|Each of the apples is sweet|Every of the apples is sweet|Each of rule ke mutabik verb singular (is) hogi",
+            "I enjoyed every minute of it. Right or Wrong?|Right|Wrong|Minute countable hai aur abstract time unit ki tarah used hai every perfect hai",
+            "He gave each of them a ticket. Right or Wrong?|Right|Wrong|Each of them ek sahi construction hai kyunki pronoun plural hai",
+            "Almost each person smiled. Correct it.|Almost every person smiled|Almost all person smiled|Almost + Each galat combination hai",
+            "Every student have failed. Find error.|Every student has failed|Each student have failed|Every + Noun singular subject banate hain isliye has lagega",
+            "There is a guard at each door. Right or Wrong?|Right|Wrong|Agar do door hain ya zada sabko individual dekha ja raha hai Each sahi hai",
+            "Every of the players is fit. Correct it.|Each of the players is fit|Every player is fit|Every of phrase grammar me exist nahi karta",
+            "Each boy and each girl are ready. Correct it.|Each boy and each girl is ready|Every boy and every girl are ready|Each kitni bhi baar repeat ho verb always singular hoti hai",
+            "Nearly each table is booked. Correct it.|Nearly every table is booked|Nearly all table is booked|Nearly word Each ko support nahi karta",
+            "Each of the building is tall. Find error.|Each of the buildings is tall|Every of the building is tall|Each of the ke sath noun buildings plural hona chahiye",
+            "I brush my teeth every morning. Right or Wrong?|Right|Wrong|Routine action batane ke liye every morning standard English hai",
+            "Each players was tired. Find error.|Each player was tired|Every players was tired|Each ke just baad noun singular player hona zaruri hai",
+            "We go on holiday every year. Right or Wrong?|Right|Wrong|Har saal ki activity ko denote karne ke liye every sahi hai",
+            "Almost each flight was delayed. Correct it.|Almost every flight was delayed|Almost all flight was delayed|Almost modifier strictly Every ke liye bana hai",
+            "Each of the women are strong. Correct it.|Each of the women is strong|Every of the women is strong|Each of sentence ko singular define karta hai isliye is aayega",
+            "Every one of the boy passed. Find error.|Every one of the boys passed|Each one of the boy passed|Every one of ke baad group (plural noun) hona zaruri hai",
+            "She knows each word of the song. Right or Wrong?|Right|Wrong|Ek ek word par specially focus kiya gaya hai isliye each valid hai",
+            "Practically each day was hot. Correct it.|Practically every day was hot|Practically all day was hot|Practically word aate hi Every lagana rule hai",
+            "Each of the cats are sleeping. Correct it.|Each of the cats is sleeping|Every of the cats is sleeping|Each se subject singularity show hoti hai isliye is",
+            "I ate every rice on the plate. Find error.|I ate all the rice on the plate|I ate each rice on the plate|Rice uncountable hai Every/Each nahi lag sakta",
+            "Each man and woman have a vote. Correct it.|Each man and woman has a vote|Every man and woman have a vote|Each lagte hi pura sentence singular treat hoga isliye has",
+            "He has every chance of winning. Right or Wrong?|Right|Wrong|Chance abstract noun hai is context me every lagana ek standard phrase hai",
+            "Nearly each answer is wrong. Correct it.|Nearly every answer is wrong|Nearly all answer is wrong|Nearly ke sath Each ka connection invalid hai",
+            "Each of the books are mine. Correct it.|Each of the books is mine|Every of the books is mine|Grammar ka sabse common rule Each of + is",
+            "Every bird build a nest. Find error.|Every bird builds a nest|Each bird build a nest|Every bird singular subject hai toh verb me s/es lagega",
+            "She gave a candy to each childs. Find error.|She gave a candy to each child|She gave a candy to every childs|Each ke turant baad plural noun allowed nahi hai",
+            "I play tennis every Tuesday. Right or Wrong?|Right|Wrong|Habitual action on a specific day ke liye every Tuesday correct hai",
+            "Almost each room is clean. Correct it.|Almost every room is clean|Almost all room is clean|Almost hamesha Every ko precede karta hai",
+            "Each of the computers have a mouse. Correct it.|Each of the computers has a mouse|Every of the computers has a mouse|Each of ki presence verb ko has kar deti hai",
+            "He wore a watch on every wrist. Correct it.|He wore a watch on each wrist|He wore a watch on all wrist|Insaan ki 2 wrists hoti hain aur 2 ke liye solely Each lagta hai",
+            "Every of the songs is sad. Correct it.|Each of the songs is sad|All of the songs is sad|Every of naam ka koi structure English me nahi hai",
+            "Each children needs attention. Find error.|Each child needs attention|Every children needs attention|Each ke turant baad child singular aayega",
+            "Practically each seat is empty. Correct it.|Practically every seat is empty|Practically all seat is empty|Practically dekhte hi Every lagana hota hai",
+            "Each of the trees are green. Correct it.|Each of the trees is green|Every of the trees is green|Each of ke baad singular verb is compulsory hai",
+            "Every piece of advice were helpful. Correct it.|Every piece of advice was helpful|Each piece of advice were helpful|Every singular hai aur piece countable hai isliye was aayega",
+            "She has read each of the book. Find error.|She has read each of the books|She has read every of the book|Each of ke baad book nahi books (plural) aana chahiye",
+            "I run every three miles. Right or Wrong?|Right|Wrong|Every plural unit measure (three miles) ke sath gap batane ke liye use ho sakta hai",
+            "Almost each player scored. Correct it.|Almost every player scored|Almost all player scored|Almost ke sath hamesha Every aata hai",
+            "Each of the boys do their homework. Correct it.|Each of the boys does his homework|Every of the boys do their homework|Each is singular verb does and singular pronoun his aayega",
+            "Every candidate have to sign. Find error.|Every candidate has to sign|Each candidate have to sign|Every candidate third person singular hai isliye has aayega",
+            "There is a window at each end of the room. Right or Wrong?|Right|Wrong|Room ke specifically 2 end hote hain isliye Each perfectly fit hai",
+            "Nearly each star is bright. Correct it.|Nearly every star is bright|Nearly all star is bright|Nearly aur Each grammar me mix nahi hote Every lagayein",
+            "Each of the paintings are sold. Correct it.|Each of the paintings is sold|Every of the paintings is sold|Each of strictly singular verb is ki demand karta hai",
+            "Every student must bring their own lunch. Right or Wrong in formal grammar?|Every student must bring his or her own lunch|Right|Formal grammar me Every singular pronoun mangta hai (his/her) informally their chalta hai",
+            "Each teacher and student are present. Correct it.|Each teacher and student is present|Every teacher and student are present|Each sentence me kitni baar bhi ho wo pure sentence ko singular rakhta hai"
+        ];
+
+        // Parse quiz data dynamically
+        const quizPool = rawQuizData.map(item => {
+            const parts = item.split('|');
+            // Randomize options
+            const isFirstCorrect = Math.random() > 0.5;
+            return {
+                question: parts[0],
+                options: isFirstCorrect ? [parts[1], parts[2]] : [parts[2], parts[1]],
+                correctIndex: isFirstCorrect ? 0 : 1,
+                correctText: parts[1],
+                explanation: parts[3]
+            };
+        });
+
+        // 50 IRL Scenarios formatted as tight strings
+        // Format: "Context|CorrectEnglishSentence|Explanation"
+        const rawIrlData = [
+            "Auto Wale Bhaiya Se|Each auto driver is charging double today|Alag alag auto walo se baat karke individual observation hai",
+            "Sabzi Mandi Mein|Every tomato in this basket is rotten|Puri basket ke tamataron ki ek sath as a group baat ho rahi hai",
+            "Diwali Safai|I cleaned each corner of my room carefully|Har ek kone par specific attention di gayi hai",
+            "School Assembly|Every student must stand straight|Puri school ki mass instruction hai as a whole group",
+            "Electricity Bill|The bill increases each month|Har agle mahine ko ek individual occurrence ki tarah dekha gaya",
+            "Office Meeting|Each of the employees was given a task|Group me se har ek individual ko alag se define kiya",
+            "Traffic Signal|Almost every car is honking|Almost word lagte hi Every lagana zaruri ho jata hai",
+            "Online Delivery|Each package has a tracking number|Ek ek packet ka apna individual alag number hota hai",
+            "Marriage Food|I tasted each dish at the wedding|Har dish ko alag alag ja kar taste kiya",
+            "Exam Result|Every parent wants their child to top|Duniya ke sabhi parents ka general group mindset",
+            "Cricket Match|Each team has eleven players|Dono (2) teams ki individually baat ho rahi hai",
+            "Bargaining|Every shopkeeper says the same thing|Market ke saare dukaandaron ka common behaviour as a group",
+            "Metro Travel|Practically every seat was taken|Practically adverb hamesha Every ki maang karta hai",
+            "Gym Routine|He goes to the gym every day|Habit aur routine series of days dikhane ke liye",
+            "Buying Shoes|I tried a shoe on each foot|Insan ke sirf do pair hote hain Each is mandatory for 2",
+            "WhatsApp Forwards|Every family group has morning messages|Saare groups ki common universal sachai",
+            "Taking Medicines|Take one pill every six hours|Plural time interval (six hours) se pehle frequency batane ke liye",
+            "Teacher Checking Copies|She checked each copy thoroughly|Har copy par alag se time lagaya individual focus",
+            "Rainy Season|It rained practically every day in July|Practically word plus group of days makes every perfect",
+            "Bus Ticket|Each passenger must buy a ticket|Har ek passenger ki individual responsibility",
+            "Movie Theater|Every seat in the hall is booked|Pure cinema hall ka status as one complete unit",
+            "Washing Clothes|I check each pocket before washing|Har pocket ko individually check karna padta hai",
+            "Customer Care|Each call is recorded for quality|Har individual call ek alag entity hai",
+            "Local Train|Every compartment is packed|Puri train ke dibbon ka collective halat",
+            "Bank Line|Each person in the line looked tired|Line me khade har akele insan ki description",
+            "Restaurant Menu|Each item on this menu is expensive|Menu ki har ek dish individually mehangi hai",
+            "Zomato Order|Every order takes 30 minutes|Restaurant ka general rule for all orders",
+            "Neighbours|Each of our neighbours has a car|Padosiyon ke group me se har akele insan ki baat",
+            "Elections|Every citizen should vote|Desh ke saare nagrikon ka collective duty",
+            "Traffic Police|He stopped each bike without a helmet|Har rule todne wali bike par individual action",
+            "Salary Day|Each employee was happy today|Har akele employee ki personal feeling",
+            "Street Food|Every panipuri vendor uses mineral water now|Puri market ka ek general observation",
+            "Parking Lot|Almost every spot is occupied|Almost plus group observation requires Every",
+            "Hotel Room|Each room has a sea view|Har akele kamre ki specific feature",
+            "Mobile Battery|The battery drops every two minutes|Time frequency batane ke liye plural ke aage every",
+            "Job Interview|Each candidate was asked five questions|Har akele candidate ka alag alag interview",
+            "College Fest|Every student participated in the dance|Pure college crowd ki mass involvement",
+            "Buying Gold|Each gram of gold is costly|Har ek gram unit ki individual valuation",
+            "Vegetable Rates|Almost every vegetable is costly in summer|Almost word enforces the use of Every",
+            "Flight Journey|Each passenger was given a blanket|Har seat par baithe insan ko alag se chadar mili",
+            "Wifi Password|We change the password every month|Routine cyclic action dikhane ke liye",
+            "Earphones|There is a scratch on each earbud|Earbuds exactly 2 hote hain aur 2 ke liye Each lagta hai",
+            "Reading News|I read every newspaper article|Newspaper ke saare articles as a whole complete task",
+            "Waking Up|My alarm rings every five minutes|Repeated intervals dikhane ke liye every ka rule",
+            "House Hunting|Each flat we saw was too small|Jitne flat dekhe un sabki alag alag individual state",
+            "Car Servicing|Check each tyre carefully|Gadi ke 4 tyre individual check demand karte hain",
+            "Making Chai|Each cup of tea needs one spoon of sugar|Har individual cup ka exact measurement",
+            "Board Exams|Every question is compulsory|Pure paper ki universal group instruction",
+            "Passport Checking|The officer checked each passport|Har document physically alag alag check hua",
+            "Playing Cards|Each player gets five cards|Game me har individual person ka hissa"
+        ];
+
+        // Build IRL Data Objects
+        const irlData = rawIrlData.map(item => {
+            const parts = item.split('|');
+            return { context: parts[0], sentence: parts[1], explanation: parts[2] };
+        });
+
+
+        // --- APPLICATION LOGIC ---
+
+        // Timer Logic
+        let secondsSpent = 0;
+        setInterval(() => {
+            secondsSpent++;
+            const m = Math.floor(secondsSpent / 60).toString().padStart(2, '0');
+            const s = (secondsSpent % 60).toString().padStart(2, '0');
+            document.getElementById('timer-display').innerText = `${m}:${s}`;
+        }, 1000);
+
+        // Efficiency tracking
+        let totalQuestionsAttempted = 0;
+        let totalCorrectAllTime = 0;
+
+        function updateEfficiency(isCorrect) {
+            totalQuestionsAttempted++;
+            if (isCorrect) totalCorrectAllTime++;
+            const eff = Math.round((totalCorrectAllTime / totalQuestionsAttempted) * 100);
+            document.getElementById('efficiency-display').innerText = `Efficiency ${eff}%`;
+        }
+
+        // Tab Switching
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active', 'text-white', 'border-b-2', 'border-brand-accent'));
+            
+            document.getElementById(tabId).classList.add('active');
+            
+            const btn = document.querySelector(`.nav-btn[data-tab="${tabId}"]`);
+            if(btn) {
+                btn.classList.add('active', 'text-white', 'border-b-2', 'border-brand-accent');
+            }
+        }
+
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => switchTab(e.target.dataset.tab));
+        });
+
+        // Quiz State
+        let currentQuizQueue = [];
+        let currentQIndex = 0;
+        let sessionScore = 0;
+        let answeredCurrent = false;
+
+        function shuffle(array) {
+            let currentIndex = array.length,  randomIndex;
+            while (currentIndex > 0) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+                [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+            }
+            return array;
+        }
+
+        function startQuiz() {
+            // Pick 10 random questions
+            const shuffledPool = shuffle([...quizPool]);
+            currentQuizQueue = shuffledPool.slice(0, 10);
+            currentQIndex = 0;
+            sessionScore = 0;
+            
+            document.getElementById('quiz-start').classList.add('hidden');
+            document.getElementById('quiz-result').classList.add('hidden');
+            document.getElementById('quiz-active').classList.remove('hidden');
+            document.getElementById('quiz-active').classList.add('flex');
+            
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            answeredCurrent = false;
+            const q = currentQuizQueue[currentQIndex];
+            
+            document.getElementById('quiz-progress').innerText = `Question ${currentQIndex + 1}/10`;
+            document.getElementById('quiz-score').innerText = `Score: ${sessionScore}`;
+            document.getElementById('quiz-bar').style.width = `${((currentQIndex) / 10) * 100}%`;
+            
+            document.getElementById('question-text').innerText = q.question;
+            
+            const optionsHtml = q.options.map((opt, idx) => `
+                <button onclick="selectOption(${idx})" id="opt-${idx}" class="w-full text-left p-4 bg-brand-input border border-white/5 rounded-xl text-gray-300 hover:bg-white/10 hover:border-white/20 transition group">
+                    <span class="inline-block w-6 h-6 rounded-full border border-gray-600 text-center text-sm mr-3 leading-5 group-hover:border-white">${String.fromCharCode(65 + idx)}</span>
+                    ${opt}
+                </button>
+            `).join('');
+            
+            document.getElementById('options-container').innerHTML = optionsHtml;
+            document.getElementById('feedback-container').classList.add('hidden');
+            document.getElementById('next-btn').classList.add('hidden');
+        }
+
+        function selectOption(idx) {
+            if (answeredCurrent) return;
+            answeredCurrent = true;
+            
+            const q = currentQuizQueue[currentQIndex];
+            const isCorrect = (idx === q.correctIndex);
+            
+            updateEfficiency(isCorrect);
+            if (isCorrect) sessionScore++;
+
+            // Update UI
+            document.getElementById('quiz-score').innerText = `Score: ${sessionScore}`;
+            document.getElementById('quiz-bar').style.width = `${((currentQIndex + 1) / 10) * 100}%`;
+            
+            const btnSelected = document.getElementById(`opt-${idx}`);
+            const btnCorrect = document.getElementById(`opt-${q.correctIndex}`);
+
+            // Reset all styling
+            document.querySelectorAll('#options-container button').forEach(b => {
+                b.className = "w-full text-left p-4 bg-brand-input border border-white/5 rounded-xl text-gray-500 opacity-50 cursor-not-allowed transition group";
+            });
+
+            // Highlight correctly
+            btnCorrect.classList.remove('bg-brand-input', 'border-white/5', 'text-gray-500', 'opacity-50');
+            btnCorrect.classList.add('bg-green-900/40', 'border-green-500/50', 'text-green-300', 'opacity-100');
+
+            if (!isCorrect) {
+                btnSelected.classList.remove('bg-brand-input', 'border-white/5', 'text-gray-500', 'opacity-50');
+                btnSelected.classList.add('bg-red-900/40', 'border-red-500/50', 'text-red-300', 'opacity-100');
+            }
+
+            // Show feedback
+            const fbContainer = document.getElementById('feedback-container');
+            const fbTitle = document.getElementById('feedback-title');
+            
+            fbContainer.classList.remove('hidden', 'bg-green-900/30', 'text-green-300', 'bg-red-900/30', 'text-red-300');
+            if(isCorrect) {
+                fbContainer.classList.add('bg-green-900/30', 'text-green-300');
+                fbTitle.innerText = "Correct!";
+            } else {
+                fbContainer.classList.add('bg-red-900/30', 'text-red-300');
+                fbTitle.innerText = "Incorrect!";
+            }
+            document.getElementById('feedback-desc').innerText = q.explanation;
+            
+            document.getElementById('next-btn').classList.remove('hidden');
+            if(currentQIndex === 9) {
+                document.getElementById('next-btn').innerText = "Finish Assessment";
+            } else {
+                document.getElementById('next-btn').innerText = "Next Question";
+            }
+        }
+
+        function nextQuestion() {
+            currentQIndex++;
+            if (currentQIndex >= 10) {
+                endQuiz();
+            } else {
+                loadQuestion();
+            }
+        }
+
+        function endQuiz() {
+            document.getElementById('quiz-active').classList.add('hidden');
+            document.getElementById('quiz-active').classList.remove('flex');
+            document.getElementById('quiz-result').classList.remove('hidden');
+            document.getElementById('final-score').innerText = `${sessionScore}/10`;
+        }
+
+        // IRL Scenarios Logic
+        let currentIrlPage = 0;
+        
+        function loadNextIrl() {
+            const container = document.getElementById('irl-container');
+            container.innerHTML = '';
+            
+            // Get next 5 (shuffle first if at start to ensure randomness requested)
+            if (currentIrlPage === 0) {
+                shuffle(irlData);
+            }
+            
+            const startIdx = currentIrlPage * 5;
+            let endIdx = startIdx + 5;
+            
+            if (endIdx > irlData.length) {
+                // reset to 0 and reshuffle if we exhaust 50
+                currentIrlPage = 0;
+                shuffle(irlData);
+                return loadNextIrl();
+            }
+
+            const items = irlData.slice(startIdx, endIdx);
+            
+            items.forEach((item, idx) => {
+                const card = document.createElement('div');
+                card.className = "bg-brand-input p-4 rounded-xl border border-white/5 relative group";
+                
+                const uniqueId = `irl-ans-${currentIrlPage}-${idx}`;
+                
+                card.innerHTML = `
+                    <div class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2 flex justify-between items-center">
+                        ${item.context}
+                        <button onclick="toggleIrlAns('${uniqueId}')" class="text-brand-accent hover:text-white transition" title="Reveal Answer">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                        </button>
+                    </div>
+                    <div id="${uniqueId}" class="hidden mt-3 pt-3 border-t border-white/10">
+                        <div class="text-lg font-bold text-white mb-1">"${item.sentence}"</div>
+                        <div class="text-sm text-gray-400">${item.explanation}</div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+            
+            currentIrlPage++;
+        }
+
+        window.toggleIrlAns = function(id) {
+            const el = document.getElementById(id);
+            if (el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+                el.classList.add('animation-fade-in');
+            } else {
+                el.classList.add('hidden');
+            }
+        };
+
+
+        // Anki Logic
+        function showAnki() {
+            // Generate Anki formatted string: exactly one comma per line separating Q and A.
+            // Questions and answers in rawQuizData are already guaranteed to have no commas.
+            let ankiString = "";
+            quizPool.forEach(q => {
+                ankiString += `${q.question},${q.correctText}\n`;
+            });
+            
+            document.getElementById('anki-codeblock').innerText = ankiString.trim();
+            document.getElementById('anki-modal-overlay').classList.remove('hidden');
+        }
+
+        function closeAnki() {
+            document.getElementById('anki-modal-overlay').classList.add('hidden');
+        }
+
+        function copyAnki() {
+            const text = document.getElementById('anki-codeblock').innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = document.querySelector('#anki-modal-overlay button:nth-child(2)');
+                const originalText = btn.innerText;
+                btn.innerText = "Copied!";
+                btn.classList.replace('bg-brand-accent', 'bg-green-600');
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.classList.replace('bg-green-600', 'bg-brand-accent');
+                }, 2000);
+            }).catch(err => {
+                // Fallback for older browsers / iframe restrictions
+                const textArea = document.createElement("textarea");
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    const btn = document.querySelector('#anki-modal-overlay button:nth-child(2)');
+                    btn.innerText = "Copied!";
+                    setTimeout(() => btn.innerText = "Copy to Clipboard", 2000);
+                } catch (ex) {
+                    alert("Copy failed. Please select text manually.");
+                }
+                document.body.removeChild(textArea);
+            });
+        }
+
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', () => {
+            loadNextIrl();
+        });
+
+    </script>
+</body>
+</html>
+
+```
