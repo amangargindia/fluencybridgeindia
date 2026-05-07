@@ -91,6 +91,20 @@
     "rootGroup": "Notes"
   },
   {
+    "title": "Each and Every",
+    "slug": "each-and-every",
+    "folder": "notes/Pronoun",
+    "category": "Pronoun",
+    "rootGroup": "Notes"
+  },
+  {
+    "title": "All vs Several",
+    "slug": "all-vs-several",
+    "folder": "notes/Quantifiers",
+    "category": "Quantifiers",
+    "rootGroup": "Notes"
+  },
+  {
     "title": "Little, A Little, Few, A Few",
     "slug": "little-a-little-few-a-few",
     "folder": "notes/Quantifiers",
@@ -102,6 +116,13 @@
     "slug": "many-much",
     "folder": "notes/Quantifiers",
     "category": "Quantifiers",
+    "rootGroup": "Notes"
+  },
+  {
+    "title": "Which and What",
+    "slug": "which-and-what",
+    "folder": "notes/Question formation",
+    "category": "Question formation",
     "rootGroup": "Notes"
   },
   {
