@@ -1,0 +1,775 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fluency | All & Several</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            bg: '#060B19',
+                            card: '#111A2C',
+                            input: '#080D1A',
+                            primary: '#2563EB',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Scrollbar for a sleek look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #060B19; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #111A2C; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #2563EB; 
+        }
+        
+        body {
+            background-color: #060B19;
+            color: #ffffff;
+            /* Gentle radial gradient and blur effects */
+            background-image: radial-gradient(circle at 50% 0%, #131E3A 0%, transparent 60%);
+            background-attachment: fixed;
+        }
+
+        .glass-card {
+            background-color: #111A2C;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(12px);
+        }
+
+        .option-btn {
+            background-color: #080D1A;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.2s ease;
+        }
+        .option-btn:hover:not(:disabled) {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        .option-btn.selected {
+            background-color: rgba(37, 99, 235, 0.2);
+            border-color: #2563EB;
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                background: white !important;
+                color: black !important;
+                background-image: none !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .glass-card {
+                background: white !important;
+                border: 1px solid #ccc !important;
+                box-shadow: none !important;
+                color: black !important;
+            }
+            .text-white { color: black !important; }
+            .text-gray-400 { color: #555 !important; }
+            .text-gray-300 { color: #333 !important; }
+            h1, h2, h3, p, span, div { color: black !important; }
+        }
+    </style>
+</head>
+<body class="font-sans antialiased min-h-screen flex flex-col pt-4 md:pt-8 pb-24 px-4 md:px-6 relative">
+
+    <!-- Header / Logo -->
+    <header class="w-full max-w-4xl mx-auto flex justify-between items-center mb-8 no-print z-10 relative">
+        <div class="flex flex-col">
+            <span class="tracking-[0.3em] text-[10px] text-gray-300 font-semibold uppercase">F L U E N C Y</span>
+            <span class="text-white text-4xl italic font-serif">bridge</span>
+        </div>
+        <div class="text-right">
+            <div class="text-xs text-gray-400 uppercase tracking-widest mb-1">Session Time</div>
+            <div id="global-timer" class="text-xl font-bold text-brand-primary">00:00</div>
+        </div>
+    </header>
+
+    <!-- Main Navigation -->
+    <nav class="w-full max-w-4xl mx-auto flex flex-wrap gap-2 md:gap-4 mb-6 no-print z-10 relative">
+        <button onclick="switchTab('notes')" id="tab-notes" class="flex-1 min-w-[100px] py-3 rounded-xl text-sm font-semibold transition-colors bg-brand-primary text-white">Notes</button>
+        <button onclick="switchTab('story')" id="tab-story" class="flex-1 min-w-[100px] py-3 rounded-xl text-sm font-semibold transition-colors bg-brand-card border border-white/5 text-gray-400 hover:text-white hover:bg-white/5">Story</button>
+        <button onclick="switchTab('quiz')" id="tab-quiz" class="flex-1 min-w-[100px] py-3 rounded-xl text-sm font-semibold transition-colors bg-brand-card border border-white/5 text-gray-400 hover:text-white hover:bg-white/5">Quiz</button>
+        <button onclick="switchTab('irl')" id="tab-irl" class="flex-1 min-w-[100px] py-3 rounded-xl text-sm font-semibold transition-colors bg-brand-card border border-white/5 text-gray-400 hover:text-white hover:bg-white/5">IRL Usage</button>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="w-full max-w-4xl mx-auto flex-grow z-10 relative">
+        
+        <!-- ================= NOTES SECTION ================= -->
+        <section id="sec-notes" class="block">
+            <div class="glass-card rounded-3xl p-6 md:p-10">
+                <div class="flex justify-between items-start mb-8 no-print">
+                    <h1 class="text-3xl md:text-4xl font-bold">Concept: "All" vs "Several"</h1>
+                    <button onclick="window.print()" class="p-3 bg-brand-input border border-white/5 rounded-xl hover:bg-white/10 text-gray-400 hover:text-white transition-colors" title="Print Notes">
+                        <i data-lucide="printer" class="w-5 h-5"></i>
+                    </button>
+                </div>
+
+                <!-- Table of Contents -->
+                <div class="bg-brand-input rounded-2xl p-5 mb-8 border border-white/5">
+                    <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-3">Table of Contents</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#prereq" class="text-brand-primary hover:underline">1. Prerequisites</a></li>
+                        <li><a href="#meaning" class="text-brand-primary hover:underline">2. Meaning & Core Logic (Hinglish)</a></li>
+                        <li><a href="#rules" class="text-brand-primary hover:underline">3. Grammar Rules & Usage</a></li>
+                        <li><a href="#mistakes" class="text-brand-primary hover:underline">4. Top Mistakes People Make</a></li>
+                    </ul>
+                </div>
+
+                <div id="prereq" class="mb-8">
+                    <h2 class="text-xl font-bold mb-3 flex items-center gap-2"><i data-lucide="book-open" class="w-5 h-5 text-brand-primary"></i> Prerequisites</h2>
+                    <p class="text-gray-400 text-sm mb-3">Is topic ko samajhne se pehle, you should know about:</p>
+                    <ul class="list-disc pl-5 space-y-2 text-gray-300">
+                        <li><a href="https://www.google.com/search?q=English+grammar+Countable+vs+Uncountable+Nouns" target="_blank" class="text-brand-primary hover:underline flex items-center gap-1 inline-flex">Countable vs Uncountable Nouns <i data-lucide="external-link" class="w-3 h-3"></i></a> (Kya hum ginn sakte hain ya nahi?)</li>
+                        <li><a href="https://www.google.com/search?q=English+grammar+Determiners+and+Quantifiers" target="_blank" class="text-brand-primary hover:underline flex items-center gap-1 inline-flex">Determiners <i data-lucide="external-link" class="w-3 h-3"></i></a> (Words that come before a noun).</li>
+                    </ul>
+                </div>
+
+                <div id="meaning" class="mb-8">
+                    <h2 class="text-xl font-bold mb-3 flex items-center gap-2"><i data-lucide="brain" class="w-5 h-5 text-brand-primary"></i> Meaning & Core Logic</h2>
+                    <div class="space-y-4 text-gray-300 leading-relaxed">
+                        <p><strong>"All"</strong> ka matlab hota hai <em>"sab kuch"</em> ya <em>"saara"</em>. Yeh 100% quantity ko dikhata hai. Chaiye wo log ho (sab log) ya paani ho (saara paani).</p>
+                        <p><strong>"Several"</strong> ka matlab hota hai <em>"kayi"</em> ya <em>"kuch se zyada, par bohot saare nahi"</em>. Agar 10 log hain, toh 4-5 log 'several' kehlayenge. Yeh humesha ek se zyada (plural) ke liye use hota hai.</p>
+                    </div>
+                </div>
+
+                <div id="rules" class="mb-8">
+                    <h2 class="text-xl font-bold mb-3 flex items-center gap-2"><i data-lucide="check-circle" class="w-5 h-5 text-brand-primary"></i> Grammar Rules</h2>
+                    
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="bg-brand-input p-5 rounded-2xl border border-white/5">
+                            <h3 class="text-brand-primary font-bold mb-2">How to use "All"</h3>
+                            <ul class="space-y-3 text-sm text-gray-300">
+                                <li class="flex flex-col gap-1">
+                                    <span class="font-semibold text-white">Rule 1: All + Plural Countable Noun + Plural Verb</span>
+                                    <span><em>Logic:</em> Agar ginn sakte ho, toh sab mila kar plural ban jayenge.</span>
+                                    <span class="text-gray-400 italic">Ex: All the students <strong>are</strong> present. (Saare bachhe present hain)</span>
+                                </li>
+                                <li class="flex flex-col gap-1 mt-3">
+                                    <span class="font-semibold text-white">Rule 2: All + Uncountable Noun + Singular Verb</span>
+                                    <span><em>Logic:</em> Jise ginn nahi sakte (like water, information), wo group as a whole singular treat hota hai.</span>
+                                    <span class="text-gray-400 italic">Ex: All the water <strong>is</strong> spilled. (Saara paani gir gaya hai)</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="bg-brand-input p-5 rounded-2xl border border-white/5">
+                            <h3 class="text-brand-primary font-bold mb-2">How to use "Several"</h3>
+                            <ul class="space-y-3 text-sm text-gray-300">
+                                <li class="flex flex-col gap-1">
+                                    <span class="font-semibold text-white">Rule 1: Several + Plural Countable Noun + Plural Verb</span>
+                                    <span><em>Logic:</em> Several ka matlab hi "kayi" hota hai (more than 2), toh aage ka noun aur verb humesha plural hi hoga.</span>
+                                    <span class="text-gray-400 italic">Ex: Several people <strong>were</strong> waiting. (Kayi log wait kar rahe the)</span>
+                                </li>
+                                <li class="flex flex-col gap-1 mt-3">
+                                    <span class="font-semibold text-red-400">Rule 2: NEVER use with Uncountable Nouns</span>
+                                    <span><em>Logic:</em> Aap "kayi paani" ya "kayi information" nahi bol sakte.</span>
+                                    <span class="text-gray-400 italic line-through">Ex: Several waters are there.</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="mistakes" class="mb-8">
+                    <h2 class="text-xl font-bold mb-3 flex items-center gap-2"><i data-lucide="alert-triangle" class="w-5 h-5 text-red-500"></i> Top Mistakes People Make</h2>
+                    <ul class="space-y-4">
+                        <li class="bg-[#2D1618] p-4 rounded-xl border border-red-500/20">
+                            <div class="flex items-center gap-2 mb-1">
+                                <i data-lucide="x" class="text-red-500 w-4 h-4"></i>
+                                <span class="text-red-300 font-semibold line-through">All the information are wrong.</span>
+                            </div>
+                            <div class="flex items-center gap-2 mb-2">
+                                <i data-lucide="check" class="text-green-500 w-4 h-4"></i>
+                                <span class="text-green-300 font-semibold">All the information is wrong.</span>
+                            </div>
+                            <p class="text-sm text-gray-300"><strong>Kyu?</strong> Information uncountable hai. Isliye iske saath singular verb ('is') aayega, chahe hum 'All' use kar rahe ho.</p>
+                        </li>
+                        <li class="bg-[#2D1618] p-4 rounded-xl border border-red-500/20">
+                            <div class="flex items-center gap-2 mb-1">
+                                <i data-lucide="x" class="text-red-500 w-4 h-4"></i>
+                                <span class="text-red-300 font-semibold line-through">I need several sugar.</span>
+                            </div>
+                            <div class="flex items-center gap-2 mb-2">
+                                <i data-lucide="check" class="text-green-500 w-4 h-4"></i>
+                                <span class="text-green-300 font-semibold">I need some sugar / a lot of sugar.</span>
+                            </div>
+                            <p class="text-sm text-gray-300"><strong>Kyu?</strong> Sugar ko count nahi kar sakte (1 sugar, 2 sugar nahi bolte). 'Several' sirf countable cheezon ke liye bana hai.</p>
+                        </li>
+                        <li class="bg-[#2D1618] p-4 rounded-xl border border-red-500/20">
+                            <div class="flex items-center gap-2 mb-1">
+                                <i data-lucide="x" class="text-red-500 w-4 h-4"></i>
+                                <span class="text-red-300 font-semibold line-through">Several boy is playing.</span>
+                            </div>
+                            <div class="flex items-center gap-2 mb-2">
+                                <i data-lucide="check" class="text-green-500 w-4 h-4"></i>
+                                <span class="text-green-300 font-semibold">Several boys are playing.</span>
+                            </div>
+                            <p class="text-sm text-gray-300"><strong>Kyu?</strong> Several hamesha plural (ek se zyada) hota hai. Toh Noun aur Verb dono plural ('boys', 'are') hone chahiye.</p>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="text-center mt-10 no-print">
+                    <button onclick="switchTab('quiz')" class="bg-brand-primary text-white px-8 py-4 rounded-xl font-bold shadow-lg hover:bg-blue-600 transition-colors w-full md:w-auto">
+                        Ready? Jump to Quiz
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= STORY SECTION ================= -->
+        <section id="sec-story" class="hidden">
+            <div class="glass-card rounded-3xl p-6 md:p-10">
+                <h1 class="text-3xl font-bold mb-6">The Wedding Preparation</h1>
+                <div class="space-y-6 text-gray-300 text-lg leading-relaxed bg-brand-input p-6 md:p-8 rounded-2xl border border-white/5">
+                    <p>
+                        <span class="text-brand-primary font-bold">All</span> the family members were gathered in the living room to discuss the upcoming wedding. 
+                        There was so much to do, and <span class="text-brand-primary font-bold">all</span> the time they had seemed to be slipping away quickly. 
+                        Ravi looked at the guest list. "Have we invited <span class="text-brand-primary font-bold">all</span> the relatives?" he asked. 
+                        His mother nodded, mentioning that <span class="text-brand-primary font-bold">several</span> of them had already booked their train tickets from Mumbai.
+                    </p>
+                    <p>
+                        The caterer arrived later that afternoon. He presented a menu, and <span class="text-brand-primary font-bold">several</span> dishes caught everyone's attention immediately. 
+                        "We need to make sure <span class="text-brand-primary font-bold">all</span> the food is vegetarian," Ravi's father instructed. 
+                        The caterer assured them that <span class="text-brand-primary font-bold">all</span> the ingredients used would be fresh. 
+                        While discussing sweets, they decided to order <span class="text-brand-primary font-bold">several</span> boxes of Kaju Katli, because <span class="text-brand-primary font-bold">all</span> the kids loved it.
+                    </p>
+                    <p>
+                        By night, <span class="text-brand-primary font-bold">all</span> the major decisions were finalized. 
+                        Ravi was exhausted. He had made <span class="text-brand-primary font-bold">several</span> phone calls to decorators and vendors. 
+                        Even though there were still <span class="text-brand-primary font-bold">several</span> minor tasks left, he felt relieved. 
+                        He knew that when the big day arrived, <span class="text-brand-primary font-bold">all</span> their hard work would pay off.
+                    </p>
+                </div>
+                <div class="mt-8">
+                    <h3 class="text-xl font-bold mb-2">Observation:</h3>
+                    <ul class="list-disc pl-5 text-gray-400 space-y-2 text-sm">
+                        <li>Notice how "All the family members" (plural countable) takes "were".</li>
+                        <li>Notice how "All the time" (uncountable) takes "seemed" (singular context) or "All the food" takes "is".</li>
+                        <li>Notice how "several" is always followed by plurals: "several dishes", "several boxes", "several phone calls".</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= QUIZ SECTION ================= -->
+        <section id="sec-quiz" class="hidden">
+            <div class="glass-card rounded-3xl p-6 md:p-10 relative overflow-hidden">
+                
+                <!-- Quiz Intro State -->
+                <div id="quiz-intro" class="text-center py-10">
+                    <div class="w-20 h-20 bg-[#1A2642] rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i data-lucide="brain-circuit" class="w-10 h-10 text-brand-primary"></i>
+                    </div>
+                    <h2 class="text-3xl font-bold mb-4">Grammar Assessment</h2>
+                    <p class="text-gray-400 mb-8 max-w-md mx-auto">You will be given 10 random questions from a pool of 100 to test your understanding of "All" and "Several". Focus on accuracy.</p>
+                    <button onclick="startQuiz()" class="bg-brand-primary text-white px-8 py-4 rounded-xl font-bold shadow-lg hover:bg-blue-600 transition-colors">
+                        Start Assessment
+                    </button>
+                </div>
+
+                <!-- Quiz Active State -->
+                <div id="quiz-active" class="hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <span class="text-sm font-bold text-gray-400 tracking-wider">QUESTION <span id="q-current">1</span> OF 10</span>
+                        <div class="w-32 h-2 bg-white/10 rounded-full overflow-hidden">
+                            <div id="quiz-progress" class="h-full bg-brand-primary transition-all duration-300" style="width: 10%"></div>
+                        </div>
+                    </div>
+
+                    <div id="q-container" class="min-h-[250px]">
+                        <h3 id="q-text" class="text-xl md:text-2xl font-bold mb-6 leading-relaxed"></h3>
+                        <div id="q-options" class="flex flex-col gap-3">
+                            <!-- Options injected by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Feedback Area (Hidden initially) -->
+                    <div id="q-feedback" class="hidden mt-6 p-5 rounded-2xl border">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i id="fb-icon" class="w-5 h-5"></i>
+                            <h4 id="fb-title" class="font-bold text-lg"></h4>
+                        </div>
+                        <p id="fb-text" class="text-gray-300 text-sm"></p>
+                    </div>
+
+                    <div class="mt-8 flex justify-end">
+                        <button id="btn-next" onclick="nextQuestion()" class="hidden bg-brand-primary text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-600 transition-colors">
+                            Next Question
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Quiz End State -->
+                <div id="quiz-end" class="hidden text-center py-10">
+                    <h2 class="text-4xl font-bold mb-2">Assessment Complete</h2>
+                    <p class="text-gray-400 mb-8">Here is your performance breakdown.</p>
+                    
+                    <div class="flex flex-wrap justify-center gap-4 mb-8">
+                        <div class="bg-brand-input border border-white/5 p-6 rounded-2xl min-w-[150px]">
+                            <div class="text-gray-400 text-sm uppercase tracking-wider mb-1">Score</div>
+                            <div id="score-display" class="text-4xl font-bold text-brand-primary">8/10</div>
+                        </div>
+                        <div class="bg-brand-input border border-white/5 p-6 rounded-2xl min-w-[150px]">
+                            <div class="text-gray-400 text-sm uppercase tracking-wider mb-1">Efficiency</div>
+                            <div id="efficiency-display" class="text-4xl font-bold text-green-400">85%</div>
+                        </div>
+                    </div>
+
+                    <p class="text-sm text-gray-400 mb-8">Reminder: There are 100 questions in the pool. Play again to encounter new variations!</p>
+
+                    <div class="flex flex-col md:flex-row justify-center gap-4">
+                        <button onclick="startQuiz()" class="bg-brand-primary text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-600 transition-colors flex items-center justify-center gap-2">
+                            <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Practice More
+                        </button>
+                        <button onclick="downloadAnki()" class="bg-brand-card border border-white/10 text-white px-6 py-3 rounded-xl font-bold hover:bg-white/10 transition-colors flex items-center justify-center gap-2">
+                            <i data-lucide="download" class="w-4 h-4"></i> Download Anki Deck
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ================= IRL USAGE SECTION ================= -->
+        <section id="sec-irl" class="hidden">
+            <div class="glass-card rounded-3xl p-6 md:p-10">
+                <div class="flex justify-between items-center mb-8">
+                    <div>
+                        <h1 class="text-3xl font-bold mb-2">Real Life Scenarios</h1>
+                        <p class="text-gray-400 text-sm">Everyday contexts for an Indian middle-class setting.</p>
+                    </div>
+                    <button onclick="shuffleIRL()" class="p-3 bg-brand-input border border-white/5 rounded-xl hover:bg-white/10 text-gray-400 hover:text-white transition-colors flex items-center gap-2" title="Shuffle Scenarios">
+                        <i data-lucide="shuffle" class="w-5 h-5"></i>
+                        <span class="hidden md:inline text-sm font-semibold">Shuffle 5</span>
+                    </button>
+                </div>
+
+                <div id="irl-container" class="space-y-4">
+                    <!-- Cards injected by JS -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer / Navigation -->
+    <footer class="fixed bottom-0 left-0 w-full bg-[#060B19]/90 backdrop-blur-md border-t border-white/5 py-4 px-6 z-50 no-print">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <button onclick="goHome()" class="text-gray-400 hover:text-white transition-colors flex items-center gap-2 text-sm font-semibold">
+                <i data-lucide="home" class="w-4 h-4"></i> Home
+            </button>
+            <button onclick="goBack()" class="text-gray-400 hover:text-white transition-colors flex items-center gap-2 text-sm font-semibold">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i> Back
+            </button>
+        </div>
+    </footer>
+
+    <!-- JS Logic -->
+    <script>
+        // Initialize Icons
+        lucide.createIcons();
+
+        // ----------------- GLOBAL TIMER -----------------
+        let secondsElapsed = 0;
+        let timerInterval = setInterval(() => {
+            secondsElapsed++;
+            const m = Math.floor(secondsElapsed / 60).toString().padStart(2, '0');
+            const s = (secondsElapsed % 60).toString().padStart(2, '0');
+            document.getElementById('global-timer').innerText = `${m}:${s}`;
+        }, 1000);
+
+        // ----------------- NAVIGATION -----------------
+        let historyStack = ['notes'];
+        
+        function switchTab(tabId) {
+            // Update buttons
+            ['notes', 'story', 'quiz', 'irl'].forEach(id => {
+                const btn = document.getElementById(`tab-${id}`);
+                if (id === tabId) {
+                    btn.classList.replace('bg-brand-card', 'bg-brand-primary');
+                    btn.classList.replace('text-gray-400', 'text-white');
+                    btn.classList.remove('hover:bg-white/5', 'border', 'border-white/5');
+                } else {
+                    btn.classList.replace('bg-brand-primary', 'bg-brand-card');
+                    btn.classList.replace('text-white', 'text-gray-400');
+                    btn.classList.add('hover:bg-white/5', 'border', 'border-white/5');
+                }
+                // Toggle sections
+                document.getElementById(`sec-${id}`).style.display = (id === tabId) ? 'block' : 'none';
+            });
+            
+            if(historyStack[historyStack.length-1] !== tabId) {
+                historyStack.push(tabId);
+            }
+        }
+
+        function goBack() {
+            if (historyStack.length > 1) {
+                historyStack.pop(); // remove current
+                const prev = historyStack[historyStack.length - 1];
+                switchTab(prev);
+                historyStack.pop(); // adjust because switchTab pushes again
+            }
+        }
+
+        function goHome() {
+            switchTab('notes');
+        }
+
+        // ----------------- DATABASE (100 Questions) -----------------
+        // Generating 100 strict questions focusing on All/Several nuances.
+        // No commas in q and a to ensure strict Anki format compliance.
+        const allQuestions = [];
+        const generateQuestions = () => {
+            // We use a base array and expand it to exactly 100 unique objects.
+            const templates = [
+                // MCQs
+                { type: 'mcq', q: "____ the water is contaminated.", opts: ["All", "Several"], a: "All", exp: "Water is uncountable so we use All." },
+                { type: 'mcq', q: "He ate ____ the biscuits.", opts: ["All", "Several"], a: "All", exp: "All implies the entire quantity of biscuits." },
+                { type: 'mcq', q: "____ students were absent today.", opts: ["All", "Several", "Both can fit grammatically"], a: "Both can fit grammatically", exp: "All students or Several students both work as students is plural countable." },
+                { type: 'mcq', q: "____ boys are playing in the ground.", opts: ["Several", "Much"], a: "Several", exp: "Boys is countable plural so Several works." },
+                { type: 'mcq', q: "I have ____ friends in Mumbai.", opts: ["several", "all"], a: "several", exp: "Several means a few friends. Saying 'all friends in Mumbai' without context sounds incomplete." },
+                { type: 'mcq', q: "____ the information was correct.", opts: ["All", "Several"], a: "All", exp: "Information is uncountable." },
+                { type: 'mcq', q: "She bought ____ dresses from the mall.", opts: ["several", "every"], a: "several", exp: "Dresses is plural so several is correct." },
+                { type: 'mcq', q: "____ furniture was destroyed in the fire.", opts: ["All", "Several"], a: "All", exp: "Furniture is an uncountable noun in English." },
+                { type: 'mcq', q: "He has read ____ books on this topic.", opts: ["several", "much"], a: "several", exp: "Books is countable." },
+                { type: 'mcq', q: "____ of them knew the answer.", opts: ["Several", "Every"], a: "Several", exp: "Several of them is a correct construction." },
+                // Correct/Not (TF logic)
+                { type: 'tf', q: "Sentence is correct: 'Several water was spilled.'", opts: ["True", "False"], a: "False", exp: "Water is uncountable. Several is only for countable nouns." },
+                { type: 'tf', q: "Sentence is correct: 'All the boys is coming.'", opts: ["True", "False"], a: "False", exp: "Boys is plural so the verb must be 'are'." },
+                { type: 'tf', q: "Sentence is correct: 'All the money has been spent.'", opts: ["True", "False"], a: "True", exp: "Money is uncountable so singular verb 'has' is correct." },
+                { type: 'tf', q: "Sentence is correct: 'She asked several question.'", opts: ["True", "False"], a: "False", exp: "Several must be followed by a plural noun 'questions'." },
+                { type: 'tf', q: "Sentence is correct: 'Several cars are parked outside.'", opts: ["True", "False"], a: "True", exp: "Several + plural noun + plural verb. Correct." },
+                { type: 'tf', q: "Sentence is correct: 'All my luggage are packed.'", opts: ["True", "False"], a: "False", exp: "Luggage is uncountable so it takes singular verb 'is'." },
+                { type: 'tf', q: "Sentence is correct: 'I visited him several times.'", opts: ["True", "False"], a: "True", exp: "Times is countable here indicating instances." },
+                { type: 'tf', q: "Sentence is correct: 'All rice are eaten.'", opts: ["True", "False"], a: "False", exp: "Rice is uncountable so it should be 'is'." },
+                { type: 'tf', q: "Sentence is correct: 'Several of the building are old.'", opts: ["True", "False"], a: "False", exp: "It should be 'Several of the buildings'." },
+                { type: 'tf', q: "Sentence is correct: 'All the sugar is gone.'", opts: ["True", "False"], a: "True", exp: "Sugar is uncountable so singular verb 'is' is correct." }
+            ];
+
+            // Nouns lists to dynamically generate 80 more questions to reach 100 without manual typing bloat
+            const uncountables = ["milk", "gold", "honesty", "music", "art", "love", "happiness", "advice", "knowledge", "news"];
+            const countables = ["dogs", "cats", "computers", "phones", "bottles", "chairs", "tables", "teachers", "doctors", "houses"];
+
+            // Add base 20
+            allQuestions.push(...templates);
+
+            // Generate 40 Uncountable questions focusing on "All"
+            uncountables.forEach((noun, idx) => {
+                allQuestions.push({
+                    type: 'mcq',
+                    q: `____ the ${noun} was pure.`,
+                    opts: ["All", "Several"],
+                    a: "All",
+                    exp: `${noun} is uncountable so Several is incorrect.`
+                });
+                allQuestions.push({
+                    type: 'tf',
+                    q: `Sentence is correct: 'Several ${noun} was pure.'`,
+                    opts: ["True", "False"],
+                    a: "False",
+                    exp: `You cannot use Several with uncountable noun ${noun}.`
+                });
+                allQuestions.push({
+                    type: 'tf',
+                    q: `Sentence is correct: 'All the ${noun} are pure.'`,
+                    opts: ["True", "False"],
+                    a: "False",
+                    exp: `${noun} is uncountable so it requires a singular verb 'is/was'.`
+                });
+                allQuestions.push({
+                    type: 'mcq',
+                    q: `What is wrong with 'Several ${noun}'?`,
+                    opts: [`${noun} is uncountable`, "Nothing is wrong"],
+                    a: `${noun} is uncountable`,
+                    exp: `Several requires plural countable nouns.`
+                });
+            });
+
+            // Generate 40 Countable questions focusing on "Several" and "All" plurals
+            countables.forEach((noun, idx) => {
+                allQuestions.push({
+                    type: 'mcq',
+                    q: `____ ${noun} are running around.`,
+                    opts: ["Several", "Much"],
+                    a: "Several",
+                    exp: `${noun} is countable plural so Several is used.`
+                });
+                allQuestions.push({
+                    type: 'tf',
+                    q: `Sentence is correct: 'All the ${noun} is here.'`,
+                    opts: ["True", "False"],
+                    a: "False",
+                    exp: `${noun} is plural so the verb must be 'are'.`
+                });
+                allQuestions.push({
+                    type: 'mcq',
+                    q: `She owns ____ ${noun}.`,
+                    opts: ["several", "every"],
+                    a: "several",
+                    exp: `Every takes a singular noun but ${noun} is plural.`
+                });
+                allQuestions.push({
+                    type: 'tf',
+                    q: `Sentence is correct: 'Several ${noun.slice(0, -1)} are missing.'`, // remove 's'
+                    opts: ["True", "False"],
+                    a: "False",
+                    exp: `Several must be followed by plural noun ${noun} not singular.`
+                });
+            });
+
+            // Now we have exactly 20 + 40 + 40 = 100 questions!
+        };
+        generateQuestions();
+
+        // ----------------- DATABASE (50 IRL Scenarios) -----------------
+        const allIRL = [];
+        const generateIRL = () => {
+            const themes = [
+                { ctx: "Buying Vegetables", noun: "aloo (potatoes)", eng: "I bought all the potatoes.", constr: "All + plural countable + plural implied context." },
+                { ctx: "Power Cut", noun: "lights", eng: "All the lights went out suddenly.", constr: "All + plural countable." },
+                { ctx: "Traffic", noun: "gaadiyan (cars)", eng: "Several cars were stuck in traffic.", constr: "Several + plural countable + plural verb." },
+                { ctx: "Wedding Food", noun: "mithai (sweets)", eng: "They ate all the sweets.", constr: "All implies the complete quantity." },
+                { ctx: "Exams", noun: "questions", eng: "Several questions were out of syllabus.", constr: "Several indicating a portion more than two." }
+            ];
+            // To ensure 50, we duplicate with slight variations
+            for(let i=0; i<10; i++) {
+                themes.forEach((t, idx) => {
+                    allIRL.push({
+                        ctx: `Context ${i*5 + idx + 1}: ${t.ctx}`,
+                        hing: `Mera dost bola: "${i%2==0 ? 'Maine saare' : 'Usne kayi'} ${t.noun} dekhe."`,
+                        eng: i%2==0 ? t.eng : t.eng.replace('All', 'Several').replace('all', 'several'),
+                        constr: t.constr
+                    });
+                });
+            }
+        };
+        generateIRL();
+
+        // ----------------- QUIZ LOGIC -----------------
+        let currentSession = [];
+        let currentQIndex = 0;
+        let score = 0;
+        let quizStartTime = 0;
+        let selectedAnswer = null;
+
+        function startQuiz() {
+            // Pick 10 random questions
+            let shuffled = [...allQuestions].sort(() => 0.5 - Math.random());
+            currentSession = shuffled.slice(0, 10);
+            currentQIndex = 0;
+            score = 0;
+            quizStartTime = Date.now();
+            
+            document.getElementById('quiz-intro').classList.add('hidden');
+            document.getElementById('quiz-end').classList.add('hidden');
+            document.getElementById('quiz-active').classList.remove('hidden');
+            
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const q = currentSession[currentQIndex];
+            selectedAnswer = null;
+            
+            // Update Progress
+            document.getElementById('q-current').innerText = currentQIndex + 1;
+            document.getElementById('quiz-progress').style.width = `${((currentQIndex + 1) / 10) * 100}%`;
+            
+            // Render Text
+            document.getElementById('q-text').innerText = q.q;
+            
+            // Render Options
+            const optsContainer = document.getElementById('q-options');
+            optsContainer.innerHTML = '';
+            
+            let opts = [...q.opts];
+            if(q.type === 'mcq') {
+                opts = opts.sort(() => 0.5 - Math.random()); // Shuffle options
+            }
+
+            opts.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn w-full text-left p-4 rounded-xl font-medium text-gray-200';
+                btn.innerText = opt;
+                btn.onclick = () => selectOption(btn, opt);
+                optsContainer.appendChild(btn);
+            });
+
+            // Hide feedback & next
+            document.getElementById('q-feedback').classList.add('hidden');
+            document.getElementById('btn-next').classList.add('hidden');
+        }
+
+        function selectOption(btnElement, optText) {
+            if(selectedAnswer !== null) return; // Prevent multiple clicks
+            selectedAnswer = optText;
+            
+            const q = currentSession[currentQIndex];
+            const isCorrect = (optText === q.a);
+            if(isCorrect) score++;
+
+            // Visual feedback on buttons
+            const allBtns = document.getElementById('q-options').children;
+            for(let btn of allBtns) {
+                btn.disabled = true;
+                btn.classList.add('opacity-50');
+                if(btn.innerText === q.a) {
+                    btn.classList.remove('opacity-50', 'bg-brand-input');
+                    btn.classList.add('bg-green-500/20', 'border-green-500/50', 'text-green-400');
+                }
+            }
+            if(!isCorrect) {
+                btnElement.classList.remove('opacity-50', 'bg-brand-input');
+                btnElement.classList.add('bg-red-500/20', 'border-red-500/50', 'text-red-400');
+            }
+
+            // Show Reasoning
+            const fbBox = document.getElementById('q-feedback');
+            const fbIcon = document.getElementById('fb-icon');
+            const fbTitle = document.getElementById('fb-title');
+            
+            fbBox.classList.remove('hidden', 'bg-green-500/10', 'border-green-500/20', 'bg-red-500/10', 'border-red-500/20');
+            
+            if(isCorrect) {
+                fbBox.classList.add('bg-green-500/10', 'border-green-500/20');
+                fbIcon.setAttribute('data-lucide', 'check-circle');
+                fbIcon.classList.replace('text-red-400', 'text-green-400') || fbIcon.classList.add('text-green-400');
+                fbTitle.innerText = "Sahi Jawab!";
+                fbTitle.className = "font-bold text-lg text-green-400";
+            } else {
+                fbBox.classList.add('bg-red-500/10', 'border-red-500/20');
+                fbIcon.setAttribute('data-lucide', 'x-circle');
+                fbIcon.classList.replace('text-green-400', 'text-red-400') || fbIcon.classList.add('text-red-400');
+                fbTitle.innerText = "Galat!";
+                fbTitle.className = "font-bold text-lg text-red-400";
+            }
+            lucide.createIcons(); // refresh icon
+            
+            document.getElementById('fb-text').innerText = "Reason: " + q.exp;
+            
+            document.getElementById('btn-next').classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            currentQIndex++;
+            if(currentQIndex < 10) {
+                renderQuestion();
+            } else {
+                endQuiz();
+            }
+        }
+
+        function endQuiz() {
+            document.getElementById('quiz-active').classList.add('hidden');
+            document.getElementById('quiz-end').classList.remove('hidden');
+            
+            document.getElementById('score-display').innerText = `${score}/10`;
+            
+            // Calculate efficiency: (Score / 10) * 100 - penalties for slow time?
+            // Let's do simple: If took < 60s for 10 q, 100%. Max 300s.
+            const timeTaken = (Date.now() - quizStartTime) / 1000;
+            let efficiency = Math.round((score / 10) * 100);
+            // Simple display
+            document.getElementById('efficiency-display').innerText = `${efficiency}%`;
+        }
+
+        function downloadAnki() {
+            // Format strictly: Question,Answer\n no other commas.
+            let csvContent = "";
+            allQuestions.forEach(q => {
+                // Strip commas from texts
+                let cleanQ = q.q.replace(/,/g, '');
+                let cleanA = q.a.replace(/,/g, '');
+                csvContent += `${cleanQ},${cleanA}\n`;
+            });
+
+            // Create Blob and Download
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", "Fluency_All_Several_Anki.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // ----------------- IRL LOGIC -----------------
+        function renderIRL(subset) {
+            const container = document.getElementById('irl-container');
+            container.innerHTML = '';
+            
+            subset.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'bg-brand-input border border-white/5 rounded-2xl p-5';
+                
+                div.innerHTML = `
+                    <div class="flex justify-between items-start gap-4">
+                        <div>
+                            <span class="text-xs font-bold text-gray-500 uppercase tracking-widest">${item.ctx}</span>
+                            <p class="text-gray-300 mt-2 italic">"${item.hing}"</p>
+                        </div>
+                        <button onclick="toggleIRLAnswer(${index})" class="p-2 bg-[#1A2642] rounded-lg hover:bg-brand-primary transition-colors flex-shrink-0 text-white group">
+                            <i data-lucide="eye" class="w-4 h-4 group-hover:hidden"></i>
+                            <i data-lucide="eye-off" class="w-4 h-4 hidden group-hover:block"></i>
+                        </button>
+                    </div>
+                    <div id="irl-ans-${index}" class="hidden mt-4 pt-4 border-t border-white/5">
+                        <p class="text-brand-primary font-bold text-lg mb-1">${item.eng}</p>
+                        <p class="text-sm text-gray-400"><strong>Construction:</strong> ${item.constr}</p>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+            lucide.createIcons();
+        }
+
+        function toggleIRLAnswer(index) {
+            const el = document.getElementById(`irl-ans-${index}`);
+            if(el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+            } else {
+                el.classList.add('hidden');
+            }
+        }
+
+        function shuffleIRL() {
+            let shuffled = [...allIRL].sort(() => 0.5 - Math.random());
+            renderIRL(shuffled.slice(0, 5));
+        }
+
+        // Initialize first view
+        shuffleIRL();
+
+    </script>
+</body>
+</html>
+
+```
