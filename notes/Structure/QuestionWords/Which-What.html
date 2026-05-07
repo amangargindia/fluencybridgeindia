@@ -1,0 +1,671 @@
+```html
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fluency Bridge | Which vs What</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@1,400;1,600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .font-serif-italic { font-family: 'Playfair Display', serif; }
+        
+        /* Custom Scrollbar for dark theme */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #060B19; }
+        ::-webkit-scrollbar-thumb { background: #111A2C; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #2563EB; }
+
+        @media print {
+            body { background: white !important; color: black !important; }
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            .bg-\[\#111A2C\] { background: #f3f4f6 !important; color: black !important; border: 1px solid #e5e7eb !important; box-shadow: none !important;}
+            .bg-\[\#080D1A\] { background: white !important; color: black !important; border: 1px solid #d1d5db !important;}
+            * { text-shadow: none !important; color: black !important; }
+            h1, h2, h3, h4, h5, h6, p, span, div { color: black !important; }
+        }
+        
+        .glass-panel {
+            background: #111A2C;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+        }
+        
+        .input-dark {
+            background: #080D1A;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.2s ease;
+        }
+        .input-dark:hover { background: rgba(255, 255, 255, 0.05); }
+    </style>
+</head>
+<body class="bg-[#060B19] text-white min-h-screen relative flex flex-col pt-4 md:pt-6 px-4 md:px-6 pb-24 selection:bg-[#2563EB] selection:text-white">
+
+    <!-- Subtle Background Blur/Gradient -->
+    <div class="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#131E3A]/60 via-[#060B19] to-[#060B19] pointer-events-none -z-10"></div>
+
+    <!-- Header -->
+    <header class="w-full max-w-4xl mx-auto flex justify-between items-center mb-8 no-print">
+        <div class="flex flex-col">
+            <span class="tracking-[0.3em] text-[10px] text-gray-300 uppercase">F L U E N C Y</span>
+            <span class="text-white text-3xl md:text-4xl italic font-serif-italic">bridge</span>
+        </div>
+        <div class="flex flex-col items-end">
+            <span class="text-[10px] tracking-widest text-gray-400 uppercase">Session Time</span>
+            <span id="global-timer" class="text-lg md:text-xl font-bold text-white tracking-wide">00:00</span>
+        </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="w-full max-w-4xl mx-auto mb-6 flex overflow-x-auto space-x-2 md:space-x-4 pb-2 no-print custom-scrollbar">
+        <button onclick="switchTab('notes')" id="btn-notes" class="px-5 py-2.5 rounded-xl text-sm font-medium transition-all bg-[#2563EB] text-white whitespace-nowrap">Notes & Rules</button>
+        <button onclick="switchTab('story')" id="btn-story" class="px-5 py-2.5 rounded-xl text-sm font-medium transition-all bg-[#111A2C] text-gray-400 hover:text-white border-t border-white/5 whitespace-nowrap">Story Time</button>
+        <button onclick="switchTab('realLife')" id="btn-realLife" class="px-5 py-2.5 rounded-xl text-sm font-medium transition-all bg-[#111A2C] text-gray-400 hover:text-white border-t border-white/5 whitespace-nowrap">Real Life Usage</button>
+        <button onclick="switchTab('quiz')" id="btn-quiz" class="px-5 py-2.5 rounded-xl text-sm font-medium transition-all bg-[#111A2C] text-gray-400 hover:text-white border-t border-white/5 whitespace-nowrap">Assessment Quiz</button>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="w-full max-w-4xl mx-auto flex-grow relative">
+
+        <!-- ================= SECTION: NOTES ================= -->
+        <section id="tab-notes" class="block animate-fade-in">
+            <div class="glass-panel rounded-3xl p-6 md:p-8 mb-6">
+                <div class="flex justify-between items-start mb-6 border-b border-white/10 pb-4 no-print">
+                    <h1 class="text-2xl md:text-3xl font-bold">Which vs. What</h1>
+                    <div class="flex space-x-3">
+                        <button onclick="window.print()" class="input-dark px-4 py-2 rounded-xl text-xs md:text-sm text-gray-300 hover:text-white">Print Notes</button>
+                        <button onclick="showAnkiModal()" class="input-dark px-4 py-2 rounded-xl text-xs md:text-sm text-gray-300 hover:text-white">Anki CSV</button>
+                        <button onclick="switchTab('quiz')" class="bg-[#2563EB] px-4 py-2 rounded-xl text-xs md:text-sm text-white font-medium hover:bg-blue-600 transition-colors">Go to Quiz</button>
+                    </div>
+                </div>
+
+                <!-- Print Only Header -->
+                <h1 class="hidden print-only text-3xl font-bold mb-4">Grammar Revision: Which vs. What</h1>
+
+                <!-- TOC -->
+                <div class="input-dark rounded-xl p-4 md:p-6 mb-8 no-print">
+                    <h3 class="text-sm uppercase tracking-widest text-gray-400 mb-3">Table of Contents</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#prerequisites" class="text-white hover:text-[#2563EB] transition-colors">- 01. Prerequisites</a></li>
+                        <li><a href="#core-concept" class="text-white hover:text-[#2563EB] transition-colors">- 02. The Core Concept (Hinglish)</a></li>
+                        <li><a href="#deep-dive" class="text-white hover:text-[#2563EB] transition-colors">- 03. Deep Dive & Examples</a></li>
+                        <li><a href="#top-mistakes" class="text-white hover:text-[#2563EB] transition-colors">- 04. Top Mistakes People Make</a></li>
+                    </ul>
+                </div>
+
+                <!-- Content -->
+                <div class="space-y-8 text-gray-300 leading-relaxed">
+                    
+                    <div id="prerequisites">
+                        <h2 class="text-xl font-bold text-white mb-2">01. Prerequisites (Pehle ye samjho)</h2>
+                        <p class="text-sm mb-2">Before mastering Which and What, you should have a basic idea of:</p>
+                        <ul class="list-disc pl-5 space-y-1 text-sm">
+                            <li><a href="https://www.google.com/search?q=Interrogative+Pronouns+English+Grammar" target="_blank" class="text-[#2563EB] hover:underline">Interrogative Pronouns (Click to search)</a> - Words used to ask questions.</li>
+                            <li><a href="https://www.google.com/search?q=Determiners+English+Grammar" target="_blank" class="text-[#2563EB] hover:underline">Determiners (Click to search)</a> - Words placed in front of a noun to make it clear what the noun refers to.</li>
+                        </ul>
+                    </div>
+
+                    <div id="core-concept">
+                        <h2 class="text-xl font-bold text-white mb-3">02. The Core Concept (The Secret Rule)</h2>
+                        <p class="mb-3">Ek simple rule yaad rakho: <strong>Choices ka limit</strong>.</p>
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div class="input-dark p-5 rounded-xl border-t border-[#2563EB]/50">
+                                <h3 class="text-lg font-bold text-white mb-2">WHEN TO USE 'WHICH'</h3>
+                                <p class="text-sm mb-3">Jab aapke paas <strong>LIMITED CHOICES</strong> (ginti ke options) hote hain. Aapko pata hai ki options kya hain, aur unme se ek chunna hai.</p>
+                                <p class="text-sm text-gray-400 italic">"Which shirt should I buy? The red one or the blue one?" (Yahan sirf 2 option hain)</p>
+                            </div>
+                            <div class="input-dark p-5 rounded-xl border-t border-purple-500/50">
+                                <h3 class="text-lg font-bold text-white mb-2">WHEN TO USE 'WHAT'</h3>
+                                <p class="text-sm mb-3">Jab aapke paas <strong>UNLIMITED CHOICES</strong> (bahut saare options) hote hain ya options open-ended hote hain.</p>
+                                <p class="text-sm text-gray-400 italic">"What is your favourite colour?" (Duniya mein hazaaron colours hain, koi limit nahi hai)</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="deep-dive">
+                        <h2 class="text-xl font-bold text-white mb-3">03. Deep Dive & Logical Examples</h2>
+                        <ul class="space-y-4">
+                            <li class="input-dark p-4 rounded-xl">
+                                <strong class="text-white block mb-1">Scenario A: Asking about someone's name</strong>
+                                <span class="text-red-400 block text-sm">Wrong: Which is your name?</span>
+                                <span class="text-green-400 block text-sm mb-2">Right: What is your name?</span>
+                                <span class="text-sm text-gray-400"><strong>Logic:</strong> Duniya mein lakho names hain. Koi limited menu nahi hai names ka jisme se ek choose karna ho. Isliye 'What' aayega.</span>
+                            </li>
+                            <li class="input-dark p-4 rounded-xl">
+                                <strong class="text-white block mb-1">Scenario B: Choosing a train to Delhi</strong>
+                                <span class="text-red-400 block text-sm">Wrong: What train are you taking to Delhi? Shatabdi or Rajdhani?</span>
+                                <span class="text-green-400 block text-sm mb-2">Right: Which train are you taking to Delhi? Shatabdi or Rajdhani?</span>
+                                <span class="text-sm text-gray-400"><strong>Logic:</strong> Yahan specifically 2 trains ke beech choice di gayi hai (Shatabdi ya Rajdhani). Choices limited hain, so 'Which' is the correct answer.</span>
+                            </li>
+                            <li class="input-dark p-4 rounded-xl">
+                                <strong class="text-white block mb-1">Scenario C: The tricky implied limits</strong>
+                                <p class="text-sm mb-1 text-white">"Which hand do you write with?" (Right ✅)</p>
+                                <span class="text-sm text-gray-400"><strong>Logic:</strong> Insaan ke paas naturally 2 hi haath hote hain (Left or Right). Options automatically limited hain, chahe sentence mein bola na gaya ho. Isliye 'What hand' bolna galat hai.</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div id="top-mistakes">
+                        <h2 class="text-xl font-bold text-white mb-3">04. Top Mistakes People Make (Dhyan rakhna!)</h2>
+                        <div class="space-y-3">
+                            <div class="border-l-2 border-red-500 pl-4 py-1">
+                                <p class="text-white font-medium text-sm">Mistake 1: Using 'What' for fixed menus.</p>
+                                <p class="text-sm text-gray-400">Restaurant mein menu dekh kar: <del class="text-red-400/70">What dish should we order from here?</del> -> <span class="text-green-400">Which dish should we order?</span> (Kyunki menu limited hota hai).</p>
+                            </div>
+                            <div class="border-l-2 border-red-500 pl-4 py-1">
+                                <p class="text-white font-medium text-sm">Mistake 2: Using 'Which' for general knowledge.</p>
+                                <p class="text-sm text-gray-400">Gk puchte waqt: <del class="text-red-400/70">Which is the capital of India?</del> -> <span class="text-green-400">What is the capital of India?</span> (Though there is one right answer, the scope of the question before knowing the answer is wide open).</p>
+                                <p class="text-xs text-gray-500 mt-1">*Note: If you show a map with 4 cities and ask, then "Which of these is the capital?" becomes correct.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SECTION: STORY ================= -->
+        <section id="tab-story" class="hidden animate-fade-in">
+            <div class="glass-panel rounded-3xl p-6 md:p-8">
+                <h2 class="text-2xl font-bold text-white mb-4 border-b border-white/10 pb-4">Story Time: A Trip to the Market</h2>
+                <div class="prose prose-invert max-w-none text-gray-300 space-y-4 text-sm md:text-base leading-relaxed">
+                    <p>Rahul and Anjali were standing outside the busy Sarojini Market in Delhi. Rahul looked at the endless shops and asked, "<strong class="text-white">What</strong> do you want to buy today?"</p>
+                    
+                    <p>Anjali thought for a moment. There were so many options. "I need some clothes for college," she replied. As they walked in, they saw two large stalls selling jeans. Rahul pointed and asked, "<strong class="text-white">Which</strong> stall should we go to? The left one or the right one?"</p>
+                    
+                    <p>"Let's go to the right one," Anjali decided. Inside, the shopkeeper showed her a pile of jeans. She picked up a blue pair and a black pair. The shopkeeper smiled and asked, "<strong class="text-white">Which</strong> color do you prefer, Madam?"</p>
+                    
+                    <p>"The black one looks better," she said. After buying the jeans, Rahul realized he was hungry. He looked at the vast food court menu. "<strong class="text-white">What</strong> should we eat?" he wondered aloud.</p>
+                    
+                    <p>Anjali knew Rahul loved either Momos or Chole Bhature. "<strong class="text-white">Which</strong> of your favorites do you want right now? Momos or Bhature?" she asked playfully.</p>
+                    
+                    <p>Rahul laughed. "Momos! By the way, <strong class="text-white">what</strong> time is it?"</p>
+                    
+                    <p>"It's 6 PM," Anjali replied. "Let's eat and head back home."</p>
+                </div>
+                <div class="mt-8 p-4 input-dark rounded-xl">
+                    <p class="text-sm text-gray-400"><strong>Story Breakdown:</strong> Notice how <span class="text-white">What</span> was used for open questions ("What do you want to buy?", "What should we eat?", "What time is it?"). And <span class="text-white">Which</span> was used when choices were presented ("Which stall... left or right?", "Which color...", "Which of your favorites...").</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SECTION: REAL LIFE USAGE ================= -->
+        <section id="tab-realLife" class="hidden animate-fade-in">
+            <div class="glass-panel rounded-3xl p-6 md:p-8">
+                <div class="flex justify-between items-center mb-6 border-b border-white/10 pb-4">
+                    <h2 class="text-2xl font-bold text-white">Daily Life Scenarios (India)</h2>
+                    <button onclick="loadNextScenarios()" class="bg-[#2563EB] px-4 py-2 rounded-xl text-xs md:text-sm text-white font-medium hover:bg-blue-600 transition-colors">Load Next 5</button>
+                </div>
+                
+                <p class="text-sm text-gray-400 mb-6">Here are practical sentences you can use daily. Click the 'Eye' button to reveal the answer and reasoning.</p>
+
+                <div id="scenarios-container" class="space-y-4">
+                    <!-- Scenarios injected via JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SECTION: QUIZ ================= -->
+        <section id="tab-quiz" class="hidden animate-fade-in">
+            <div class="glass-panel rounded-3xl p-6 md:p-8 min-h-[400px] flex flex-col justify-center" id="quiz-container">
+                
+                <!-- Start Screen -->
+                <div id="quiz-start-screen" class="text-center">
+                    <h2 class="text-3xl font-bold text-white mb-4">Assessment Quiz</h2>
+                    <p class="text-gray-400 mb-8 max-w-md mx-auto text-sm">Test your knowledge with a set of 10 randomized questions from our database of 100 questions. Includes MCQs, True/False, and Error Spotting.</p>
+                    <button onclick="startQuiz()" class="bg-[#2563EB] text-white px-8 py-3 rounded-xl font-bold text-lg hover:bg-blue-600 transition-all transform hover:scale-105 shadow-[0_0_20px_rgba(37,99,235,0.4)]">Start Assessment</button>
+                </div>
+
+                <!-- Active Quiz Screen -->
+                <div id="quiz-active-screen" class="hidden w-full max-w-2xl mx-auto">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-xs font-bold tracking-widest text-gray-400 uppercase">Question <span id="q-current">1</span> of 10</span>
+                        <span class="text-xs font-bold tracking-widest text-[#2563EB] uppercase">Score: <span id="q-score">0</span></span>
+                    </div>
+                    <!-- Progress Bar -->
+                    <div class="w-full h-2 bg-white/10 rounded-full mb-8 overflow-hidden">
+                        <div id="quiz-progress" class="h-full bg-[#2563EB] rounded-full transition-all duration-300" style="width: 10%"></div>
+                    </div>
+
+                    <h3 id="quiz-question-text" class="text-xl md:text-2xl font-bold text-white mb-6 leading-tight"></h3>
+
+                    <div id="quiz-options" class="space-y-3 mb-6">
+                        <!-- Options injected via JS -->
+                    </div>
+
+                    <div id="quiz-feedback" class="hidden input-dark p-4 rounded-xl mb-6 animate-fade-in">
+                        <p id="quiz-feedback-text" class="text-sm font-medium mb-1"></p>
+                        <p id="quiz-feedback-reason" class="text-xs text-gray-400"></p>
+                    </div>
+
+                    <div class="flex justify-end">
+                        <button id="quiz-next-btn" onclick="nextQuestion()" class="hidden bg-[#2563EB] text-white px-6 py-2 rounded-xl font-medium hover:bg-blue-600 transition-colors">Next Question</button>
+                    </div>
+                </div>
+
+                <!-- End Screen -->
+                <div id="quiz-end-screen" class="hidden text-center">
+                    <h2 class="text-3xl font-bold text-white mb-2">Assessment Complete</h2>
+                    <p class="text-gray-400 mb-8 text-sm">Here is how you performed.</p>
+                    
+                    <div class="flex justify-center space-x-4 mb-8">
+                        <div class="input-dark p-6 rounded-2xl w-32">
+                            <span class="block text-3xl font-bold text-white mb-1" id="end-score">8/10</span>
+                            <span class="text-[10px] uppercase tracking-widest text-gray-400">Score</span>
+                        </div>
+                        <div class="input-dark p-6 rounded-2xl w-32">
+                            <span class="block text-3xl font-bold text-white mb-1" id="end-efficiency">80%</span>
+                            <span class="text-[10px] uppercase tracking-widest text-gray-400">Efficiency</span>
+                        </div>
+                    </div>
+
+                    <p class="text-sm text-gray-400 mb-6">Practice makes perfect. Every quiz loads 10 random questions from the master database.</p>
+                    
+                    <div class="flex justify-center space-x-3">
+                        <button onclick="startQuiz()" class="bg-[#2563EB] text-white px-6 py-3 rounded-xl font-medium hover:bg-blue-600 transition-colors">Take Another Quiz</button>
+                        <button onclick="switchTab('notes')" class="input-dark text-white px-6 py-3 rounded-xl font-medium transition-colors">Review Notes</button>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Sticky Footer -->
+    <footer class="fixed bottom-0 left-0 w-full bg-[#060B19]/90 backdrop-blur-md border-t border-white/5 py-4 px-6 z-50 no-print">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <button onclick="alert('Navigating Home (Mock)')" class="text-gray-400 hover:text-white text-sm font-medium transition-colors flex items-center space-x-2">
+                <span>← Home</span>
+            </button>
+            <button onclick="switchTab('notes')" class="text-gray-400 hover:text-white text-sm font-medium transition-colors flex items-center space-x-2">
+                <span>Back to Notes</span>
+            </button>
+        </div>
+    </footer>
+
+    <!-- Anki Modal (Hidden by default) -->
+    <div id="anki-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-3xl rounded-3xl p-6 md:p-8 max-h-[80vh] flex flex-col relative">
+            <button onclick="closeAnkiModal()" class="absolute top-4 right-6 text-gray-400 hover:text-white text-2xl">&times;</button>
+            <h2 class="text-xl font-bold text-white mb-2">Anki Flashcards Database</h2>
+            <p class="text-xs text-gray-400 mb-4">Formatted strictly as CSV (Question,Answer). No extra commas.</p>
+            
+            <div class="flex-grow overflow-hidden mb-4 rounded-xl border border-white/10">
+                <pre class="bg-[#080D1A] w-full h-full p-4 overflow-auto text-xs text-green-400 font-mono" id="anki-code-block"></pre>
+            </div>
+            
+            <div class="flex justify-end">
+                <button onclick="downloadAnkiCSV()" class="bg-[#2563EB] text-white px-6 py-2 rounded-xl font-medium hover:bg-blue-600 transition-colors">Download .csv File</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Logic -->
+    <script>
+        // --- 1. GLOBAL TIMER ---
+        let secondsSpent = 0;
+        setInterval(() => {
+            secondsSpent++;
+            const mins = String(Math.floor(secondsSpent / 60)).padStart(2, '0');
+            const secs = String(secondsSpent % 60).padStart(2, '0');
+            document.getElementById('global-timer').innerText = `${mins}:${secs}`;
+        }, 1000);
+
+        // --- 2. TAB NAVIGATION ---
+        function switchTab(tabId) {
+            const tabs = ['notes', 'story', 'realLife', 'quiz'];
+            tabs.forEach(t => {
+                document.getElementById(`tab-${t}`).classList.add('hidden');
+                document.getElementById(`btn-${t}`).classList.remove('bg-[#2563EB]', 'text-white');
+                document.getElementById(`btn-${t}`).classList.add('bg-[#111A2C]', 'text-gray-400');
+            });
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            document.getElementById(`btn-${tabId}`).classList.remove('bg-[#111A2C]', 'text-gray-400');
+            document.getElementById(`btn-${tabId}`).classList.add('bg-[#2563EB]', 'text-white');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // --- 3. DATA: 100 QUIZ QUESTIONS ---
+        // Formatting: NO commas inside 'q' or 'a' to strictly satisfy Anki CSV requirement.
+        const allQuestions = [
+            { q: "_____ is your favorite movie?", a: "What", type: "mcq", options: ["Which", "What"], reason: "Movies represent an unlimited set of choices." },
+            { q: "_____ movie do you want to watch tonight (Avatar or Titanic)?", a: "Which", type: "mcq", options: ["Which", "What"], reason: "The choices are limited to two specific options." },
+            { q: "_____ hand do you throw the ball with?", a: "Which", type: "mcq", options: ["Which", "What"], reason: "Humans naturally have a limited number of hands (two) so choices are limited." },
+            { q: "_____ time will you come home?", a: "What", type: "mcq", options: ["Which", "What"], reason: "Time is asked generally without providing a limited set of options." },
+            { q: "_____ stream will you choose after 10th standard (Science or Commerce)?", a: "Which", type: "mcq", options: ["Which", "What"], reason: "The options are explicitly limited to Science or Commerce." },
+            { q: "_____ is your name?", a: "What", type: "mcq", options: ["Which", "What"], reason: "Names are open-ended with practically infinite possibilities." },
+            { q: "_____ subject is hardest for you in school?", a: "Which", type: "mcq", options: ["Which", "What"], reason: "School subjects form a specific limited list." },
+            { q: "_____ did you say to him?", a: "What", type: "mcq", options: ["Which", "What"], reason: "Speech is open-ended. You could have said anything." },
+            { q: "Is this sentence correct: What leg is hurt?", a: "False", type: "tf", options: ["True", "False"], reason: "You only have two legs. Limited choices require 'Which leg is hurt?'" },
+            { q: "Is this sentence correct: Which is the capital of India?", a: "False", type: "tf", options: ["True", "False"], reason: "Unless pointing at a map with limited choices you use 'What is the capital of India?'" },
+            { q: "_____ flavor of ice cream do you want from this menu?", a: "Which", type: "mcq", options: ["Which", "What"], reason: "A menu implies a limited set of available choices." },
+            { q: "_____ is the meaning of this Hindi word?", a: "What", type: "mcq", options: ["Which", "What"], reason: "Meanings are open-ended inquiries without a provided list." },
+            { q: "_____ of these two shirts looks better on me?", a: "Which", type: "mcq", options: ["Which", "What"], reason: "'These two' strictly limits the choices." },
+            { q: "_____ happened at the party yesterday?", a: "What", type: "mcq", options: ["Which", "What"], reason: "Events are open-ended." },
+            { q: "Is this sentence correct: What of these pens is yours?", a: "False", type: "tf", options: ["True", "False"], reason: "'Of these pens' limits the choice so it must be 'Which of these pens is yours?'" },
+            { q: "_____ color is your new car?", a: "What", type: "mcq", options: ["Which", "What"], reason: "Without giving options you use What for colors generally." },
+            { q: "_____ color is your new car (the black one or the red one)?", a: "Which", type: "mcq", options: ["Which", "What"], reason: "Adding options makes it limited." },
+            { q: "_____ is the wifi password?", a: "What", type: "mcq", options: ["Which", "What"], reason: "Passwords are an open-ended piece of information." },
+            { q: "_____ floor is your apartment on?", a: "Which", type: "mcq", options: ["Which", "What"], reason: "A building has a limited and specific number of floors." },
+            { q: "_____ should we cook for dinner?", a: "What", type: "mcq", options: ["Which", "What"], reason: "No options are provided so the choice is open." },
+            { q: "_____ dal should we cook (Arhar or Moong)?", a: "Which", type: "mcq", options: ["Which", "What"], reason: "The options are limited to Arhar or Moong." },
+            { q: "Is this sentence correct: Which do you want for your birthday?", a: "False", type: "tf", options: ["True", "False"], reason: "Without specifying options from a list it should be 'What do you want'." },
+            { q: "_____ phone is better (iPhone or Samsung)?", a: "Which", type: "mcq", options: ["Which", "What"], reason: "You are choosing between two specific brands." },
+            { q: "_____ does this machine do?", a: "What", type: "mcq", options: ["Which", "What"], reason: "Asking for an explanation is an open-ended question." },
+            { q: "_____ side of the road should we drive on?", a: "Which", type: "mcq", options: ["Which", "What"], reason: "Roads only have two sides (left or right)." },
+            { q: "_____ is your problem?", a: "What", type: "mcq", options: ["Which", "What"], reason: "Problems can be anything so it is open-ended." },
+            { q: "_____ of the students scored the highest?", a: "Which", type: "mcq", options: ["Which", "What"], reason: "A class has a limited known number of students." },
+            { q: "_____ is the fastest animal on earth?", a: "What", type: "mcq", options: ["Which", "What"], reason: "Asked as a general knowledge question without a list." },
+            { q: "_____ is the fastest animal on earth (Cheetah or Lion)?", a: "Which", type: "mcq", options: ["Which", "What"], reason: "Options are provided making it limited." },
+            { q: "Is this sentence correct: What day is your exam on?", a: "True", type: "tf", options: ["True", "False"], reason: "While days are technically 7 we often use 'What day' when the context is open-ended calendar planning." },
+            { q: "_____ day works better for you (Monday or Tuesday)?", a: "Which", type: "mcq", options: ["Which", "What"], reason: "Restricted to Monday or Tuesday." },
+            { q: "_____ is your father's profession?", a: "What", type: "mcq", options: ["Which", "What"], reason: "Professions are vast and unlimited." },
+            { q: "_____ team will win the IPL this year?", a: "Which", type: "mcq", options: ["Which", "What"], reason: "The IPL has a limited specific number of teams." },
+            { q: "_____ are you doing right now?", a: "What", type: "mcq", options: ["Which", "What"], reason: "Open-ended activity question." },
+            { q: "_____ route should we take to bypass traffic?", a: "Which", type: "mcq", options: ["Which", "What"], reason: "Routes to a destination are usually a limited known set." },
+            { q: "_____ makes you so happy?", a: "What", type: "mcq", options: ["Which", "What"], reason: "The cause of happiness is unlimited." },
+            { q: "Is this correct: What of the two brothers is older?", a: "False", type: "tf", options: ["True", "False"], reason: "'Of the two' strictly means limited choices so use Which." },
+            { q: "_____ kind of music do you like?", a: "What", type: "mcq", options: ["Which", "What"], reason: "Music genres are wide and unlimited." },
+            { q: "_____ kind of music do you prefer (Jazz or Rock)?", a: "Which", type: "mcq", options: ["Which", "What"], reason: "Limited to Jazz or Rock." },
+            { q: "_____ shoe is untied?", a: "Which", type: "mcq", options: ["Which", "What"], reason: "You only wear two shoes." },
+            { q: "_____ size do you wear (S M or L)?", a: "Which", type: "mcq", options: ["Which", "What"], reason: "Sizes are a fixed limited set." },
+            { q: "_____ are your plans for tomorrow?", a: "What", type: "mcq", options: ["Which", "What"], reason: "Plans can be literally anything." },
+            { q: "_____ of these books belongs to you?", a: "Which", type: "mcq", options: ["Which", "What"], reason: "The phrase 'of these' implies a limited group." },
+            { q: "_____ did you buy from the market?", a: "What", type: "mcq", options: ["Which", "What"], reason: "You could have bought anything." },
+            { q: "Is this correct: Which is your address?", a: "False", type: "tf", options: ["True", "False"], reason: "Addresses are unlimited so you must ask 'What is your address?'" },
+            { q: "_____ flight are we taking?", a: "Which", type: "mcq", options: ["Which", "What"], reason: "Flights on a given day to a destination are a limited schedule." },
+            { q: "_____ is inside that box?", a: "What", type: "mcq", options: ["Which", "What"], reason: "The contents are unknown and open-ended." },
+            { q: "_____ button turns on the AC?", a: "Which", type: "mcq", options: ["Which", "What"], reason: "A remote has a limited number of buttons." },
+            { q: "_____ is the best way to learn English?", a: "What", type: "mcq", options: ["Which", "What"], reason: "Methods are broad and subjective." },
+            { q: "_____ eye is itching?", a: "Which", type: "mcq", options: ["Which", "What"], reason: "You only have two eyes." },
+            { q: "_____ language do they speak in Brazil?", a: "What", type: "mcq", options: ["Which", "What"], reason: "General knowledge question without options." },
+            { q: "_____ seat is mine?", a: "Which", type: "mcq", options: ["Which", "What"], reason: "Seats in a theater or train are a limited numbered set." },
+            { q: "Is this correct: What finger did you cut?", a: "False", type: "tf", options: ["True", "False"], reason: "You have a limited number of fingers (10) so it should be Which." },
+            { q: "_____ does he want from me?", a: "What", type: "mcq", options: ["Which", "What"], reason: "Desires are open-ended." },
+            { q: "_____ door leads to the exit?", a: "Which", type: "mcq", options: ["Which", "What"], reason: "There are a limited number of doors in a hallway." },
+            { q: "_____ is your blood type?", a: "What", type: "mcq", options: ["Which", "What"], reason: "Usually asked with What in common speech despite types being limited biologically." },
+            { q: "_____ chapter is the test on?", a: "Which", type: "mcq", options: ["Which", "What"], reason: "A book has a limited number of chapters." },
+            { q: "_____ do you think about the new policy?", a: "What", type: "mcq", options: ["Which", "What"], reason: "Opinions are unlimited." },
+            { q: "_____ key opens the front door?", a: "Which", type: "mcq", options: ["Which", "What"], reason: "You hold a limited bunch of keys." },
+            { q: "Is this correct: Which of the players got injured?", a: "True", type: "tf", options: ["True", "False"], reason: "A team has a limited set of players." },
+            { q: "_____ is the price of this laptop?", a: "What", type: "mcq", options: ["Which", "What"], reason: "Price is open-ended numerical data." },
+            { q: "_____ laptop should I buy (Dell or HP)?", a: "Which", type: "mcq", options: ["Which", "What"], reason: "Limited choices provided." },
+            { q: "_____ did the doctor say?", a: "What", type: "mcq", options: ["Which", "What"], reason: "Speech and advice are open-ended." },
+            { q: "_____ medicine did the doctor prescribe (Paracetamol or Ibuprofen)?", a: "Which", type: "mcq", options: ["Which", "What"], reason: "Limited options are specified." },
+            { q: "_____ floor do you live on?", a: "Which", type: "mcq", options: ["Which", "What"], reason: "Floors are limited." },
+            { q: "_____ is the matter with you?", a: "What", type: "mcq", options: ["Which", "What"], reason: "Issues can be anything." },
+            { q: "_____ candidate are you voting for?", a: "Which", type: "mcq", options: ["Which", "What"], reason: "Elections have a specific limited list of candidates." },
+            { q: "_____ kind of car does he drive?", a: "What", type: "mcq", options: ["Which", "What"], reason: "Car types are vast." },
+            { q: "Is this correct: What of these answers is correct?", a: "False", type: "tf", options: ["True", "False"], reason: "'Of these' creates a limited set so use Which." },
+            { q: "_____ way did he go?", a: "Which", type: "mcq", options: ["Which", "What"], reason: "Directions from a point are limited." },
+            { q: "_____ exactly are you looking for?", a: "What", type: "mcq", options: ["Which", "What"], reason: "The object sought is unknown and unlimited." },
+            { q: "_____ bag is yours?", a: "Which", type: "mcq", options: ["Which", "What"], reason: "Out of the bags present only one is yours (limited)." },
+            { q: "_____ is the difference between these two?", a: "What", type: "mcq", options: ["Which", "What"], reason: "Differences require explanation and are open-ended." },
+            { q: "_____ of the twins is smarter?", a: "Which", type: "mcq", options: ["Which", "What"], reason: "Twins strictly means two people (limited)." },
+            { q: "_____ was the weather like yesterday?", a: "What", type: "mcq", options: ["Which", "What"], reason: "Descriptions are open-ended." },
+            { q: "_____ season do you like more (Summer or Winter)?", a: "Which", type: "mcq", options: ["Which", "What"], reason: "Two options are given." },
+            { q: "Is this correct: What hand do you hold your pen in?", a: "False", type: "tf", options: ["True", "False"], reason: "Hands are limited to two." },
+            { q: "_____ do you call a person who fixes pipes?", a: "What", type: "mcq", options: ["Which", "What"], reason: "Asking for a vocabulary word is open-ended." },
+            { q: "_____ pipe is leaking (the kitchen one or the bathroom one)?", a: "Which", type: "mcq", options: ["Which", "What"], reason: "Two options are given." },
+            { q: "_____ are we having for lunch?", a: "What", type: "mcq", options: ["Which", "What"], reason: "Lunch can be anything." },
+            { q: "_____ of the dishes on the table is vegetarian?", a: "Which", type: "mcq", options: ["Which", "What"], reason: "The dishes on the table form a limited set." },
+            { q: "_____ is the name of your dog?", a: "What", type: "mcq", options: ["Which", "What"], reason: "Names are open-ended." },
+            { q: "_____ dog is yours (the pug or the husky)?", a: "Which", type: "mcq", options: ["Which", "What"], reason: "Choices are limited to two breeds." },
+            { q: "Is this correct: Which is your phone number?", a: "False", type: "tf", options: ["True", "False"], reason: "Numbers are infinite so use What." },
+            { q: "_____ network provider do you use?", a: "Which", type: "mcq", options: ["Which", "What"], reason: "Telecom providers in a country are a limited list." },
+            { q: "_____ did you get me for my anniversary?", a: "What", type: "mcq", options: ["Which", "What"], reason: "Gifts can be anything." },
+            { q: "_____ necklace should I wear (gold or silver)?", a: "Which", type: "mcq", options: ["Which", "What"], reason: "Limited to gold or silver." },
+            { q: "_____ is your final decision?", a: "What", type: "mcq", options: ["Which", "What"], reason: "Decisions are open-ended until stated." },
+            { q: "_____ option will you choose (A B or C)?", a: "Which", type: "mcq", options: ["Which", "What"], reason: "Limited to three letters." },
+            { q: "Is this correct: What of your parents is stricter?", a: "False", type: "tf", options: ["True", "False"], reason: "You have two parents so use Which." },
+            { q: "_____ is the length of this table?", a: "What", type: "mcq", options: ["Which", "What"], reason: "Measurements are open-ended data points." },
+            { q: "_____ side of the table should I sit on?", a: "Which", type: "mcq", options: ["Which", "What"], reason: "A table has a limited number of sides." },
+            { q: "_____ was your favorite part of the movie?", a: "What", type: "mcq", options: ["Which", "What"], reason: "Opinions and parts are open-ended." },
+            { q: "_____ actor played the villain?", a: "Which", type: "mcq", options: ["Which", "What"], reason: "The cast list of a movie is limited." },
+            { q: "_____ happens if I press this button?", a: "What", type: "mcq", options: ["Which", "What"], reason: "Outcomes are open-ended." },
+            { q: "_____ button should I press to start (Green or Red)?", a: "Which", type: "mcq", options: ["Which", "What"], reason: "Limited choices." },
+            { q: "Is this correct: Which is the meaning of life?", a: "False", type: "tf", options: ["True", "False"], reason: "Highly philosophical and open-ended so use What." },
+            { q: "_____ path should we take to reach the temple?", a: "Which", type: "mcq", options: ["Which", "What"], reason: "Paths are a physical limited choice." },
+            { q: "_____ do you think is going to happen next?", a: "What", type: "mcq", options: ["Which", "What"], reason: "Predictions are open-ended." },
+            { q: "_____ candidate performed better in the interview?", a: "Which", type: "mcq", options: ["Which", "What"], reason: "The pool of candidates is a limited set." }
+        ];
+
+        // --- 4. DATA: 50 REAL LIFE SCENARIOS ---
+        const realLifeScenarios = [
+            { q: "Deciding dinner menu without options", s: "_____ should we make for dinner today?", a: "What", hint: "Because there are no options given." },
+            { q: "Deciding between two vegetables", s: "_____ sabzi should we cook (Bhindi or Gobi)?", a: "Which", hint: "Options are limited to Bhindi or Gobi." },
+            { q: "Asking the auto driver for direction", s: "Bhaiya _____ way to the metro station?", a: "Which", hint: "Roads/Ways are limited physical paths." },
+            { q: "Asking about the fare", s: "_____ is the fare to Connaught Place?", a: "What", hint: "Price/Fare is open-ended numerical data." },
+            { q: "At the mobile shop", s: "_____ phone is better for gaming under 20k?", a: "Which", hint: "Phones under 20k form a limited, specific category/list in the shop." },
+            { q: "Asking for a WiFi password", s: "Bhai _____ is the WiFi password?", a: "What", hint: "Passwords are open-ended." },
+            { q: "Choosing a streaming platform", s: "_____ app has that new series (Netflix or Prime)?", a: "Which", hint: "Limited to Netflix or Prime." },
+            { q: "Asking about someone's salary", s: "_____ is your starting package?", a: "What", hint: "Package/Salary is an open-ended number." },
+            { q: "Choosing an IT stream", s: "_____ stream should I take (CS or IT)?", a: "Which", hint: "Strictly limited choices." },
+            { q: "Asking a friend's plan", s: "_____ are you doing this weekend?", a: "What", hint: "Plans can be anything." },
+            { q: "Choosing a mode of transport", s: "_____ is cheaper (Train or Bus)?", a: "Which", hint: "Comparing two specific things." },
+            { q: "Asking for advice", s: "_____ should I do now?", a: "What", hint: "Advice is open-ended." },
+            { q: "Buying shoes", s: "_____ size do you wear?", a: "Which", hint: "Shoe sizes are a fixed, limited scale (7, 8, 9, 10)." },
+            { q: "Asking about the weather", s: "_____ is the weather like outside?", a: "What", hint: "Open-ended description." },
+            { q: "Asking which hand is dominant", s: "_____ hand do you write with?", a: "Which", hint: "Humans only have two hands (implied limit)." },
+            { q: "Discussing cricket", s: "_____ team will lift the trophy this time?", a: "Which", hint: "Tournament teams are a limited list." },
+            { q: "Asking a name", s: "_____ is your good name?", a: "What", hint: "Names are infinite." },
+            { q: "Choosing a seat", s: "_____ seat is mine in this row?", a: "Which", hint: "Seats in a row are numbered and limited." },
+            { q: "Asking about a problem", s: "_____ is wrong with the fan?", a: "What", hint: "Issues are open-ended." },
+            { q: "Choosing a switch", s: "_____ switch is for the fan?", a: "Which", hint: "A switchboard has limited switches." },
+            { q: "Asking the time", s: "_____ is the time?", a: "What", hint: "Open-ended." },
+            { q: "Choosing a date", s: "_____ date works for the wedding?", a: "Which", hint: "Calendar dates are a set list." },
+            { q: "Asking about an object", s: "_____ is this thing called in English?", a: "What", hint: "Open-ended vocabulary question." },
+            { q: "Choosing a color from a catalogue", s: "_____ color should we paint the living room?", a: "Which", hint: "A paint catalogue is a limited list of choices." },
+            { q: "General question about color", s: "_____ is your favorite color?", a: "What", hint: "Without a catalogue, colors are open-ended." },
+            { q: "Asking for a reason", s: "_____ is the reason for this delay?", a: "What", hint: "Reasons are open-ended." },
+            { q: "Choosing an exam center", s: "_____ center did you get allotted?", a: "Which", hint: "Centers are from a fixed list provided by the board." },
+            { q: "Asking a score", s: "_____ was your score in the test?", a: "What", hint: "Scores are numerical and open-ended." },
+            { q: "Choosing an answer in MCQ", s: "_____ option is correct (A B C or D)?", a: "Which", hint: "Options are limited." },
+            { q: "Asking about a dream", s: "_____ did you dream about last night?", a: "What", hint: "Dreams are completely open-ended." },
+            { q: "Choosing a shirt for office", s: "_____ shirt looks more professional?", a: "Which", hint: "You are choosing from the shirts in your wardrobe (limited)." },
+            { q: "Asking about an ingredient", s: "_____ goes into making this dish?", a: "What", hint: "Ingredients can be anything." },
+            { q: "Choosing a language", s: "_____ language do they speak in Kerala?", a: "Which", hint: "Indian states have specific, listed official languages." },
+            { q: "General knowledge", s: "_____ is the capital of Australia?", a: "What", hint: "Open-ended general knowledge." },
+            { q: "Choosing an actor", s: "_____ actor played the hero in that movie?", a: "Which", hint: "Movie cast is a limited list." },
+            { q: "Asking about a movie plot", s: "_____ happens at the end of the movie?", a: "What", hint: "Plot is open-ended." },
+            { q: "Choosing a road", s: "_____ road goes to the airport?", a: "Which", hint: "Roads are limited physical paths." },
+            { q: "Asking a definition", s: "_____ is the meaning of 'Democracy'?", a: "What", hint: "Meanings are open-ended explanations." },
+            { q: "Choosing a bank", s: "_____ bank offers the best home loan interest?", a: "Which", hint: "Banks are a limited corporate list in India." },
+            { q: "Asking about interest rate", s: "_____ is the current repo rate?", a: "What", hint: "Numerical data." },
+            { q: "Choosing a college", s: "_____ college did you graduate from?", a: "Which", hint: "Colleges are registered institutions (a limited set)." },
+            { q: "Asking about a major", s: "_____ did you study in college?", a: "What", hint: "Subjects are open-ended." },
+            { q: "Choosing a floor", s: "_____ floor is the HR department on?", a: "Which", hint: "Buildings have limited floors." },
+            { q: "Asking about a rule", s: "_____ is the company policy on leaves?", a: "What", hint: "Policies are open-ended explanations." },
+            { q: "Choosing a candidate", s: "_____ of the two candidates should we hire?", a: "Which", hint: "Limited to two candidates." },
+            { q: "Asking about feedback", s: "_____ did the manager say about my report?", a: "What", hint: "Feedback is open-ended." },
+            { q: "Choosing a platform", s: "_____ platform does the train arrive on?", a: "Which", hint: "Stations have numbered, limited platforms." },
+            { q: "Asking about train status", s: "_____ is the current status of the train?", a: "What", hint: "Status is open-ended." },
+            { q: "Choosing an eye", s: "_____ eye has lower vision?", a: "Which", hint: "You only have two eyes." },
+            { q: "Asking about a vision score", s: "_____ is your eyesight power?", a: "What", hint: "Numerical value." }
+        ];
+
+        // --- 5. REAL LIFE USAGE LOGIC ---
+        let currentScenarioIndex = 0;
+        
+        function renderRealLifeScenarios() {
+            const container = document.getElementById('scenarios-container');
+            container.innerHTML = '';
+            
+            // Get next 5
+            const slice = realLifeScenarios.slice(currentScenarioIndex, currentScenarioIndex + 5);
+            
+            if (slice.length === 0) {
+                currentScenarioIndex = 0; // Reset
+                renderRealLifeScenarios();
+                return;
+            }
+
+            slice.forEach((scen, idx) => {
+                const div = document.createElement('div');
+                div.className = "input-dark p-4 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-4";
+                
+                div.innerHTML = `
+                    <div class="flex-grow">
+                        <span class="text-xs text-gray-400 uppercase tracking-wider mb-1 block">${scen.q}</span>
+                        <p class="text-white text-lg font-medium">${scen.s}</p>
+                        <div id="hint-${currentScenarioIndex + idx}" class="hidden mt-2 pt-2 border-t border-white/5">
+                            <span class="text-[#2563EB] font-bold mr-2">${scen.a}</span>
+                            <span class="text-gray-400 text-sm">${scen.hint}</span>
+                        </div>
+                    </div>
+                    <button onclick="document.getElementById('hint-${currentScenarioIndex + idx}').classList.toggle('hidden')" class="bg-white/5 hover:bg-white/10 text-gray-300 p-3 rounded-xl transition-colors flex-shrink-0 flex items-center justify-center" aria-label="Reveal Answer">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                    </button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function loadNextScenarios() {
+            currentScenarioIndex += 5;
+            if (currentScenarioIndex >= realLifeScenarios.length) {
+                currentScenarioIndex = 0;
+            }
+            renderRealLifeScenarios();
+        }
+
+        // --- 6. QUIZ LOGIC ---
+        let currentQuizQuestions = [];
+        let currentQIndex = 0;
+        let score = 0;
+
+        function startQuiz() {
+            // Shuffle and pick 10
+            const shuffled = [...allQuestions].sort(() => 0.5 - Math.random());
+            currentQuizQuestions = shuffled.slice(0, 10);
+            
+            currentQIndex = 0;
+            score = 0;
+
+            document.getElementById('quiz-start-screen').classList.add('hidden');
+            document.getElementById('quiz-end-screen').classList.add('hidden');
+            document.getElementById('quiz-active-screen').classList.remove('hidden');
+            
+            renderQuizQuestion();
+        }
+
+        function renderQuizQuestion() {
+            const q = currentQuizQuestions[currentQIndex];
+            
+            document.getElementById('q-current').innerText = currentQIndex + 1;
+            document.getElementById('q-score').innerText = score;
+            document.getElementById('quiz-progress').style.width = `${((currentQIndex) / 10) * 100}%`;
+            
+            document.getElementById('quiz-question-text').innerText = q.q;
+            
+            const optionsContainer = document.getElementById('quiz-options');
+            optionsContainer.innerHTML = '';
+            
+            q.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left input-dark p-4 rounded-xl text-white font-medium hover:pl-6 transition-all";
+                btn.innerText = opt;
+                btn.onclick = () => handleAnswer(opt, q, btn);
+                optionsContainer.appendChild(btn);
+            });
+
+            document.getElementById('quiz-feedback').classList.add('hidden');
+            document.getElementById('quiz-next-btn').classList.add('hidden');
+        }
+
+        function handleAnswer(selectedOpt, q, btnClicked) {
+            // Disable all buttons
+            const buttons = document.getElementById('quiz-options').querySelectorAll('button');
+            buttons.forEach(b => {
+                b.onclick = null;
+                b.classList.remove('hover:pl-6');
+                if (b.innerText === q.a) {
+                    b.classList.add('bg-green-500/20', 'border-green-500/50', 'text-green-400');
+                } else {
+                    b.classList.add('opacity-50');
+                }
+            });
+
+            const feedbackDiv = document.getElementById('quiz-feedback');
+            const feedbackText = document.getElementById('quiz-feedback-text');
+            const feedbackReason = document.getElementById('quiz-feedback-reason');
+
+            feedbackDiv.classList.remove('hidden', 'border-green-500/50', 'border-red-500/50');
+            
+            if (selectedOpt === q.a) {
+                score++;
+                document.getElementById('q-score').innerText = score;
+                feedbackText.innerText = "Correct!";
+                feedbackText.className = "text-sm font-bold mb-1 text-green-400";
+                feedbackDiv.classList.add('border', 'border-green-500/50', 'bg-green-500/5');
+            } else {
+                btnClicked.classList.add('bg-red-500/20', 'border-red-500/50', 'text-red-400');
+                feedbackText.innerText = "Incorrect";
+                feedbackText.className = "text-sm font-bold mb-1 text-red-400";
+                feedbackDiv.classList.add('border', 'border-red-500/50', 'bg-red-500/5');
+            }
+
+            feedbackReason.innerText = q.reason;
+            document.getElementById('quiz-next-btn').classList.remove('hidden');
+            document.getElementById('quiz-progress').style.width = `${((currentQIndex + 1) / 10) * 100}%`;
+        }
+
+        function nextQuestion() {
+            currentQIndex++;
+            if (currentQIndex < 10) {
+                renderQuizQuestion();
+            } else {
+                endQuiz();
+            }
+        }
+
+        function endQuiz() {
+            document.getElementById('quiz-active-screen').classList.add('hidden');
+            document.getElementById('quiz-end-screen').classList.remove('hidden');
+            
+            document.getElementById('end-score').innerText = `${score}/10`;
+            document.getElementById('end-efficiency').innerText = `${(score / 10) * 100}%`;
+        }
+
+        // --- 7. ANKI EXPORT LOGIC ---
+        function showAnkiModal() {
+            let csvContent = "";
+            // Generating perfect strict CSV with NO internal commas.
+            allQuestions.forEach(q => {
+                csvContent += `${q.q},${q.a}\n`;
+            });
+            
+            document.getElementById('anki-code-block').innerText = csvContent;
+            document.getElementById('anki-modal').classList.remove('hidden');
+        }
+
+        function closeAnkiModal() {
+            document.getElementById('anki-modal').classList.add('hidden');
+        }
+
+        function downloadAnkiCSV() {
+            const text = document.getElementById('anki-code-block').innerText;
+            const blob = new Blob([text], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('hidden', '');
+            a.setAttribute('href', url);
+            a.setAttribute('download', 'Which_vs_What_Anki.csv');
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        // Initialize App
+        window.onload = () => {
+            renderRealLifeScenarios();
+        };
+
+    </script>
+</body>
+</html>
+
+```
