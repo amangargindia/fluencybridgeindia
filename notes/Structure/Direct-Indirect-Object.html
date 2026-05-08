@@ -1,0 +1,877 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fluency Bridge - Direct & Indirect Objects</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital@1&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    colors: {
+                        brand: {
+                            bg: '#060B19',
+                            card: '#111A2C',
+                            input: '#080D1A',
+                            accent: '#2563EB'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #060B19;
+            color: white;
+            -webkit-font-smoothing: antialiased;
+        }
+        .glass-panel {
+            background: rgba(17, 26, 44, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+        }
+        .glass-input {
+            background: rgba(8, 13, 26, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.2s ease;
+        }
+        .glass-input:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
+        
+        /* Print Styles */
+        @media print {
+            body { 
+                background: #060B19 !important; 
+                color: white !important; 
+                -webkit-print-color-adjust: exact; 
+                print-color-adjust: exact;
+                overflow: visible !important;
+            }
+            .no-print { display: none !important; }
+            #sec-notes { display: block !important; }
+            .glass-panel { border: 1px solid rgba(255,255,255,0.2); background: #111A2C !important; }
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="h-screen w-full flex flex-col overflow-hidden relative selection:bg-brand-accent selection:text-white">
+    <!-- Deep Space Gradient Background -->
+    <div class="absolute inset-0 z-[-1] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#131E3A] via-brand-bg to-brand-bg pointer-events-none no-print"></div>
+
+    <!-- Header -->
+    <header class="p-6 text-center border-b border-white/5 no-print shrink-0">
+        <div class="tracking-[0.3em] text-[10px] text-gray-300 uppercase font-sans">F L U E N C Y</div>
+        <div class="text-white text-4xl italic font-serif mt-1">bridge</div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="flex gap-2 p-4 overflow-x-auto border-b border-white/5 no-print shrink-0 hide-scrollbar justify-start md:justify-center bg-[#060B19]/50 backdrop-blur-sm z-10">
+        <button onclick="app.nav('notes')" id="nav-notes" class="px-4 py-2 rounded-xl text-sm font-semibold transition-all bg-white/10 text-white border border-white/10 shadow-lg shadow-black/20">Notes</button>
+        <button onclick="app.nav('story')" id="nav-story" class="px-4 py-2 rounded-xl text-sm font-semibold transition-all text-gray-400 hover:text-white hover:bg-white/5 border border-transparent">Story</button>
+        <button onclick="app.nav('quiz')" id="nav-quiz" class="px-4 py-2 rounded-xl text-sm font-semibold transition-all text-gray-400 hover:text-white hover:bg-white/5 border border-transparent">Quiz</button>
+        <button onclick="app.nav('real')" id="nav-real" class="px-4 py-2 rounded-xl text-sm font-semibold transition-all text-gray-400 hover:text-white hover:bg-white/5 border border-transparent">Real Life</button>
+        <button onclick="app.nav('anki')" id="nav-anki" class="px-4 py-2 rounded-xl text-sm font-semibold transition-all text-gray-400 hover:text-white hover:bg-white/5 border border-transparent">Anki</button>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 overflow-y-auto p-4 md:p-6 relative">
+        
+        <!-- ================= SECTION: NOTES ================= -->
+        <section id="sec-notes" class="max-w-3xl mx-auto space-y-6 pb-20">
+            <div class="flex justify-between items-center no-print">
+                <h1 class="text-2xl font-bold tracking-tight">Direct & Indirect Objects</h1>
+                <div class="flex gap-2">
+                    <button onclick="window.print()" class="p-2 rounded-xl glass-input text-gray-300 hover:text-white transition-colors border border-white/10" title="Print Notes">
+                        <i data-lucide="printer" class="w-5 h-5"></i>
+                    </button>
+                    <button onclick="app.nav('quiz')" class="px-4 py-2 rounded-xl bg-brand-accent text-white font-semibold text-sm transition-colors hover:bg-blue-600 shadow-lg shadow-brand-accent/20">
+                        Go to Quiz
+                    </button>
+                </div>
+            </div>
+
+            <div class="glass-panel rounded-3xl p-6 md:p-8 space-y-8 shadow-xl" id="notes-content">
+                <!-- Table of Contents -->
+                <div class="space-y-4 bg-white/5 p-5 rounded-2xl border border-white/5">
+                    <h2 class="text-lg font-bold text-gray-200">Table of Contents</h2>
+                    <ul class="space-y-3 text-sm text-brand-accent flex flex-col items-start">
+                        <li><a href="#prereq" class="hover:underline hover:text-blue-400 transition-colors">1. Prerequisites (Pehle ye seekhein)</a></li>
+                        <li><a href="#concept" class="hover:underline hover:text-blue-400 transition-colors">2. The Core Concept (Asli mudda)</a></li>
+                        <li><a href="#direct" class="hover:underline hover:text-blue-400 transition-colors">3. Direct Object Pehchano</a></li>
+                        <li><a href="#indirect" class="hover:underline hover:text-blue-400 transition-colors">4. Indirect Object Pehchano</a></li>
+                        <li><a href="#mistakes" class="hover:underline hover:text-blue-400 transition-colors">5. Top Mistakes (Kahan galti hoti hai)</a></li>
+                        <li><a href="#nuances" class="hover:underline hover:text-blue-400 transition-colors">6. Advanced Nuances</a></li>
+                    </ul>
+                </div>
+
+                <div id="prereq" class="space-y-3 scroll-mt-6">
+                    <h2 class="text-xl font-bold text-white border-b border-white/10 pb-2">1. Prerequisites</h2>
+                    <p class="text-gray-400 text-sm">Ye topic samajhne se pehle aapko in basics ka idea hona chahiye. Click to search and learn:</p>
+                    <ul class="list-none space-y-2 text-gray-300">
+                        <li class="flex items-center gap-2"><i data-lucide="arrow-right" class="w-4 h-4 text-brand-accent"></i> <a href="https://www.google.com/search?q=English+grammar+Subject" target="_blank" class="text-brand-accent hover:underline font-semibold">Subject</a> - Jo action karta hai (Doer)</li>
+                        <li class="flex items-center gap-2"><i data-lucide="arrow-right" class="w-4 h-4 text-brand-accent"></i> <a href="https://www.google.com/search?q=English+grammar+Action+Verb" target="_blank" class="text-brand-accent hover:underline font-semibold">Action Verb</a> - Jo kaam ho raha hai (Action)</li>
+                        <li class="flex items-center gap-2"><i data-lucide="arrow-right" class="w-4 h-4 text-brand-accent"></i> <a href="https://www.google.com/search?q=English+grammar+Prepositions" target="_blank" class="text-brand-accent hover:underline font-semibold">Prepositions</a> - Words like 'to' or 'for' jo relation batate hain</li>
+                    </ul>
+                </div>
+
+                <div id="concept" class="space-y-3 scroll-mt-6">
+                    <h2 class="text-xl font-bold text-white border-b border-white/10 pb-2">2. The Core Concept</h2>
+                    <p class="text-gray-300 leading-relaxed">
+                        English sentence ka ek basic dhancha (structure) hota hai: <strong>Subject + Verb + Object</strong>.<br><br>
+                        Object wo hota hai jispar verb (kaam) ka direct asar padta hai. Lekin kabhi kabhi, ek sentence mein do objects aa jate hain: ek <strong>Direct Object</strong> aur ek <strong>Indirect Object</strong>. Aisa zyadatar tab hota hai jab hum kisi ko kuch dete hain batate hain ya dikhate hain.
+                    </p>
+                </div>
+
+                <div id="direct" class="space-y-3 bg-brand-input p-6 rounded-2xl border border-white/5 scroll-mt-6 shadow-inner">
+                    <h2 class="text-xl font-bold text-white">3. Direct Object</h2>
+                    <p class="text-gray-400">Ye wo asli cheez ya insaan hai jo action ko seedha receive karta hai.</p>
+                    <div class="bg-[#111A2C] p-4 rounded-xl border border-white/5 mt-2">
+                        <p class="text-sm font-semibold text-brand-accent mb-2"><i data-lucide="zap" class="w-4 h-4 inline mr-1"></i>Trick to find it:</p>
+                        <p class="text-gray-300 text-sm">Verb (Action word) ke aage "Kya?" (What?) ya "Kisko?" (Whom?) lagakar sawal pucho.</p>
+                    </div>
+                    <ul class="list-disc pl-5 space-y-2 text-gray-300 text-sm mt-4">
+                        <li><strong>Sentence:</strong> "Rahul kicked the ball."
+                            <ul class="list-[circle] pl-5 mt-1 text-gray-400 space-y-1">
+                                <li>Kaam kya hua? -> Kicked.</li>
+                                <li>Rahul ne kya kick kiya? -> <em>the ball</em>.</li>
+                                <li>Result: "the ball" is the Direct Object.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
+                <div id="indirect" class="space-y-3 bg-brand-input p-6 rounded-2xl border border-white/5 scroll-mt-6 shadow-inner">
+                    <h2 class="text-xl font-bold text-white">4. Indirect Object</h2>
+                    <p class="text-gray-400">Ye wo insaan janwar ya cheez hai jiske liye kaam kiya gaya ya jisko direct object receive hua.</p>
+                    <div class="bg-[#111A2C] p-4 rounded-xl border border-white/5 mt-2">
+                        <p class="text-sm font-semibold text-brand-accent mb-2"><i data-lucide="zap" class="w-4 h-4 inline mr-1"></i>Trick to find it:</p>
+                        <p class="text-gray-300 text-sm">Verb ke aage "Kiske liye?" (For whom?) ya "Kisko mila?" (To whom?) pucho.</p>
+                        <p class="text-xs text-red-400 mt-2 font-bold">Important Rule: Indirect object hamesha Direct Object ke PEHLE aata hai bina kisi 'to' ya 'for' ke.</p>
+                    </div>
+                    <ul class="list-disc pl-5 space-y-2 text-gray-300 text-sm mt-4">
+                        <li><strong>Sentence:</strong> "Neha gave Rohan a book."
+                            <ul class="list-[circle] pl-5 mt-1 text-gray-400 space-y-1">
+                                <li>Kya diya? -> <em>a book</em> (Direct Object).</li>
+                                <li>Kisko mila book? -> <em>Rohan</em> (Indirect Object).</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
+                <div id="mistakes" class="space-y-4 border-l-4 border-red-500/50 pl-5 bg-red-500/5 p-4 rounded-r-2xl scroll-mt-6">
+                    <h2 class="text-xl font-bold text-red-400">5. Top Mistakes</h2>
+                    <div class="space-y-5 text-sm text-gray-300">
+                        <div class="bg-black/20 p-4 rounded-xl">
+                            <p class="font-bold text-white flex items-center gap-2"><i data-lucide="x-circle" class="w-4 h-4 text-red-400"></i> Mistake 1: Prepositional object ko Indirect Object man lena.</p>
+                            <p class="text-gray-400 mt-2"><strong>Galat Soch:</strong> Sentence "I gave a book <em>to Rohan</em>" mein 'Rohan' indirect object hai.</p>
+                            <p class="mt-2 text-green-300"><strong>Sahi Logic:</strong> Grammatically yahan 'Rohan' ek preposition ('to') ka object hai. True indirect object tabhi banta hai jab sentence "I gave <em>Rohan</em> a book" ho. Meaning bilkul same hai par grammar ka construction alag ho jata hai.</p>
+                        </div>
+                        <div class="bg-black/20 p-4 rounded-xl">
+                            <p class="font-bold text-white flex items-center gap-2"><i data-lucide="x-circle" class="w-4 h-4 text-red-400"></i> Mistake 2: Subject Complement ko Direct Object man lena.</p>
+                            <p class="text-gray-400 mt-2"><strong>Example:</strong> "He is a doctor."</p>
+                            <p class="mt-2 text-green-300"><strong>Sahi Logic:</strong> Yahan koi action nahi ho raha. 'Is' ek linking verb hai. Toh 'doctor' direct object nahi hai. Wo bas subject (He) ki hi pehchan bata raha hai isliye ise Subject Complement kehte hain.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="nuances" class="space-y-3 scroll-mt-6">
+                    <h2 class="text-xl font-bold text-white border-b border-white/10 pb-2">6. Advanced Nuances</h2>
+                    <ul class="list-disc pl-5 space-y-4 text-sm text-gray-300">
+                        <li>
+                            <strong class="text-white">Pronoun Placement Rule:</strong> Agar aapka Direct Object ek pronoun hai (jaise 'it' ya 'them') toh aap standard (bina 'to' wala) Indirect Object structure use nahi kar sakte. Aapko 'to' lagana hi padega.
+                            <div class="bg-white/5 p-3 rounded-lg mt-2 font-mono text-xs">
+                                <span class="text-red-400">❌ Wrong:</span> "Give him it." <br>
+                                <span class="text-green-400">✅ Right:</span> "Give it to him."
+                            </div>
+                        </li>
+                        <li>
+                            <strong class="text-white">Verbs that take two objects (Dative Verbs):</strong> Har verb do objects nahi le sakta. Kuch specific verbs hi allow karte hain. Yaad rakhne wale common words hain: <br>
+                            <em class="text-brand-accent bg-brand-accent/10 px-2 py-1 rounded inline-block mt-2">give, buy, bring, send, show, teach, tell, lend, offer, make, cook, promise</em>.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SECTION: STORY ================= -->
+        <section id="sec-story" class="max-w-3xl mx-auto space-y-6 pb-20 hidden">
+            <div class="flex justify-between items-center">
+                <h1 class="text-2xl font-bold">Contextual Stories</h1>
+                <button onclick="app.nextStory()" class="px-4 py-2 rounded-xl bg-brand-accent text-white font-semibold text-sm transition-colors hover:bg-blue-600 shadow-lg shadow-brand-accent/20 flex items-center gap-2">
+                    Next Story <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </button>
+            </div>
+            
+            <p class="text-sm text-gray-400">Read these short stories to see how native speakers naturally use double objects. Pay attention to the highlighted words.</p>
+
+            <div id="story-container" class="glass-panel rounded-3xl p-6 md:p-8 space-y-6 text-gray-300 leading-relaxed text-lg shadow-xl relative min-h-[300px]">
+                <!-- Story Content Injected Here by JS -->
+            </div>
+
+            <div class="p-4 bg-brand-input rounded-2xl border border-white/5 text-sm shadow-inner">
+                <p class="font-bold text-white mb-2">Key Breakdown for all stories:</p>
+                <p class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-white inline-block"></span> <strong>Bold white words</strong> = Indirect Objects (The Receivers).</p>
+                <p class="flex items-center gap-2 mt-1"><span class="w-3 h-3 rounded-full bg-brand-accent inline-block"></span> <span class="text-brand-accent font-semibold">Blue colored words</span> = Direct Objects (The things being transferred).</p>
+            </div>
+        </section>
+
+        <!-- ================= SECTION: QUIZ ================= -->
+        <section id="sec-quiz" class="max-w-2xl mx-auto space-y-6 pb-20 hidden">
+            <div class="flex justify-between items-end">
+                <div>
+                    <h1 class="text-2xl font-bold" id="quiz-title">Assessment Session</h1>
+                    <p class="text-sm text-gray-400 mt-1" id="quiz-progress">Question 1 of 10</p>
+                </div>
+                <div class="text-right bg-white/5 px-4 py-2 rounded-xl border border-white/5 shadow-inner">
+                    <p class="text-[10px] text-gray-400 uppercase tracking-widest">Efficiency</p>
+                    <p class="text-xl font-bold text-brand-accent" id="quiz-efficiency">0%</p>
+                </div>
+            </div>
+
+            <div class="glass-panel rounded-3xl p-6 md:p-8 relative min-h-[350px] flex flex-col justify-center shadow-xl" id="quiz-container">
+                <!-- Quiz content injected here -->
+                <div class="text-center space-y-4">
+                    <div class="w-20 h-20 rounded-full bg-brand-accent/20 flex items-center justify-center mx-auto mb-6 border border-brand-accent/50 shadow-lg shadow-brand-accent/20">
+                        <i data-lucide="brain" class="w-10 h-10 text-brand-accent"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold tracking-tight">Ready for the test?</h2>
+                    <p class="text-gray-400 text-sm mb-6 max-w-sm mx-auto">10 random questions will be drawn from a strict pool of 100 to test your understanding of objects.</p>
+                    <button onclick="app.startQuiz()" class="px-8 py-4 rounded-xl bg-brand-accent text-white font-bold w-full max-w-sm mx-auto hover:bg-blue-600 transition-all shadow-lg shadow-brand-accent/20 hover:scale-[1.02]">Start Assessment</button>
+                </div>
+            </div>
+            
+            <!-- Result/Explanation Box -->
+            <div id="quiz-feedback" class="glass-panel rounded-2xl p-5 hidden border-l-4 shadow-xl transition-all duration-300">
+                <div class="flex items-start gap-3">
+                    <div id="feedback-icon" class="mt-1 shrink-0"></div>
+                    <div>
+                        <p class="font-bold text-lg" id="feedback-title"></p>
+                        <p class="text-sm text-gray-300 mt-2 leading-relaxed" id="feedback-reason"></p>
+                    </div>
+                </div>
+                <button onclick="app.nextQuizQuestion()" class="mt-5 px-6 py-3 rounded-xl bg-white/10 text-white font-bold w-full hover:bg-white/20 transition-colors border border-white/10 shadow-inner">Next Question</button>
+            </div>
+        </section>
+
+        <!-- ================= SECTION: REAL LIFE ================= -->
+        <section id="sec-real" class="max-w-3xl mx-auto space-y-6 pb-20 hidden">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-2xl font-bold">Real Life Usage</h1>
+                    <p class="text-sm text-gray-400 mt-1">Middle-class Indian context scenarios.</p>
+                </div>
+                <button onclick="app.loadRealLifeScenarios()" class="px-4 py-2 rounded-xl bg-white/10 text-white font-semibold text-sm transition-colors hover:bg-white/20 border border-white/10 shadow-inner flex items-center gap-2">
+                    <i data-lucide="refresh-cw" class="w-4 h-4"></i> Shuffle 5
+                </button>
+            </div>
+            
+            <div class="bg-brand-accent/10 border border-brand-accent/30 rounded-xl p-4 text-sm text-blue-200 mb-6">
+                <i data-lucide="info" class="w-4 h-4 inline mb-1 mr-1"></i> Try to translate the Hindi sentence in your head using the double-object rule before clicking the eye icon to reveal the answer.
+            </div>
+
+            <div id="real-life-container" class="space-y-4">
+                <!-- Real life cards injected here by JS -->
+            </div>
+        </section>
+
+        <!-- ================= SECTION: ANKI ================= -->
+        <section id="sec-anki" class="max-w-3xl mx-auto space-y-6 pb-20 hidden">
+            <div class="flex justify-between items-center flex-wrap gap-4">
+                <div>
+                    <h1 class="text-2xl font-bold">Anki Flashcards Export</h1>
+                    <p class="text-sm text-gray-400 mt-1">100 perfectly formatted cards</p>
+                </div>
+                <button onclick="app.downloadAnki()" class="px-6 py-3 rounded-xl bg-brand-accent text-white font-bold text-sm transition-all hover:bg-blue-600 flex items-center gap-2 shadow-lg shadow-brand-accent/20">
+                    <i data-lucide="download" class="w-5 h-5"></i> Download CSV
+                </button>
+            </div>
+            
+            <div class="glass-panel rounded-3xl p-6 text-sm text-gray-300 space-y-4 shadow-xl">
+                <div class="flex items-start gap-3 bg-white/5 p-4 rounded-xl border border-white/5">
+                    <i data-lucide="check-circle-2" class="w-5 h-5 text-green-400 shrink-0 mt-0.5"></i>
+                    <p>This export strictly follows your rules: Exactly one comma per line acting only as a separator between Question and Answer. No colons no semicolons no numbering and no extra commentary.</p>
+                </div>
+                
+                <h3 class="font-bold text-white mt-6 mb-2">Preview of generated CSV format:</h3>
+                <div class="bg-[#080D1A] rounded-xl p-4 border border-white/5 overflow-x-auto shadow-inner relative">
+                    <pre id="anki-preview" class="text-xs text-gray-400 whitespace-pre-wrap font-mono"></pre>
+                    <div class="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-[#080D1A] to-transparent pointer-events-none"></div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Sticky Footer -->
+    <footer class="p-4 border-t border-white/5 bg-[#060B19]/95 backdrop-blur-md flex justify-between items-center shrink-0 z-50 no-print shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
+        <div class="flex gap-2 sm:gap-4">
+            <button onclick="app.nav('notes')" class="text-gray-400 hover:text-white hover:bg-white/5 px-3 py-2 rounded-lg transition-colors flex flex-col items-center gap-1">
+                <i data-lucide="home" class="w-5 h-5"></i>
+                <span class="text-[10px] uppercase tracking-wider font-bold">Home</span>
+            </button>
+            <button onclick="app.goBack()" class="text-gray-400 hover:text-white hover:bg-white/5 px-3 py-2 rounded-lg transition-colors flex flex-col items-center gap-1">
+                <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                <span class="text-[10px] uppercase tracking-wider font-bold">Back</span>
+            </button>
+        </div>
+        
+        <div class="flex items-center gap-3 bg-[#111A2C] px-4 py-2 rounded-xl border border-white/10 shadow-inner">
+            <div class="text-right">
+                <p class="text-[9px] text-gray-400 uppercase tracking-widest font-bold">Session Time</p>
+                <p class="text-sm font-mono font-bold text-white tracking-widest" id="global-timer">00:00</p>
+            </div>
+            <div class="w-8 h-8 rounded-full bg-brand-accent/20 flex items-center justify-center">
+                <i data-lucide="clock" class="w-4 h-4 text-brand-accent"></i>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Application Logic & Data -->
+    <script>
+        // --- 100 STRICTLY FORMATTED QUESTIONS WITHOUT COMMAS IN TEXT ---
+        // Format: Type(0=MCQ 1=TF 2=Flashcard 3=Correct/Not) ~ Question Text ~ Options delimited by pipe ~ Answer Index/String ~ Reason
+        const rawQuizData = [
+            "0~Find the direct object in 'He bought a car'~He|bought|a car|none~2~Car action receive kar raha hai",
+            "0~Find the indirect object in 'She gave him a gift'~She|gave|him|a gift~2~Him ko gift mila hai",
+            "0~What is the direct object in 'I sent my mother flowers'~I|sent|my mother|flowers~3~Flowers bheje gaye hain",
+            "0~Find the indirect object in 'The teacher taught us grammar'~The teacher|taught|us|grammar~2~Us ko padhaya gaya hai",
+            "0~Identify the direct object in 'They built a new house'~They|built|a new house|none~2~Action built ka asar house par hai",
+            "0~Find the direct object in 'Please pass me the salt'~Please|pass|me|the salt~3~Salt pass kiya ja raha hai",
+            "0~Find the indirect object in 'Rahul lent Neha his pen'~Rahul|lent|Neha|his pen~2~Neha ko pen mila",
+            "0~What is the direct object in 'I wrote my friend a letter'~I|wrote|my friend|a letter~3~Letter likha gaya hai",
+            "0~Find the direct object in 'We made them breakfast'~We|made|them|breakfast~3~Breakfast banaya gaya hai",
+            "0~Find the direct object in 'She showed the doctor her report'~She|showed|the doctor|her report~3~Report show ki gayi",
+            "0~Find the indirect object in 'He offered the guest some tea'~He|offered|the guest|some tea~2~Guest ko tea offer ki gayi",
+            "0~Identify the direct object in 'Did you feed the dog his food'~Did you|feed|the dog|his food~3~Food diya gaya",
+            "0~Identify the indirect object in 'I promised my son a bike'~I|promised|my son|a bike~2~Son ko promise kiya",
+            "0~Find the direct object in 'I asked the teacher a question'~I|asked|the teacher|a question~3~Question pucha gaya",
+            "0~Find the indirect object in 'She handed the waiter the menu'~She|handed|the waiter|the menu~2~Waiter ko menu mila",
+            "0~Identify the direct object in 'The company paid the workers their salary'~company|paid|workers|salary~3~Salary pay ki gayi",
+            "0~Identify the indirect object in 'Please read the kids a story'~Please|read|the kids|a story~2~Kids ko story padh kar sunayi",
+            "0~Find the direct object in 'He threw the player the ball'~He|threw|the player|the ball~3~Ball phenki gayi",
+            "0~Find the indirect object in 'They awarded the scientist a prize'~They|awarded|the scientist|a prize~2~Scientist ko prize mila",
+            "0~Identify the direct object in 'She owes the bank money'~She|owes|the bank|money~3~Money owe karti hai",
+            "0~Identify the indirect object in 'I brought you a glass of water'~I|brought|you|a glass of water~2~You ko water mila",
+            "0~Find the direct object in 'The chef baked us a cake'~chef|baked|us|a cake~3~Cake bake kiya gaya",
+            "0~Find the indirect object in 'Mom bought me new shoes'~Mom|bought|me|new shoes~2~Me ko shoes mile",
+            "0~Identify the direct object in 'He painted the house'~He|painted|the house|none~2~House par paint hua",
+            "0~Identify the indirect object in 'She sang the baby a lullaby'~She|sang|the baby|a lullaby~2~Baby ko lullaby sunai",
+            "0~Find the direct object in 'Can you lend me ten dollars'~Can you|lend|me|ten dollars~3~Ten dollars udhar diye",
+            "0~Find the indirect object in 'They guaranteed the customer a refund'~They|guaranteed|the customer|a refund~2~Customer ko guarantee mili",
+            "0~Identify the direct object in 'I will show you the way'~I|will show|you|the way~3~The way dikhaya jayega",
+            "0~Identify the indirect object in 'Pass your brother the remote'~Pass|your brother|the remote|none~1~Brother ko remote milega",
+            "0~Find the direct object in 'He told the police the whole story'~He|told|the police|the whole story~3~Story batayi gayi",
+            "0~Find the indirect object in 'The magician showed the audience a trick'~magician|showed|the audience|a trick~2~Audience ko trick dikhayi",
+            "0~Identify the direct object in 'She poured the guests wine'~She|poured|the guests|wine~3~Wine pour ki",
+            "0~Identify the indirect object in 'I made my friend a card'~I|made|my friend|a card~2~Friend ke liye card banaya",
+            "0~Find the direct object in 'They granted the student a scholarship'~They|granted|the student|a scholarship~3~Scholarship di",
+            "0~Find the indirect object in 'He wrote his girlfriend a poem'~He|wrote|his girlfriend|a poem~2~Girlfriend ko poem likhi",
+            "0~Identify the direct object in 'Please bring me the file'~Please|bring|me|the file~3~File laani hai",
+            "0~Identify the indirect object in 'She left her dog some food'~She|left|her dog|some food~2~Dog ke liye food chhoda",
+            "0~Find the direct object in 'He assigned the class homework'~He|assigned|the class|homework~3~Homework assign kiya",
+            "0~Find the indirect object in 'I offered the beggar food'~I|offered|the beggar|food~2~Beggar ko food offer kiya",
+            "0~Identify the direct object in 'She bought herself a dress'~She|bought|herself|a dress~3~Dress kharidi",
+            "0~Identify the indirect object in 'He gave the plant water'~He|gave|the plant|water~2~Plant ko water mila",
+            "0~Find the direct object in 'She fed the stray cats milk'~She|fed|the stray cats|milk~3~Milk pilaya",
+            "0~Find the indirect object in 'I sent the manager my resume'~I|sent|the manager|my resume~2~Manager ko resume bheja",
+            "0~Identify the direct object in 'He left me a message'~He|left|me|a message~3~Message chhoda",
+            "0~Identify the indirect object in 'They built the community a park'~They|built|the community|a park~2~Community ke liye park banaya",
+            "0~Find the direct object in 'I taught the students English'~I|taught|the students|English~3~English padhayi",
+            "0~Find the indirect object in 'She guaranteed me a job'~She|guaranteed|me|a job~2~Me ko guarantee mili",
+            "0~Identify the direct object in 'He bought the team uniforms'~He|bought|the team|uniforms~3~Uniforms kharidi",
+            "0~Identify the indirect object in 'I read the blind man a newspaper'~I|read|the blind man|a newspaper~2~Blind man ko sunaya",
+            "0~Find the direct object in 'He passed the goalkeeper the ball'~He|passed|the goalkeeper|the ball~3~Ball pass ki",
+            "0~Find the indirect object in 'She sold the man a car'~She|sold|the man|a car~2~Man ko car bechi",
+            "0~Identify the direct object in 'I wrote my dad an email'~I|wrote|my dad|an email~3~Email likhi",
+            "0~Identify the indirect object in 'They offered the woman a seat'~They|offered|the woman|a seat~2~Woman ko seat di",
+            "0~Find the direct object in 'She promised her friend a favor'~She|promised|her friend|a favor~3~Favor promise kiya",
+            "0~Find the indirect object in 'He handed the cashier the money'~He|handed|the cashier|the money~2~Cashier ko money diya",
+            "0~Identify the direct object in 'I lent my brother a shirt'~I|lent|my brother|a shirt~3~Shirt udhar di",
+            "0~Identify the indirect object in 'She told the children a ghost story'~She|told|the children|a ghost story~2~Children ko story sunayi",
+            "1~True or False. An indirect object always comes before a direct object if there is no preposition~True|False~0~Ye English grammar ka basic rule hai bina preposition ke receiver pehle aayega",
+            "1~True or False. You can have an indirect object without a direct object~True|False~1~Indirect object hamesha direct object ko receive karta hai bina gift ke receiver kaisa",
+            "1~True or False. In 'I bought it for you' the word 'you' is a direct object~True|False~1~Yahan you ek prepositional object hai for ke baad",
+            "1~True or False. Action verbs are required to have a direct object~True|False~1~Transitive verbs ko chahiye par intransitive verbs jaise sleep ko nahi",
+            "1~True or False. 'A book' is the direct object in 'I gave a book to him'~True|False~0~Book hi di gayi hai sentence chahe kaise bhi likha ho action book par hua",
+            "1~True or False. A direct object usually follows the verb~True|False~0~English mein SVO pattern follow hota hai verb ke baad seedha object",
+            "1~True or False. 'Him' is the direct object in 'I hit him'~True|False~0~Hit ka asar him par seedha hua isliye wo direct hai yahan",
+            "1~True or False. 'To the store' is an indirect object in 'I went to the store'~True|False~1~Went intransitive hai iska koi object nahi hota store location hai",
+            "1~True or False. Verbs of giving often take two objects~True|False~0~Give lend send aise verbs hamesha double objects lete hain",
+            "1~True or False. A sentence always needs an indirect object~True|False~1~Bohot se sentences mein sirf direct object hota hai jaise I ate an apple",
+            "1~True or False. 'Money' is the direct object in 'I owe him money'~True|False~0~Money owe kiya jata hai him ko so money is direct",
+            "1~True or False. Intransitive verbs take direct objects~True|False~1~Intransitive verbs object nahi lete wo apne aap mein pure hote hain",
+            "1~True or False. Subject complements rename the subject not receive the action~True|False~0~Isliye wo direct objects nahi hote linking verbs ke baad aate hain",
+            "1~True or False. Direct object answers the question Who or What did the action~True|False~1~Wo subject hota hai. DO answers Whom or What receives it",
+            "1~True or False. A sentence can have two direct objects for one verb~True|False~1~Compound direct objects ho sakte hain jaise I bought an apple and a banana",
+            "2~What question word finds the direct object~What or Whom~~Action ka direct receiver dhundne ke liye",
+            "2~What question words find the indirect object~To whom or For whom~~Receiver of the direct object dhundne ke liye",
+            "2~Which verb typically takes two objects sleep or give~give~~Sleep intransitive hai usme object nahi hota",
+            "2~If a sentence has 'for' before a noun is that noun an indirect object~No it is a prepositional object~~Grammatically use prepositional object kehte hain",
+            "2~What is the direct object in 'I kicked the ball'~the ball~~Kicking action ball par hua",
+            "2~Identify the indirect object in 'He left the waiter a tip'~the waiter~~Waiter ko tip mili",
+            "2~Find the direct object in 'I love chocolate'~chocolate~~Love ka object chocolate hai",
+            "2~What is the direct object in 'I closed the door'~the door~~Door band hua",
+            "2~Find the indirect object in 'I saved you a seat'~you~~You ke liye seat save ki",
+            "2~What is the direct object in 'She lost her keys'~her keys~~Keys ghum hui",
+            "2~Find the direct object in 'They elected him president'~him~~Yahan president object complement hai aur him direct object hai",
+            "2~What is the indirect object in 'He threw the dog a bone'~the dog~~Dog ko bone mili",
+            "2~Find the direct object in 'I saw a movie'~a movie~~Movie dekhi",
+            "2~Identify the indirect object in 'I bought my dog a toy'~my dog~~Dog ke liye toy kharida",
+            "2~What is the direct object in 'He drives a fast car'~a fast car~~Driving action car par ho raha hai",
+            "2~Find the indirect object in 'They fed the monkey a banana'~the monkey~~Monkey ko banana mila",
+            "3~Correct or Not. I gave to him the book~Correct|Not Correct~1~Jab to lagta hai tab indirect object direct object ke baad aata hai I gave the book to him",
+            "3~Correct or Not. She told me a secret~Correct|Not Correct~0~Me indirect hai aur secret direct hai jo bilkul sahi place par hain",
+            "3~Correct or Not. Give it him~Correct|Not Correct~1~Pronoun direct object it aane par to lagana zaroori hai. Give it to him",
+            "3~Correct or Not. He cooked his wife dinner~Correct|Not Correct~0~His wife indirect hai aur dinner direct hai valid sentence",
+            "3~Correct or Not. Tell the truth to me~Correct|Not Correct~0~Ye correct hai prepositional phrase use karke to me",
+            "3~Correct or Not. Bring me it~Correct|Not Correct~1~Pronouns ke sath Bring it to me use hota hai English mein",
+            "3~Correct or Not. I bought a gift for her~Correct|Not Correct~0~For her prepositional object hai aur ye structure sahi hai",
+            "3~Correct or Not. She poured him some coffee~Correct|Not Correct~0~Him indirect aur some coffee direct hai perfect grammar",
+            "3~Correct or Not. I sent to him an email~Correct|Not Correct~1~I sent an email to him ya I sent him an email hona chahiye",
+            "3~Correct or Not. Find me a cab~Correct|Not Correct~0~Me indirect aur cab direct hai bilkul natural lagta hai",
+            "3~Correct or Not. Pass the salt me~Correct|Not Correct~1~Pass me the salt ya Pass the salt to me hona chahiye",
+            "3~Correct or Not. She made a cake for him~Correct|Not Correct~0~Ye perfectly valid construction hai using preposition for",
+            "3~Correct or Not. I gave him it~Correct|Not Correct~1~I gave it to him hoga pronoun rule ke hisaab se",
+            "3~Correct or Not. Bring the menu to us~Correct|Not Correct~0~To use karke sahi banaya hai prepositional phrase",
+            "3~Correct or Not. He asked me a question~Correct|Not Correct~0~Me indirect aur question direct hai classic example"
+        ];
+
+        // 50 Scenarios
+        const rawRealLife = [
+            "Doodhwale ko paise de do~Give the milkman the money~Milkman indirect object hai aur the money direct object",
+            "Bhaiya ko pani ka glass dena~Give brother a glass of water~Brother indirect object a glass of water direct",
+            "Mummy ne mujhe nayi shirt dilwayi~Mom bought me a new shirt~Me indirect object a new shirt direct",
+            "Papa ne mujhe daant pilayi~Dad gave me a scolding~Me indirect a scolding direct",
+            "Auto wale ko change de do~Hand the auto driver the change~Auto driver indirect the change direct",
+            "Maine dost ko notes bheje~I sent my friend the notes~My friend indirect the notes direct",
+            "Teacher ko assignment dikhao~Show the teacher the assignment~The teacher indirect the assignment direct",
+            "Bachcho ko kahani sunao~Tell the kids a story~The kids indirect a story direct",
+            "Usne mujhe sach bataya~He told me the truth~Me indirect the truth direct",
+            "Kutte ko khana khila do~Feed the dog some food~The dog indirect some food direct",
+            "Mehmano ko chai pilao~Offer the guests some tea~The guests indirect some tea direct",
+            "Mujhe thoda time do~Give me some time~Me indirect some time direct",
+            "Bhikhari ko khana de do~Give the beggar some food~The beggar indirect some food direct",
+            "Manager ko email likho~Write the manager an email~The manager indirect an email direct",
+            "Dukaan wale se bill maango~Ask the shopkeeper for the bill~Yahan structure alag hai ask him a question type",
+            "Mujhe ek sawal puchna hai~Let me ask you a question~You indirect a question direct",
+            "Maine usko udhar paise diye~I lent him some money~Him indirect some money direct",
+            "Usne mujhe apni car di~He gave me his car~Me indirect his car direct",
+            "Mummy mere liye khana bana rahi hain~Mom is making me food~Me indirect food direct",
+            "Papa ne mujhe cycle promise ki hai~Dad promised me a bicycle~Me indirect a bicycle direct",
+            "Rohan ko apna pen udhar de do~Lend Rohan your pen~Rohan indirect your pen direct",
+            "Maine usko ek rasta dikhaya~I showed him a way~Him indirect a way direct",
+            "Mujhe apna phone dikhao~Show me your phone~Me indirect your phone direct",
+            "Gaurd ko gate pass dikha do~Show the guard the gate pass~The guard indirect the gate pass direct",
+            "Maid ko uski salary de di~I paid the maid her salary~The maid indirect her salary direct",
+            "Zomato wale ko tip de dena~Leave the delivery guy a tip~Delivery guy indirect a tip direct",
+            "Sabko sweets baant do~Hand everyone the sweets~Everyone indirect the sweets direct",
+            "Mujhe namak pass karna~Pass me the salt~Me indirect the salt direct",
+            "Uske liye ek seat rakhna~Save him a seat~Him indirect a seat direct",
+            "Maine usko message bhej diya~I sent him a message~Him indirect a message direct",
+            "Client ko proposal bhej do~Send the client the proposal~The client indirect the proposal direct",
+            "Doctor ko report dikhani hai~Show the doctor the report~The doctor indirect the report direct",
+            "Mujhe ek favor kardo~Do me a favor~Me indirect a favor direct",
+            "Bachche ko khilauna dila do~Buy the kid a toy~The kid indirect a toy direct",
+            "Mummy mujhe kahani padh kar sunati hain~Mom reads me a story~Me indirect a story direct",
+            "Papa ne dadi ko dawai di~Dad gave grandma the medicine~Grandma indirect the medicine direct",
+            "Mujhe apna jacket dena thodi der~Lend me your jacket for a while~Me indirect your jacket direct",
+            "Watchman ko chabi pakda dena~Hand the watchman the keys~The watchman indirect the keys direct",
+            "Maine tailor ko kapde de diye~I gave the tailor the clothes~The tailor indirect the clothes direct",
+            "Plumber ko uske paise de do~Pay the plumber his money~The plumber indirect his money direct",
+            "Dost ke liye ticket le lena~Buy your friend a ticket~Your friend indirect a ticket direct",
+            "Usne mujhe apni book dikhayi~He showed me his book~Me indirect his book direct",
+            "Teacher bachcho ko maths padhate hain~The teacher teaches the kids maths~The kids indirect maths direct",
+            "Mujhe rasta bata do~Tell me the way~Me indirect the way direct",
+            "Police ko sach bata do~Tell the police the truth~The police indirect the truth direct",
+            "Maine usko ek job offer ki~I offered him a job~Him indirect a job direct",
+            "Mummy ne bhagwan ko prasad chadhaya~Mom offered God the sweets~God indirect the sweets direct",
+            "Mujhe thodi advice de do~Give me some advice~Me indirect some advice direct",
+            "Papa ne mujhe ek achi sikh di~Dad taught me a good lesson~Me indirect a good lesson direct",
+            "Maine apne bhai ko gift diya~I gave my brother a gift~My brother indirect a gift direct"
+        ];
+
+        // 5 Dynamic Stories Context
+        const storyBank = [
+            `It was Diwali weekend. Rohan wanted to buy <strong>his family</strong> <span class="text-brand-accent font-semibold">some gifts</span>. He went to the market and showed <strong>the shopkeeper</strong> <span class="text-brand-accent font-semibold">a list</span>.<br><br>First he bought <strong>his mother</strong> <span class="text-brand-accent font-semibold">a beautiful saree</span>. Then he found a toy shop. He asked <strong>the owner</strong> <span class="text-brand-accent font-semibold">a question</span> about remote-control cars. The owner handed <strong>him</strong> <span class="text-brand-accent font-semibold">a red sports car</span>. Rohan immediately bought <strong>his little brother</strong> <span class="text-brand-accent font-semibold">the car</span>.<br><br>When he returned home he gave <strong>everyone</strong> <span class="text-brand-accent font-semibold">their presents</span>. His mother cooked <strong>him</strong> <span class="text-brand-accent font-semibold">his favorite meal</span> to say thank you. Reading this story teaches <strong>you</strong> <span class="text-brand-accent font-semibold">the concept</span> of double objects naturally!`,
+            
+            `At the restaurant the waiter handed <strong>us</strong> <span class="text-brand-accent font-semibold">the menus</span>. My father asked <strong>him</strong> <span class="text-brand-accent font-semibold">a question</span> about the special dish. The chef cooked <strong>everyone</strong> <span class="text-brand-accent font-semibold">a wonderful meal</span>.<br><br>After dinner the waiter brought <strong>my dad</strong> <span class="text-brand-accent font-semibold">the bill</span>. My dad left <strong>the staff</strong> <span class="text-brand-accent font-semibold">a generous tip</span> because they offered <strong>us</strong> <span class="text-brand-accent font-semibold">excellent service</span>.`,
+            
+            `During the English class Mr. Sharma taught <strong>the students</strong> <span class="text-brand-accent font-semibold">a new lesson</span>. He gave <strong>them</strong> <span class="text-brand-accent font-semibold">an easy test</span> to check their understanding.<br><br>Rahul showed <strong>the teacher</strong> <span class="text-brand-accent font-semibold">his perfect answers</span>. Impressed Mr. Sharma awarded <strong>Rahul</strong> <span class="text-brand-accent font-semibold">a gold star</span>. The principal even sent <strong>the class</strong> <span class="text-brand-accent font-semibold">a congratulatory note</span>.`,
+            
+            `For her birthday Priya threw <strong>her friends</strong> <span class="text-brand-accent font-semibold">a huge party</span>. Her parents bought <strong>her</strong> <span class="text-brand-accent font-semibold">a new laptop</span>.<br><br>All the guests handed <strong>the birthday girl</strong> <span class="text-brand-accent font-semibold">beautiful presents</span>. In return Priya's mother served <strong>the kids</strong> <span class="text-brand-accent font-semibold">chocolate cake</span> and poured <strong>them</strong> <span class="text-brand-accent font-semibold">cold drinks</span>. It was a day that gave <strong>everyone</strong> <span class="text-brand-accent font-semibold">great joy</span>.`,
+            
+            `In the office the manager offered <strong>Sunil</strong> <span class="text-brand-accent font-semibold">a promotion</span>. Sunil immediately wrote <strong>his boss</strong> <span class="text-brand-accent font-semibold">a thank you email</span>.<br><br>Later he promised <strong>his team</strong> <span class="text-brand-accent font-semibold">a treat</span>. He bought <strong>his colleagues</strong> <span class="text-brand-accent font-semibold">coffee</span> and told <strong>them</strong> <span class="text-brand-accent font-semibold">the good news</span>. The company guaranteed <strong>him</strong> <span class="text-brand-accent font-semibold">a brighter future</span>.`
+        ];
+
+        // Process Data
+        const quizBank = rawQuizData.map(str => {
+            const parts = str.split('~');
+            return {
+                type: parseInt(parts[0]),
+                q: parts[1],
+                opts: parts[2] ? parts[2].split('|') : [],
+                ans: parts[2] ? parseInt(parts[3]) : parts[3],
+                rsn: parts[4]
+            };
+        });
+
+        const realLifeBank = rawRealLife.map(str => {
+            const parts = str.split('~');
+            return { hindi: parts[0], eng: parts[1], rsn: parts[2] };
+        });
+
+        // --- APPLICATION STATE & LOGIC ---
+        const app = {
+            state: {
+                currentSection: 'notes',
+                history: ['notes'],
+                timeSpent: 0,
+                storyIndex: 0,
+                quiz: { active: [], currentIndex: 0, correctCount: 0, totalAnswered: 0 },
+                realLifeIndex: 0
+            },
+
+            init() {
+                this.safeRenderIcons();
+                this.startTimer();
+                this.nav('notes', true);
+                this.generateAnkiPreview();
+                this.renderStory(); // Initialize story early
+            },
+
+            safeRenderIcons() {
+                try {
+                    lucide.createIcons();
+                } catch (e) {
+                    console.warn("Lucide icons failed to load or parse", e);
+                }
+            },
+
+            startTimer() {
+                setInterval(() => {
+                    this.state.timeSpent++;
+                    const m = Math.floor(this.state.timeSpent / 60).toString().padStart(2, '0');
+                    const s = (this.state.timeSpent % 60).toString().padStart(2, '0');
+                    document.getElementById('global-timer').innerText = `${m}:${s}`;
+                }, 1000);
+            },
+
+            nav(sectionId, isInitial = false) {
+                // Update navigation visual states
+                ['notes', 'story', 'quiz', 'real', 'anki'].forEach(id => {
+                    const btn = document.getElementById(`nav-${id}`);
+                    if (id === sectionId) {
+                        btn.className = "px-4 py-2 rounded-xl text-sm font-semibold transition-all bg-white/10 text-white border border-white/10 shadow-lg shadow-black/20";
+                    } else {
+                        btn.className = "px-4 py-2 rounded-xl text-sm font-semibold transition-all text-gray-400 hover:text-white hover:bg-white/5 border border-transparent";
+                    }
+                    // Use Tailwind's hidden to ensure it's removed from layout safely
+                    document.getElementById(`sec-${id}`).classList.add('hidden');
+                });
+
+                document.getElementById(`sec-${sectionId}`).classList.remove('hidden');
+                
+                // History Management
+                if (!isInitial && this.state.currentSection !== sectionId) {
+                    this.state.history.push(sectionId);
+                }
+                this.state.currentSection = sectionId;
+
+                // Fire initializers for specific sections if needed
+                if (sectionId === 'real') this.loadRealLifeScenarios(true);
+            },
+
+            goBack() {
+                if (this.state.history.length > 1) {
+                    this.state.history.pop(); // remove current
+                    const prev = this.state.history[this.state.history.length - 1];
+                    this.nav(prev, true);
+                }
+            },
+
+            // --- STORY LOGIC ---
+            renderStory() {
+                const container = document.getElementById('story-container');
+                // Adding a fade effect trick by resetting HTML
+                container.style.opacity = 0;
+                setTimeout(() => {
+                    container.innerHTML = `<p>${storyBank[this.state.storyIndex]}</p>
+                    <div class="absolute top-4 right-4 text-xs font-mono text-gray-500 bg-black/40 px-2 py-1 rounded">Story ${this.state.storyIndex + 1}/${storyBank.length}</div>`;
+                    container.style.opacity = 1;
+                    container.style.transition = 'opacity 0.3s ease';
+                }, 50);
+            },
+
+            nextStory() {
+                this.state.storyIndex = (this.state.storyIndex + 1) % storyBank.length;
+                this.renderStory();
+            },
+
+            // --- QUIZ LOGIC ---
+            shuffle(array) {
+                const arr = [...array];
+                for (let i = arr.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [arr[i], arr[j]] = [arr[j], arr[i]];
+                }
+                return arr;
+            },
+
+            startQuiz() {
+                this.state.quiz.active = this.shuffle(quizBank).slice(0, 10);
+                this.state.quiz.currentIndex = 0;
+                this.state.quiz.correctCount = 0;
+                this.state.quiz.totalAnswered = 0;
+                this.renderQuizQuestion();
+                this.updateEfficiency();
+            },
+
+            updateEfficiency() {
+                const eff = this.state.quiz.totalAnswered === 0 ? 0 : Math.round((this.state.quiz.correctCount / this.state.quiz.totalAnswered) * 100);
+                document.getElementById('quiz-efficiency').innerText = `${eff}%`;
+            },
+
+            renderQuizQuestion() {
+                const qIndex = this.state.quiz.currentIndex;
+                if (qIndex >= 10) {
+                    this.renderQuizEnd();
+                    return;
+                }
+
+                document.getElementById('quiz-progress').innerText = `Question ${qIndex + 1} of 10`;
+                const qData = this.state.quiz.active[qIndex];
+                const container = document.getElementById('quiz-container');
+                document.getElementById('quiz-feedback').classList.add('hidden');
+
+                let html = `
+                    <div class="text-xs text-brand-accent uppercase tracking-widest font-bold mb-2">
+                        ${qData.type === 2 ? 'Flashcard' : qData.type === 1 ? 'True / False' : qData.type === 3 ? 'Concept Check' : 'Multiple Choice'}
+                    </div>
+                    <h2 class="text-xl md:text-2xl font-bold mb-8 leading-relaxed">${qData.q}</h2>`;
+                
+                if (qData.type === 2) { // Flashcard
+                    html += `
+                        <button onclick="app.showFlashcardAnswer()" class="px-6 py-5 rounded-xl bg-brand-input border border-white/10 text-gray-300 hover:text-white hover:bg-white/5 transition-colors w-full text-center font-bold shadow-lg shadow-black/20">
+                            Reveal Answer
+                        </button>
+                    `;
+                } else {
+                    html += `<div class="space-y-3">`;
+                    qData.opts.forEach((opt, idx) => {
+                        html += `
+                            <button onclick="app.submitQuizAnswer(${idx})" class="w-full text-left px-6 py-4 rounded-xl bg-brand-input border border-white/5 hover:bg-white/10 hover:border-white/20 transition-all text-gray-200 shadow-md flex items-center justify-between group">
+                                <span>${opt}</span>
+                                <i data-lucide="chevron-right" class="w-4 h-4 text-transparent group-hover:text-brand-accent transition-colors"></i>
+                            </button>
+                        `;
+                    });
+                    html += `</div>`;
+                }
+                container.innerHTML = html;
+                this.safeRenderIcons();
+            },
+
+            showFlashcardAnswer() {
+                const qData = this.state.quiz.active[this.state.quiz.currentIndex];
+                const container = document.getElementById('quiz-container');
+                container.innerHTML = `
+                    <div class="text-xs text-brand-accent uppercase tracking-widest font-bold mb-2">Flashcard Answer</div>
+                    <h2 class="text-xl md:text-2xl font-bold mb-8 leading-relaxed">${qData.q}</h2>
+                    <div class="p-8 bg-brand-accent/10 border border-brand-accent/30 rounded-2xl text-center shadow-inner">
+                        <p class="text-2xl font-bold text-white tracking-wide">${qData.ans}</p>
+                    </div>
+                `;
+                this.showFeedback(true, qData.rsn);
+                this.state.quiz.totalAnswered++;
+                this.updateEfficiency();
+            },
+
+            submitQuizAnswer(idx) {
+                const qData = this.state.quiz.active[this.state.quiz.currentIndex];
+                const isCorrect = (idx === qData.ans);
+                
+                this.state.quiz.totalAnswered++;
+                if (isCorrect) this.state.quiz.correctCount++;
+                this.updateEfficiency();
+
+                // Disable buttons and style them based on correctness
+                const container = document.getElementById('quiz-container');
+                const buttons = container.querySelectorAll('button');
+                buttons.forEach((b, i) => {
+                    b.onclick = null;
+                    b.classList.remove('hover:bg-white/10', 'hover:border-white/20', 'group');
+                    const icon = b.querySelector('i');
+                    if (icon) icon.remove();
+
+                    if (i === qData.ans) {
+                        b.classList.add('bg-green-500/10', 'border-green-500/50', 'text-green-300');
+                        b.innerHTML += ` <i data-lucide="check-circle-2" class="w-5 h-5 inline float-right text-green-400"></i>`;
+                    } else if (i === idx && !isCorrect) {
+                        b.classList.add('bg-red-500/10', 'border-red-500/50', 'text-red-300');
+                        b.innerHTML += ` <i data-lucide="x-circle" class="w-5 h-5 inline float-right text-red-400"></i>`;
+                    } else {
+                        b.classList.add('opacity-40');
+                    }
+                });
+                this.safeRenderIcons();
+                this.showFeedback(isCorrect, qData.rsn);
+            },
+
+            showFeedback(isCorrect, reason) {
+                const fb = document.getElementById('quiz-feedback');
+                const title = document.getElementById('feedback-title');
+                const iconContainer = document.getElementById('feedback-icon');
+                document.getElementById('feedback-reason').innerText = reason;
+                
+                fb.classList.remove('hidden', 'border-green-500', 'border-red-500', 'bg-green-500/5', 'bg-red-500/5');
+                
+                if (isCorrect) {
+                    title.innerText = "Correct!";
+                    title.className = "font-bold text-lg text-green-400";
+                    fb.classList.add('border-green-500', 'bg-green-500/5');
+                    iconContainer.innerHTML = `<i data-lucide="check-circle-2" class="w-6 h-6 text-green-400"></i>`;
+                } else {
+                    title.innerText = "Incorrect";
+                    title.className = "font-bold text-lg text-red-400";
+                    fb.classList.add('border-red-500', 'bg-red-500/5');
+                    iconContainer.innerHTML = `<i data-lucide="alert-circle" class="w-6 h-6 text-red-400"></i>`;
+                }
+                this.safeRenderIcons();
+            },
+
+            nextQuizQuestion() {
+                this.state.quiz.currentIndex++;
+                this.renderQuizQuestion();
+            },
+
+            renderQuizEnd() {
+                document.getElementById('quiz-feedback').classList.add('hidden');
+                const eff = Math.round((this.state.quiz.correctCount / 10) * 100);
+                const container = document.getElementById('quiz-container');
+                container.innerHTML = `
+                    <div class="text-center space-y-6">
+                        <div class="w-24 h-24 rounded-full bg-brand-accent/20 flex items-center justify-center mx-auto border border-brand-accent/50 shadow-xl shadow-brand-accent/20">
+                            <i data-lucide="award" class="w-12 h-12 text-brand-accent"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-3xl font-bold tracking-tight">Assessment Complete!</h2>
+                            <p class="text-gray-400 mt-2 text-lg">You scored <strong class="text-white">${this.state.quiz.correctCount}</strong> out of 10.</p>
+                        </div>
+                        <div class="bg-[#080D1A] p-4 rounded-xl border border-white/5 inline-block mx-auto min-w-[200px]">
+                            <p class="text-sm text-gray-500 uppercase tracking-widest mb-1">Final Efficiency</p>
+                            <p class="text-3xl font-bold text-brand-accent">${eff}%</p>
+                        </div>
+                        <div class="pt-4">
+                            <button onclick="app.startQuiz()" class="px-8 py-4 rounded-xl bg-white/10 text-white font-bold hover:bg-white/20 transition-all w-full max-w-sm mx-auto flex items-center justify-center gap-2 border border-white/10 shadow-lg hover:scale-[1.02]">
+                                <i data-lucide="rotate-ccw" class="w-5 h-5"></i> Start Another Quiz
+                            </button>
+                        </div>
+                    </div>
+                `;
+                this.safeRenderIcons();
+            },
+
+            // --- REAL LIFE LOGIC ---
+            loadRealLifeScenarios(reset = false) {
+                if (reset) this.state.realLifeIndex = 0;
+                
+                const start = this.state.realLifeIndex;
+                let batch = realLifeBank.slice(start, start + 5);
+                
+                if (batch.length < 5) { // loop back
+                    this.state.realLifeIndex = 0;
+                    batch = realLifeBank.slice(0, 5);
+                } else {
+                    this.state.realLifeIndex += 5;
+                }
+
+                const container = document.getElementById('real-life-container');
+                container.innerHTML = batch.map((item, i) => `
+                    <div class="glass-panel p-5 md:p-6 rounded-2xl flex flex-col gap-4 border border-white/5 shadow-lg group hover:border-white/10 transition-colors">
+                        <div class="flex justify-between items-start gap-4">
+                            <p class="font-bold text-lg md:text-xl text-white leading-snug">"${item.hindi}"</p>
+                            <button onclick="app.toggleRealLife(${i})" class="shrink-0 p-3 rounded-xl bg-[#080D1A] border border-white/5 hover:bg-white/10 transition-all shadow-inner group-hover:shadow-black/50" title="Reveal Answer">
+                                <i data-lucide="eye" class="w-5 h-5 text-brand-accent"></i>
+                            </button>
+                        </div>
+                        <div id="rl-ans-${i}" class="hidden space-y-3 pt-4 border-t border-white/5 mt-2">
+                            <p class="text-brand-accent font-bold text-lg flex items-center gap-2"><i data-lucide="message-square" class="w-4 h-4 opacity-50"></i> ${item.eng}</p>
+                            <p class="text-sm text-gray-400 bg-white/5 p-3 rounded-lg leading-relaxed">${item.rsn}</p>
+                        </div>
+                    </div>
+                `).join('');
+                this.safeRenderIcons();
+            },
+
+            toggleRealLife(idx) {
+                const el = document.getElementById(`rl-ans-${idx}`);
+                el.classList.toggle('hidden');
+            },
+
+            // --- ANKI LOGIC ---
+            generateAnkiCSV() {
+                let csv = "";
+                quizBank.forEach(q => {
+                    let ansStr = q.ans;
+                    if (q.type !== 2 && Array.isArray(q.opts)) {
+                        ansStr = q.opts[q.ans];
+                    }
+                    // Safety check to ensure absolutely zero extra commas in output (Complying with prompt rule)
+                    const cleanQ = q.q.replace(/,/g, '');
+                    const cleanA = String(ansStr).replace(/,/g, '');
+                    csv += `${cleanQ},${cleanA}\n`;
+                });
+                return csv;
+            },
+
+            generateAnkiPreview() {
+                const csv = this.generateAnkiCSV();
+                // Show a small preview to not overwhelm the DOM
+                const lines = csv.split('\n').filter(l => l.trim().length > 0);
+                const previewText = lines.slice(0, 10).join('\n') + '\n... (90 more cards)';
+                document.getElementById('anki-preview').innerText = previewText;
+            },
+
+            downloadAnki() {
+                const csv = this.generateAnkiCSV();
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = 'FluencyBridge_DirectIndirectObjects_Anki.csv';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+            }
+        };
+
+        // Initialize application on load
+        window.addEventListener('DOMContentLoaded', () => {
+            app.init();
+        });
+    </script>
+</body>
+</html>
+
+
+```
