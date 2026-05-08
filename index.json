@@ -133,6 +133,13 @@
     "rootGroup": "Notes"
   },
   {
+    "title": "Why & Where",
+    "slug": "Where-Why",
+    "folder": "notes/Structure/QuestionWords",
+    "category": "Structure",
+    "rootGroup": "Notes"
+  },
+  {
     "title": "Which vs What",
     "slug": "Which-What",
     "folder": "notes/Structure/QuestionWords",
