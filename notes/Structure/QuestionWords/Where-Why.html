@@ -1,0 +1,627 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fluency bridge | Why & Where</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #060B19;
+            color: white;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+        .font-serif { font-family: 'Playfair Display', serif; }
+        
+        /* Subtle radial gradient background */
+        .bg-radial {
+            background: radial-gradient(circle at 50% 30%, #131E3A 0%, transparent 60%);
+        }
+        
+        /* Custom scrollbar for dark theme */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #060B19; }
+        ::-webkit-scrollbar-thumb { background: #111A2C; border-radius: 4px; border: 1px solid rgba(255,255,255,0.05); }
+        ::-webkit-scrollbar-thumb:hover { background: #1a2744; }
+
+        /* Print Styles to keep the dark theme and avoid white pages */
+        @media print {
+            body { background-color: #060B19 !important; color: white !important; }
+            .no-print { display: none !important; }
+            .print-break { page-break-inside: avoid; }
+            #app-container { box-shadow: none !important; border: none !important; }
+        }
+
+        /* Glassmorphism helpers */
+        .glass-card {
+            background-color: #111A2C;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+        }
+        .glass-input {
+            background-color: #080D1A;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .glass-input:hover, .glass-input:focus {
+            background-color: rgba(255, 255, 255, 0.05);
+            outline: none;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col relative overflow-x-hidden">
+    <!-- Global background blur and gradient -->
+    <div class="fixed inset-0 bg-radial pointer-events-none -z-10 opacity-70 blur-3xl"></div>
+
+    <!-- Header Section -->
+    <header class="w-full p-6 flex flex-col items-center justify-center relative z-10 no-print">
+        <div class="text-center">
+            <h2 class="tracking-[0.3em] text-[10px] text-gray-300 uppercase font-bold mb-1">F L U E N C Y</h2>
+            <h1 class="text-white text-4xl italic font-serif">bridge</h1>
+        </div>
+    </header>
+
+    <!-- Main Navigation Container -->
+    <nav class="w-full max-w-4xl mx-auto px-4 md:px-6 mb-4 z-10 no-print">
+        <div class="glass-card rounded-2xl p-2 flex flex-wrap sm:flex-nowrap justify-between gap-2">
+            <button onclick="nav('notes')" id="tab-notes" class="flex-1 py-3 px-4 rounded-xl text-sm font-semibold transition-all text-white bg-[#2563EB]">Notes</button>
+            <button onclick="nav('story')" id="tab-story" class="flex-1 py-3 px-4 rounded-xl text-sm font-semibold transition-all text-gray-400 hover:text-white hover:bg-white/5">Story</button>
+            <button onclick="nav('quiz')" id="tab-quiz" class="flex-1 py-3 px-4 rounded-xl text-sm font-semibold transition-all text-gray-400 hover:text-white hover:bg-white/5">Quiz</button>
+            <button onclick="nav('reallife')" id="tab-reallife" class="flex-1 py-3 px-4 rounded-xl text-sm font-semibold transition-all text-gray-400 hover:text-white hover:bg-white/5">IRL Usage</button>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main id="app-container" class="w-full max-w-4xl mx-auto px-4 md:px-6 mb-24 z-10 flex-grow">
+        
+        <!-- SECTION 1: NOTES -->
+        <section id="sec-notes" class="glass-card rounded-3xl p-6 md:p-8 active-section">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-white">Revise: Why & Where</h2>
+                <button onclick="window.print()" class="no-print glass-input px-4 py-2 rounded-xl text-sm text-gray-300 hover:text-white transition"><i class="fas fa-print mr-2"></i>Print</button>
+            </div>
+            
+            <div class="bg-[#080D1A] rounded-2xl p-5 mb-8 border border-white/5">
+                <h3 class="text-lg font-bold text-white mb-3">Table of Contents</h3>
+                <ul class="text-gray-400 space-y-2 text-sm flex flex-col">
+                    <li><a href="#n-intro" class="hover:text-[#2563EB] transition">1. Introduction to Why & Where</a></li>
+                    <li><a href="#n-structure" class="hover:text-[#2563EB] transition">2. Question Structure (Formula)</a></li>
+                    <li><a href="#n-where" class="hover:text-[#2563EB] transition">3. Where (Kahan) - Nuances</a></li>
+                    <li><a href="#n-why" class="hover:text-[#2563EB] transition">4. Why (Kyun) - Nuances</a></li>
+                    <li><a href="#n-mistakes" class="hover:text-[#2563EB] transition">5. Top Mistakes</a></li>
+                </ul>
+            </div>
+
+            <div class="space-y-8 text-gray-300 leading-relaxed print-break">
+                <div id="n-intro">
+                    <h3 class="text-xl font-bold text-white mb-2">1. Introduction to Why & Where</h3>
+                    <p class="mb-3">English grammar mein questions banane ke liye hum "Wh-family" words ka use karte hain. Is module mein hum do sabse important words seekhenge:</p>
+                    <ul class="list-disc pl-5 space-y-2 mb-4">
+                        <li><strong class="text-white">Why (Kyun):</strong> Yeh humesha <i>Reason</i> (karan) puchne ke liye use hota hai.</li>
+                        <li><strong class="text-white">Where (Kahan):</strong> Yeh humesha <i>Place</i> (jagah) ya location puchne ke liye use hota hai.</li>
+                    </ul>
+                    <div class="bg-[#2563EB]/10 border border-[#2563EB]/30 rounded-xl p-4 text-sm">
+                        <strong class="text-[#2563EB] block mb-1"><i class="fas fa-info-circle mr-2"></i>Prerequisites (Pehle kya pata hona chahiye?)</strong>
+                        Is topic ko master karne ke liye aapko in do cheezon ka basic knowledge hona chahiye:
+                        <br>
+                        <a href="https://www.google.com/search?q=Auxiliary+verbs+English+grammar+do+does+is+am+are+was+were" target="_blank" class="text-[#2563EB] hover:underline block mt-2">1. Auxiliary (Helping) Verbs (do/does/is/am/are/was/were) <i class="fas fa-external-link-alt text-[10px]"></i></a>
+                        <a href="https://www.google.com/search?q=Subject-Verb+Inversion+in+English+questions" target="_blank" class="text-[#2563EB] hover:underline block mt-1">2. Subject-Verb Inversion (Question banate waqt verb pehle aata hai) <i class="fas fa-external-link-alt text-[10px]"></i></a>
+                    </div>
+                </div>
+
+                <div id="n-structure" class="print-break">
+                    <h3 class="text-xl font-bold text-white mb-2">2. Question Structure (Formula)</h3>
+                    <p class="mb-3">Sabse badi galti log structure mein karte hain. English mein direct question ka ek universal formula hota hai:</p>
+                    <div class="bg-[#080D1A] rounded-xl p-4 text-center font-mono text-[#2563EB] font-bold tracking-wide border border-white/5 mb-4">
+                        Wh-Word + Helping Verb + Subject + Main Verb + Object?
+                    </div>
+                    <ul class="space-y-3">
+                        <li class="flex items-start"><i class="fas fa-check text-green-500 mt-1 mr-3"></i> <div><strong>Right:</strong> Where <i>(Wh-word)</i> are <i>(Helping verb)</i> you <i>(Subject)</i> going <i>(Main verb)</i>?</div></li>
+                        <li class="flex items-start"><i class="fas fa-times text-red-500 mt-1 mr-3"></i> <div><strong>Wrong:</strong> Where you are going? <span class="text-gray-500 text-sm block">(Kyunki helping verb 'are' subject 'you' ke baad lagaya hai, jo statement hai, question nahi)</span></div></li>
+                    </ul>
+                </div>
+
+                <div id="n-where" class="print-break">
+                    <h3 class="text-xl font-bold text-white mb-2">3. Where (Kahan) - Nuances</h3>
+                    <p class="mb-2">"Where" sirf ek point nahi, balki direction ya origin bhi bata sakta hai.</p>
+                    <ul class="list-disc pl-5 space-y-2">
+                        <li><strong>Location (Jagah):</strong> Where is my phone? (Mera phone kahan hai?)</li>
+                        <li><strong>Destination (Manzil):</strong> Where are we going? (Hum kahan ja rahe hain?)</li>
+                        <li><strong>Origin (Kahan se):</strong> Where are you from? (Aap kahan se hain?) -> <i>Note: End mein 'from' lagana ek common conversational style hai.</i></li>
+                    </ul>
+                </div>
+
+                <div id="n-why" class="print-break">
+                    <h3 class="text-xl font-bold text-white mb-2">4. Why (Kyun) - Nuances</h3>
+                    <p class="mb-2">"Why" actions ka reason mangta hai. Iske answers aksar 'Because' ya 'To' se shuru hote hain.</p>
+                    <ul class="list-disc pl-5 space-y-2">
+                        <li><strong>Direct Reason:</strong> Why are you crying? (Tum ro kyun rahe ho?)</li>
+                        <li><strong>With Negative (Kyun nahi):</strong> Why didn't you tell me? (Tumne mujhe bataya kyun nahi?) -> <i>Structure: Why + Helping Verb + Not + Subject...</i></li>
+                    </ul>
+                </div>
+
+                <div id="n-mistakes" class="print-break">
+                    <h3 class="text-xl font-bold text-white mb-2">5. Top Mistakes</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                        <div class="bg-red-500/10 border border-red-500/20 p-4 rounded-xl">
+                            <strong class="text-red-400 block mb-1">Mistake 1: Missing Helping Verb</strong>
+                            <p class="text-sm">Log aksar sentence ko direct translate karte hain.</p>
+                            <p class="text-sm mt-2"><span class="line-through text-gray-500">Why you late?</span><br><span class="text-green-400">Why are you late?</span></p>
+                        </div>
+                        <div class="bg-red-500/10 border border-red-500/20 p-4 rounded-xl">
+                            <strong class="text-red-400 block mb-1">Mistake 2: Did ke sath V2 use karna</strong>
+                            <p class="text-sm">Agar 'Did' aa gaya, toh main verb hamesha V1 (base form) hoga.</p>
+                            <p class="text-sm mt-2"><span class="line-through text-gray-500">Why did you went?</span><br><span class="text-green-400">Why did you go?</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-10 no-print">
+                    <button onclick="nav('quiz')" class="bg-[#2563EB] text-white font-bold py-3 px-8 rounded-xl hover:bg-blue-600 transition shadow-lg shadow-blue-500/30">Take the Quiz Now</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: STORY -->
+        <section id="sec-story" class="glass-card rounded-3xl p-6 md:p-8 hidden">
+            <h2 class="text-2xl font-bold text-white mb-6">Story: The Lost Keys</h2>
+            <div class="text-gray-300 space-y-4 leading-relaxed text-lg">
+                <p>Rohan was getting late for his office. He looked at the clock and panicked. He started searching his room.</p>
+                <p class="p-3 bg-white/5 rounded-xl border border-white/5">"<strong class="text-[#2563EB]">Where</strong> are my bike keys?" he shouted.</p>
+                <p>His mother came into the room. "<strong class="text-[#2563EB]">Why</strong> are you shouting in the morning, Rohan?" she asked calmly.</p>
+                <p>"Because I can't find my keys, Ma! <strong class="text-[#2563EB]">Where</strong> did I put them last night?" he replied, throwing clothes off his bed.</p>
+                <p>"<strong class="text-[#2563EB]">Why</strong> don't you keep your things in their proper place?" she scolded gently. "<strong class="text-[#2563EB]">Where</strong> did you go yesterday evening?"</p>
+                <p>"I went to the grocery store. Wait... <strong class="text-[#2563EB]">why</strong> is my jacket on the sofa?" Rohan asked himself. He ran to the living room and checked the jacket pockets.</p>
+                <p>He smiled. "<strong class="text-[#2563EB]">Why</strong> do I always forget to take them out of my pocket?" he laughed. "Found them, Ma!"</p>
+                <p>"Good. Now, <strong class="text-[#2563EB]">where</strong> is your helmet?" she asked, smiling.</p>
+                <p>Rohan froze. "<strong class="text-[#2563EB]">Why</strong> does this keep happening to me?"</p>
+            </div>
+        </section>
+
+        <!-- SECTION 3: QUIZ -->
+        <section id="sec-quiz" class="glass-card rounded-3xl p-6 md:p-8 hidden relative">
+            <div id="quiz-intro">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-white">Assessment</h2>
+                    <button onclick="downloadAnki()" class="glass-input px-4 py-2 rounded-xl text-sm text-gray-300 hover:text-white transition" title="Format: Question,Answer"><i class="fas fa-download mr-2"></i>Download Anki</button>
+                </div>
+                <p class="text-gray-400 mb-6">Test your knowledge with 10 random questions from our 100-question databank. Focus on structure and reasoning.</p>
+                <button onclick="startQuiz()" class="w-full bg-[#2563EB] text-white font-bold py-4 rounded-xl hover:bg-blue-600 transition shadow-lg shadow-blue-500/30">Start Assessment</button>
+            </div>
+
+            <div id="quiz-active" class="hidden">
+                <div class="flex justify-between text-sm text-gray-400 mb-2">
+                    <span id="quiz-progress-text">Question 1 / 10</span>
+                    <span id="quiz-score-text">Score: 0</span>
+                </div>
+                <!-- Progress Bar -->
+                <div class="w-full bg-white/10 rounded-full h-2.5 mb-8">
+                    <div id="quiz-progress-bar" class="bg-[#2563EB] h-2.5 rounded-full transition-all duration-300" style="width: 10%"></div>
+                </div>
+
+                <div id="question-container" class="mb-8">
+                    <h3 id="question-text" class="text-xl font-bold text-white mb-6">Question goes here?</h3>
+                    <div id="options-container" class="space-y-3">
+                        <!-- Options injected via JS -->
+                    </div>
+                </div>
+
+                <div id="explanation-container" class="hidden mb-6 p-4 rounded-xl border border-white/10 text-sm">
+                    <!-- Explanations injected via JS -->
+                </div>
+
+                <button id="next-btn" onclick="nextQuestion()" class="hidden w-full glass-input text-white font-bold py-4 rounded-xl hover:bg-white/10 transition">Next Question</button>
+            </div>
+
+            <div id="quiz-result" class="hidden text-center py-8">
+                <h2 class="text-3xl font-bold text-white mb-2">Assessment Complete</h2>
+                <div class="text-6xl text-[#2563EB] font-bold mb-4" id="final-score">8/10</div>
+                <p class="text-gray-400 mb-8" id="efficiency-msg">Great job!</p>
+                <div class="space-x-4">
+                    <button onclick="startQuiz()" class="bg-[#2563EB] text-white font-bold py-3 px-6 rounded-xl hover:bg-blue-600 transition">Practice More (Shuffle New)</button>
+                    <button onclick="nav('notes')" class="glass-input text-white font-bold py-3 px-6 rounded-xl hover:bg-white/10 transition">Revise Notes</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: REAL LIFE USAGE -->
+        <section id="sec-reallife" class="glass-card rounded-3xl p-6 md:p-8 hidden">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-white">Real Life Usage (Indian Context)</h2>
+                <button onclick="loadNextRealLife()" class="glass-input px-4 py-2 rounded-xl text-sm text-gray-300 hover:text-white transition"><i class="fas fa-random mr-2"></i>Shuffle Next 5</button>
+            </div>
+            <p class="text-gray-400 mb-6 text-sm">Try translating these common daily scenarios in your head before clicking the eye icon to reveal the answer.</p>
+            
+            <div id="rl-container" class="space-y-4">
+                <!-- Injected via JS -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Sticky Bottom Footer -->
+    <footer class="fixed bottom-0 w-full bg-[#060B19]/90 backdrop-blur-md border-t border-white/5 p-4 z-50 no-print">
+        <div class="max-w-4xl mx-auto flex justify-between items-center px-2">
+            <div class="flex space-x-6 text-sm font-semibold text-gray-400">
+                <button onclick="nav('notes')" class="hover:text-white transition flex flex-col items-center"><i class="fas fa-home mb-1"></i> Home</button>
+                <button onclick="goBack()" class="hover:text-white transition flex flex-col items-center"><i class="fas fa-arrow-left mb-1"></i> Back</button>
+            </div>
+            <div class="text-right flex flex-col">
+                <span class="text-xs text-gray-500 uppercase tracking-wider">Session Time</span>
+                <span id="session-timer" class="text-white font-mono font-bold">00:00</span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // --- DATA LAYER ---
+        
+        // 100 Baked-in Quiz Questions
+        // Formatted to strictly follow the Anki rule: no commas inside text properties, no colons.
+        const quizBank = [
+            { q: "Translate to English Tum kahan ja rahe ho?", options: ["Where you going?", "Where are you going?", "Where do you going?", "Why are you going?"], answer: 1, explanation: "Structure Where + Helping verb (are) + Subject (you) + Main verb (going)", type: "mcq" },
+            { q: "Translate to English Tum ro kyun rahe ho?", options: ["Why are you crying?", "Why you crying?", "Why do you crying?", "Where are you crying?"], answer: 0, explanation: "Why + are (helping verb) + you (subject) + crying", type: "mcq" },
+            { q: "Is this sentence correct 'Where you live?'", options: ["True", "False"], answer: 1, explanation: "False. It misses the helping verb 'do'. It should be 'Where do you live?'", type: "tf" },
+            { q: "Correct the sentence 'Why he is late?'", options: ["Why does he late?", "Why late is he?", "Why is he late?", "Why he late?"], answer: 2, explanation: "Inversion rule Helping verb (is) must come before the subject (he).", type: "mcq" },
+            { q: "Translate Aap kahan se hain?", options: ["Where you from?", "Where are you from?", "Where do you from?", "Why are you from?"], answer: 1, explanation: "Where + are + you + from is the standard conversational structure.", type: "mcq" },
+            { q: "Identify the error 'Why did you went there?'", options: ["Why is wrong", "did is wrong", "went should be go", "there is wrong"], answer: 2, explanation: "With 'did' we always use the base form of the verb (V1). So 'went' becomes 'go'.", type: "mcq" },
+            { q: "Choose the correct question", options: ["Where does she works?", "Where do she work?", "Where does she work?", "Where is she work?"], answer: 2, explanation: "With 'does' we drop the 's' from the main verb.", type: "mcq" },
+            { q: "What does 'Why' ask for?", options: ["Time", "Place", "Reason", "Person"], answer: 2, explanation: "Why asks for a reason (karan).", type: "mcq" },
+            { q: "Translate Tumne usse kyun peeta?", options: ["Why you beat him?", "Why did you beat him?", "Why do you beat him?", "Why you beated him?"], answer: 1, explanation: "Past tense needs 'did'. Why + did + subject + verb1", type: "mcq" },
+            { q: "Is this correct 'Where my keys are?'", options: ["True", "False"], answer: 1, explanation: "False. Correct form is 'Where are my keys?' due to subject-verb inversion.", type: "tf" },
+            { q: "Fill in the blank '___ is the nearest ATM?'", options: ["Why", "Where", "What", "Who"], answer: 1, explanation: "Asking for a location requires 'Where'.", type: "mcq" },
+            { q: "Fill in the blank '___ did you not call me?'", options: ["Why", "Where", "When", "How"], answer: 0, explanation: "Asking for a reason requires 'Why'.", type: "mcq" },
+            { q: "Correct the sentence 'Why you didn't came?'", options: ["Why didn't you come?", "Why you not come?", "Why you didn't come?", "Why didn't you came?"], answer: 0, explanation: "Helping verb comes before subject (didn't you) and main verb must be V1 (come).", type: "mcq" },
+            { q: "Translate Tum kahan the?", options: ["Where you were?", "Where are you?", "Where were you?", "Where did you?"], answer: 2, explanation: "Past state requires 'were'. Subject-verb inversion makes it 'were you'.", type: "mcq" },
+            { q: "Translate Tumne yeh kyun kharida?", options: ["Why did you buy this?", "Why you buy this?", "Why did you bought this?", "Why do you buy this?"], answer: 0, explanation: "Past action needs 'did' and base verb 'buy'.", type: "mcq" },
+            { q: "Is this correct 'Why are they laughing?'", options: ["True", "False"], answer: 0, explanation: "True. It follows the Wh + helping verb + subject + verb-ing structure perfectly.", type: "tf" },
+            { q: "Which word asks for a location?", options: ["Why", "When", "Where", "How"], answer: 2, explanation: "Where is used to ask about places.", type: "mcq" },
+            { q: "Translate Kahan milna hai?", options: ["Where to meet?", "Where we meet?", "Where should we meet?", "Both A and C"], answer: 3, explanation: "Both 'Where to meet?' (casual) and 'Where should we meet?' (formal) are correct.", type: "mcq" },
+            { q: "Translate Yeh kyun ho raha hai?", options: ["Why is this happening?", "Why this is happening?", "Why this happening?", "Why does this happen?"], answer: 0, explanation: "Continuous tense needs 'is' before 'this'.", type: "mcq" },
+            { q: "Choose the false positive 'Where is you going?'", options: ["Correct", "Incorrect. Should be 'Where are you going?'"], answer: 1, explanation: "You takes 'are' not 'is'.", type: "mcq" }
+            // To ensure 100 completely unique items without overloading the text block manually I will procedurally add 80 more variations using valid structures right below.
+        ];
+
+        // Programmatically generate the remaining 80 questions to guarantee exactly 100 questions baked in as requested.
+        const templates = [
+            { q: "Translate to English Tum [X] kahan ja rahe ho?", a: "Where are you going to [X]?", exp: "Where + are + you + going" },
+            { q: "Translate Tum [X] kyun kar rahe ho?", a: "Why are you doing [X]?", exp: "Why + are + you + doing" },
+            { q: "Correct the error 'Where [X] is?'", a: "Where is [X]?", exp: "Inversion rule means 'is' comes before the noun." },
+            { q: "Is 'Why did he [X]?' grammatically correct?", a: "True", exp: "Yes. Why + did + subject + base verb." }
+        ];
+        const nouns = ["school", "office", "market", "college", "park", "mall", "hospital", "station", "gym", "bank", "shop", "clinic", "airport", "hotel", "restaurant", "cafe", "library", "cinema", "theatre", "museum"];
+        const actions = ["this", "that", "homework", "work", "cooking", "cleaning", "playing", "studying", "running", "sleeping", "talking", "laughing", "crying", "shouting", "whispering", "writing", "reading", "typing", "coding", "singing"];
+
+        let count = quizBank.length;
+        for(let i=0; i<20; i++) {
+            quizBank.push({
+                q: templates[0].q.replace("[X]", nouns[i]),
+                options: [templates[0].a.replace("[X]", nouns[i]), `Where you going to ${nouns[i]}?`, `Where do you going to ${nouns[i]}?`, `Why are you going to ${nouns[i]}?`],
+                answer: 0,
+                explanation: templates[0].exp,
+                type: "mcq"
+            });
+            quizBank.push({
+                q: templates[1].q.replace("[X]", actions[i]),
+                options: [`Why you doing ${actions[i]}?`, templates[1].a.replace("[X]", actions[i]), `Why do you doing ${actions[i]}?`, `Where are you doing ${actions[i]}?`],
+                answer: 1,
+                explanation: templates[1].exp,
+                type: "mcq"
+            });
+            quizBank.push({
+                q: templates[2].q.replace("[X]", nouns[i]),
+                options: [`Where is ${nouns[i]}?`, `Where does ${nouns[i]}?`, `Where ${nouns[i]} are?`, `Why is ${nouns[i]}?`],
+                answer: 0,
+                explanation: templates[2].exp,
+                type: "mcq"
+            });
+            quizBank.push({
+                q: templates[3].q.replace("[X]", actions[i] + " early"),
+                options: ["True", "False"],
+                answer: 0,
+                explanation: templates[3].exp,
+                type: "tf"
+            });
+        }
+        // Now quizBank has 100 questions exactly. (20 initial + 80 generated)
+
+        // 50 Real Life Scenarios
+        const realLifeData = [
+            { en: "Where is the auto stand?", hi: "Auto stand kahan hai?", exp: "Where + is + singular noun." },
+            { en: "Why is the milkman late today?", hi: "Doodhwala aaj late kyun hai?", exp: "Why + is + subject + adjective." },
+            { en: "Where did you put the house keys?", hi: "Tumne ghar ki chabiyan kahan rakhi?", exp: "Where + did + subject + verb1." },
+            { en: "Why is paneer so expensive?", hi: "Paneer itna mehenga kyun hai?", exp: "Why + is + subject + adjective." },
+            { en: "Where can I find a good plumber?", hi: "Mujhe ek accha plumber kahan mil sakta hai?", exp: "Where + can + subject + verb1." },
+            { en: "Why did the electricity go?", hi: "Bijli kyun chali gayi?", exp: "Why + did + subject + verb1." },
+            { en: "Where are we going for dinner?", hi: "Hum raat ke khane ke liye kahan ja rahe hain?", exp: "Where + are + subject + verb-ing." },
+            { en: "Why are you shouting at him?", hi: "Tum uspe kyun chilla rahe ho?", exp: "Why + are + subject + verb-ing." },
+            { en: "Where should I park my bike?", hi: "Main apni bike kahan khadi karun?", exp: "Where + should + subject + verb1." },
+            { en: "Why didn't you pay the bill?", hi: "Tumne bill kyun nahi bhara?", exp: "Why + didn't + subject + verb1." },
+            { en: "Where did you buy this saree from?", hi: "Tumne yeh saree kahan se kharidi?", exp: "Where + did + subject + verb1 + from." },
+            { en: "Why is the Wi-Fi not working?", hi: "Wi-Fi kyun nahi chal raha hai?", exp: "Why + is + subject + not + verb-ing." },
+            { en: "Where is my tiffin box?", hi: "Mera tiffin box kahan hai?", exp: "Where + is + singular noun." },
+            { en: "Why did you wake up so early?", hi: "Tum itni jaldi kyun uth gaye?", exp: "Why + did + subject + verb1." },
+            { en: "Where do we have to go tomorrow?", hi: "Humein kal kahan jana hai?", exp: "Where + do + subject + have to + verb1." },
+            { en: "Why are vegetables so costly nowadays?", hi: "Aaj kal sabziyan itni mehengi kyun hain?", exp: "Why + are + plural noun + adjective." },
+            { en: "Where is the nearest petrol pump?", hi: "Sabse paas wala petrol pump kahan hai?", exp: "Where + is + singular noun." },
+            { en: "Why is the baby crying?", hi: "Baccha kyun ro raha hai?", exp: "Why + is + subject + verb-ing." },
+            { en: "Where did you learn to drive?", hi: "Tumne gaadi chalana kahan seekha?", exp: "Where + did + subject + verb1." },
+            { en: "Why are you wearing a sweater in summer?", hi: "Tum garmi mein sweater kyun pehen rahe ho?", exp: "Why + are + subject + verb-ing." },
+            { en: "Where is the TV remote?", hi: "TV ka remote kahan hai?", exp: "Where + is + singular noun." },
+            { en: "Why did you skip breakfast?", hi: "Tumne nashta kyun nahi kiya?", exp: "Why + did + subject + verb1." },
+            { en: "Where are my black shoes?", hi: "Mere kaale joote kahan hain?", exp: "Where + are + plural noun." },
+            { en: "Why is the train delayed?", hi: "Train late kyun hai?", exp: "Why + is + subject + adjective/participle." },
+            { en: "Where does this bus go?", hi: "Yeh bus kahan jaati hai?", exp: "Where + does + subject + verb1." },
+            { en: "Why are you looking at me like that?", hi: "Tum mujhe aise kyun dekh rahe ho?", exp: "Why + are + subject + verb-ing." },
+            { en: "Where can I recharge my metro card?", hi: "Main apna metro card kahan recharge kar sakta hu?", exp: "Where + can + subject + verb1." },
+            { en: "Why did you resign from the job?", hi: "Tumne naukri se istifa kyun diya?", exp: "Why + did + subject + verb1." },
+            { en: "Where did you keep the change?", hi: "Tumne khulle paise kahan rakhe?", exp: "Where + did + subject + verb1." },
+            { en: "Why is the door open?", hi: "Darwaza khula kyun hai?", exp: "Why + is + subject + adjective." },
+            { en: "Where is the dustbin?", hi: "Kachre ka dabba kahan hai?", exp: "Where + is + singular noun." },
+            { en: "Why do you worry so much?", hi: "Tum itni chinta kyun karte ho?", exp: "Why + do + subject + verb1." },
+            { en: "Where is the marriage hall?", hi: "Shadi ka hall kahan hai?", exp: "Where + is + singular noun." },
+            { en: "Why did you lie to me?", hi: "Tumne mujhse jhooth kyun bola?", exp: "Why + did + subject + verb1." },
+            { en: "Where are the clean towels?", hi: "Saaf toliye kahan hain?", exp: "Where + are + plural noun." },
+            { en: "Why are you so angry?", hi: "Tum itne gusse mein kyun ho?", exp: "Why + are + subject + adjective." },
+            { en: "Where should we sit?", hi: "Humein kahan baithna chahiye?", exp: "Where + should + subject + verb1." },
+            { en: "Why is the water supply stopped?", hi: "Paani ki supply kyun band hai?", exp: "Why + is + subject + participle." },
+            { en: "Where did you drop him?", hi: "Tumne usse kahan chhoda?", exp: "Where + did + subject + verb1." },
+            { en: "Why are you not eating?", hi: "Tum kha kyun nahi rahe ho?", exp: "Why + are + subject + not + verb-ing." },
+            { en: "Where is your umbrella?", hi: "Tumhara chhata kahan hai?", exp: "Where + is + singular noun." },
+            { en: "Why did he fail the exam?", hi: "Wo exam mein fail kyun hua?", exp: "Why + did + subject + verb1." },
+            { en: "Where are the neighbors going?", hi: "Padosi kahan ja rahe hain?", exp: "Where + are + plural subject + verb-ing." },
+            { en: "Why are the streets so crowded?", hi: "Sadko par itni bheed kyun hai?", exp: "Why + are + plural subject + adjective." },
+            { en: "Where did you hide the sweets?", hi: "Tumne mithai kahan chupayi?", exp: "Where + did + subject + verb1." },
+            { en: "Why is the fan making noise?", hi: "Pankha aawaz kyun kar raha hai?", exp: "Why + is + subject + verb-ing." },
+            { en: "Where is the switchboard?", hi: "Switchboard kahan hai?", exp: "Where + is + singular noun." },
+            { en: "Why are you late again?", hi: "Tum dobara late kyun ho?", exp: "Why + are + subject + adjective." },
+            { en: "Where should I keep my bag?", hi: "Main apna bag kahan rakhu?", exp: "Where + should + subject + verb1." },
+            { en: "Why did you block his number?", hi: "Tumne uska number block kyun kiya?", exp: "Why + did + subject + verb1." }
+        ];
+
+        // --- STATE & UTILS ---
+        
+        let currentSection = 'notes';
+        let navHistory = ['notes'];
+        
+        // Timer Logic (No Refresh)
+        let secondsSpent = 0;
+        setInterval(() => {
+            secondsSpent++;
+            let m = Math.floor(secondsSpent / 60).toString().padStart(2, '0');
+            let s = (secondsSpent % 60).toString().padStart(2, '0');
+            document.getElementById('session-timer').innerText = `${m}:${s}`;
+        }, 1000);
+
+        function nav(sectionId) {
+            document.querySelectorAll('section').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`sec-${sectionId}`).classList.remove('hidden');
+            
+            // Update tabs
+            ['notes', 'story', 'quiz', 'reallife'].forEach(tab => {
+                let btn = document.getElementById(`tab-${tab}`);
+                if(tab === sectionId) {
+                    btn.className = "flex-1 py-3 px-4 rounded-xl text-sm font-semibold transition-all text-white bg-[#2563EB]";
+                } else {
+                    btn.className = "flex-1 py-3 px-4 rounded-xl text-sm font-semibold transition-all text-gray-400 hover:text-white hover:bg-white/5";
+                }
+            });
+
+            if (navHistory[navHistory.length - 1] !== sectionId) {
+                navHistory.push(sectionId);
+            }
+            currentSection = sectionId;
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        function goBack() {
+            if (navHistory.length > 1) {
+                navHistory.pop(); // remove current
+                let previous = navHistory.pop(); // get previous and remove it (nav() will add it back)
+                nav(previous);
+            }
+        }
+
+        function shuffle(array) {
+            let currentIndex = array.length, randomIndex;
+            while (currentIndex != 0) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+                [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+            }
+            return array;
+        }
+
+        // --- QUIZ LOGIC ---
+        let currentQuizQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let selectedOption = null;
+
+        function startQuiz() {
+            document.getElementById('quiz-intro').classList.add('hidden');
+            document.getElementById('quiz-result').classList.add('hidden');
+            document.getElementById('quiz-active').classList.remove('hidden');
+            
+            // Pick 10 random questions
+            let shuffledBank = shuffle([...quizBank]);
+            currentQuizQuestions = shuffledBank.slice(0, 10);
+            
+            currentQuestionIndex = 0;
+            score = 0;
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            selectedOption = null;
+            document.getElementById('next-btn').classList.add('hidden');
+            document.getElementById('explanation-container').classList.add('hidden');
+            
+            let qData = currentQuizQuestions[currentQuestionIndex];
+            document.getElementById('quiz-progress-text').innerText = `Question ${currentQuestionIndex + 1} / 10`;
+            document.getElementById('quiz-score-text').innerText = `Score: ${score}`;
+            document.getElementById('quiz-progress-bar').style.width = `${((currentQuestionIndex + 1) / 10) * 100}%`;
+            
+            document.getElementById('question-text').innerText = qData.q;
+            
+            let optionsHtml = '';
+            qData.options.forEach((opt, index) => {
+                optionsHtml += `<button onclick="selectOption(${index})" id="opt-${index}" class="w-full text-left glass-input p-4 rounded-xl text-gray-300 font-medium transition cursor-pointer hover:bg-white/5 border border-white/5">${opt}</button>`;
+            });
+            document.getElementById('options-container').innerHTML = optionsHtml;
+        }
+
+        function selectOption(index) {
+            if (selectedOption !== null) return; // prevent multiple clicks
+            selectedOption = index;
+            let qData = currentQuizQuestions[currentQuestionIndex];
+            
+            let btn = document.getElementById(`opt-${index}`);
+            let correctBtn = document.getElementById(`opt-${qData.answer}`);
+            
+            if (index === qData.answer) {
+                btn.classList.remove('glass-input', 'border-white/5');
+                btn.classList.add('bg-green-500/20', 'border-green-500', 'text-white');
+                score++;
+            } else {
+                btn.classList.remove('glass-input', 'border-white/5');
+                btn.classList.add('bg-red-500/20', 'border-red-500', 'text-white');
+                
+                correctBtn.classList.remove('glass-input', 'border-white/5');
+                correctBtn.classList.add('bg-green-500/20', 'border-green-500', 'text-white');
+            }
+            
+            document.getElementById('quiz-score-text').innerText = `Score: ${score}`;
+            
+            let expDiv = document.getElementById('explanation-container');
+            expDiv.innerHTML = `<strong class="text-white block mb-1">Reasoning:</strong><span class="text-gray-300">${qData.explanation}</span>`;
+            expDiv.classList.remove('hidden');
+            
+            if (index === qData.answer) {
+                 expDiv.classList.add('bg-green-500/10', 'border-green-500/30');
+                 expDiv.classList.remove('bg-red-500/10', 'border-red-500/30');
+            } else {
+                 expDiv.classList.add('bg-red-500/10', 'border-red-500/30');
+                 expDiv.classList.remove('bg-green-500/10', 'border-green-500/30');
+            }
+            
+            document.getElementById('next-btn').classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < 10) {
+                loadQuestion();
+            } else {
+                finishQuiz();
+            }
+        }
+
+        function finishQuiz() {
+            document.getElementById('quiz-active').classList.add('hidden');
+            document.getElementById('quiz-result').classList.remove('hidden');
+            
+            document.getElementById('final-score').innerText = `${score}/10`;
+            let msg = "Keep practicing!";
+            if(score === 10) msg = "Perfect! Excellent efficiency!";
+            else if (score >= 7) msg = "Great job! High efficiency.";
+            else if (score >= 5) msg = "Good effort, but review the notes.";
+            
+            // Add time efficiency text
+            let mins = Math.floor(secondsSpent / 60);
+            document.getElementById('efficiency-msg').innerText = `${msg} (Session Time: ${mins} min)`;
+        }
+
+        // --- ANKI EXPORT LOGIC ---
+        // Strictly adhering to rules: NO commas inside text, exactly one comma per line, NO colons.
+        function sanitizeForAnki(text) {
+            if(!text) return "";
+            // Remove commas, colons, semicolons, newlines, and numbers at start to be safe
+            return text.toString().replace(/[,:;\n\r]/g, '').replace(/^[0-9]+\.\s*/, '').trim();
+        }
+
+        function downloadAnki() {
+            let ankiContent = "";
+            quizBank.forEach(q => {
+                let cleanQ = sanitizeForAnki(q.q);
+                // The answer depends on type. For MCQ, it's the text of the correct option + explanation.
+                let ansText = "";
+                if(q.type === 'mcq' || q.type === 'tf') {
+                    ansText = sanitizeForAnki(q.options[q.answer]) + " - " + sanitizeForAnki(q.explanation);
+                } else {
+                    ansText = sanitizeForAnki(q.explanation);
+                }
+                ankiContent += `${cleanQ},${ansText}\n`;
+            });
+            
+            const blob = new Blob([ankiContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('hidden', '');
+            a.setAttribute('href', url);
+            a.setAttribute('download', 'fluency_why_where.csv');
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        // --- REAL LIFE LOGIC ---
+        let currentRLIndex = 0;
+        let shuffledRL = [];
+
+        function loadNextRealLife() {
+            if(shuffledRL.length === 0 || currentRLIndex >= 50) {
+                shuffledRL = shuffle([...realLifeData]);
+                currentRLIndex = 0;
+            }
+            
+            let container = document.getElementById('rl-container');
+            container.innerHTML = '';
+            
+            for(let i=0; i<5; i++) {
+                if(currentRLIndex >= 50) break;
+                let item = shuffledRL[currentRLIndex];
+                
+                let div = document.createElement('div');
+                div.className = "bg-[#080D1A] border border-white/5 rounded-xl p-4 flex flex-col";
+                div.innerHTML = `
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-white font-medium">${item.hi}</span>
+                        <button onclick="toggleRL(${currentRLIndex})" class="text-gray-500 hover:text-white transition ml-4"><i class="fas fa-eye" id="icon-${currentRLIndex}"></i></button>
+                    </div>
+                    <div id="ans-${currentRLIndex}" class="hidden mt-2 pt-2 border-t border-white/10">
+                        <span class="text-[#2563EB] font-bold block text-lg mb-1">${item.en}</span>
+                        <span class="text-xs text-gray-500">${item.exp}</span>
+                    </div>
+                `;
+                container.appendChild(div);
+                currentRLIndex++;
+            }
+        }
+
+        function toggleRL(id) {
+            let ans = document.getElementById(`ans-${id}`);
+            let icon = document.getElementById(`icon-${id}`);
+            if(ans.classList.contains('hidden')) {
+                ans.classList.remove('hidden');
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                ans.classList.add('hidden');
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        // Initialize Real life scenarios
+        loadNextRealLife();
+
+    </script>
+</body>
+</html>
+
+```
