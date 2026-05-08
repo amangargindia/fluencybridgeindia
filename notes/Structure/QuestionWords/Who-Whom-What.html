@@ -1,0 +1,668 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fluency Bridge - Who, Whom & What</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:ital,wght@1,600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .font-serif-italic { font-family: 'Playfair Display', serif; font-style: italic; }
+        
+        /* Print Styles keeping the dark theme */
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                background-color: #060B19 !important;
+                color: white !important;
+            }
+            .no-print { display: none !important; }
+            .print-area { display: block !important; }
+            #notes-section { max-height: none !important; overflow: visible !important; }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #374151; }
+
+        .glass-card {
+            background-color: #111A2C;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+        
+        .input-dark {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+    </style>
+</head>
+<body class="bg-[#060B19] text-white min-h-screen flex flex-col relative overflow-x-hidden">
+    
+    <!-- Background Gradient & Blur -->
+    <div class="fixed inset-0 z-[-1] pointer-events-none">
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#131E3A] via-transparent to-transparent opacity-80 blur-3xl"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="flex justify-between items-center p-5 max-w-2xl mx-auto w-full no-print">
+        <div class="flex flex-col">
+            <span class="tracking-[0.3em] text-[10px] text-gray-300 uppercase">F L U E N C Y</span>
+            <span class="text-white text-4xl font-serif-italic mt-[-4px]">bridge</span>
+        </div>
+        <div class="flex items-center gap-3">
+            <div id="global-timer" class="text-gray-400 font-mono text-sm bg-[#111A2C] px-3 py-1 rounded-lg border border-white/5">00:00</div>
+        </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="flex gap-2 p-4 overflow-x-auto max-w-2xl mx-auto w-full no-print no-scrollbar border-b border-white/5">
+        <button onclick="switchTab('notes')" id="tab-notes" class="whitespace-nowrap px-4 py-2 rounded-xl bg-[#2563EB] text-white font-semibold text-sm transition-all">Notes</button>
+        <button onclick="switchTab('story')" id="tab-story" class="whitespace-nowrap px-4 py-2 rounded-xl bg-white/5 text-gray-400 hover:bg-white/10 font-semibold text-sm transition-all">Story</button>
+        <button onclick="switchTab('quiz')" id="tab-quiz" class="whitespace-nowrap px-4 py-2 rounded-xl bg-white/5 text-gray-400 hover:bg-white/10 font-semibold text-sm transition-all">Quiz</button>
+        <button onclick="switchTab('reallife')" id="tab-reallife" class="whitespace-nowrap px-4 py-2 rounded-xl bg-white/5 text-gray-400 hover:bg-white/10 font-semibold text-sm transition-all">Daily Use</button>
+    </nav>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="flex-grow max-w-2xl mx-auto w-full p-4 mb-20">
+        
+        <!-- ================= NOTES SECTION ================= -->
+        <section id="notes-section" class="tab-content block">
+            <div class="flex justify-between items-center mb-6 no-print">
+                <h1 class="text-2xl font-bold">Concept Revision</h1>
+                <div class="flex gap-2">
+                    <button onclick="window.print()" class="p-2 bg-white/5 rounded-lg hover:bg-white/10 text-gray-300">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                    </button>
+                    <button onclick="switchTab('quiz')" class="bg-[#2563EB] px-4 py-2 rounded-lg text-sm font-semibold">Take Quiz</button>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-3xl p-6 print-area space-y-6 text-gray-300 text-sm leading-relaxed">
+                <h2 class="text-xl font-bold text-white">Who, Whom & What</h2>
+                
+                <div class="bg-[#080D1A] p-4 rounded-xl border border-white/5">
+                    <h3 class="text-white font-bold mb-2">Prerequisites (Click to search)</h3>
+                    <ul class="list-disc pl-5 space-y-1">
+                        <li><a href="https://www.google.com/search?q=Grammar+Subject+vs+Object" target="_blank" class="text-blue-400 hover:underline">Subject (Doer) & Object (Receiver)</a></li>
+                        <li><a href="https://www.google.com/search?q=Pronouns+in+English" target="_blank" class="text-blue-400 hover:underline">Pronouns (He/Him, She/Her, They/Them)</a></li>
+                        <li><a href="https://www.google.com/search?q=Prepositions+in+English" target="_blank" class="text-blue-400 hover:underline">Prepositions (to, for, with, about)</a></li>
+                    </ul>
+                </div>
+
+                <div class="space-y-4">
+                    <h3 class="text-white font-bold text-lg border-b border-white/10 pb-2">1. The Core Concept (Hinglish)</h3>
+                    <p>English mein log aksar "Who" aur "Whom" ko lekar confuse hote hain. Iska ek simple rule hai: <strong>Subject vs Object.</strong></p>
+                    <ul class="space-y-3">
+                        <li class="bg-white/5 p-3 rounded-lg">
+                            <strong class="text-white">WHO (Kaun - Subject):</strong> Yeh action karne wale (Doer) ke liye use hota hai. Agar sentence ka answer <em>"He", "She", ya "They"</em> hai, toh "Who" lagega.<br>
+                            <em class="text-gray-400">Ex: Who is knocking? (Knock kaun kar raha hai?) -> He is knocking. (Isliye Who)</em>
+                        </li>
+                        <li class="bg-white/5 p-3 rounded-lg">
+                            <strong class="text-white">WHOM (Kisko / Kise - Object):</strong> Yeh uske liye use hota hai jis par action ho raha hai (Receiver). Agar answer <em>"Him", "Her", ya "Them"</em> hai, toh "Whom" lagega.<br>
+                            <em class="text-gray-400">Ex: Whom should I call? (Main kisko call karu?) -> Call him. (Isliye Whom)</em>
+                        </li>
+                        <li class="bg-white/5 p-3 rounded-lg">
+                            <strong class="text-white">WHAT (Kya - Subject/Object for things):</strong> Yeh non-living things, ideas, ya actions ke liye use hota hai. Yeh subject aur object dono ban sakta hai.<br>
+                            <em class="text-gray-400">Ex: What fell on the floor? (Subject). What do you want? (Object).</em>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="space-y-4">
+                    <h3 class="text-white font-bold text-lg border-b border-white/10 pb-2">2. The "Preposition" Trick</h3>
+                    <p>Jab bhi sentence mein preposition (to, with, for, about) aata hai jiske baad person aana ho, hamesha <strong>Whom</strong> use hota hai, Who nahi.</p>
+                    <ul class="list-disc pl-5 space-y-1">
+                        <li><span class="text-red-400">Galat:</span> With who are you going?</li>
+                        <li><span class="text-green-400">Sahi:</span> With <strong>whom</strong> are you going? (Kiske saath ja rahe ho?)</li>
+                        <li><span class="text-green-400">Sahi:</span> To <strong>whom</strong> it may concern.</li>
+                    </ul>
+                </div>
+
+                <div class="space-y-4">
+                    <h3 class="text-white font-bold text-lg border-b border-white/10 pb-2">3. Top Mistakes People Make</h3>
+                    <ul class="space-y-2">
+                        <li><strong>Mistake 1:</strong> Using "Who" after a preposition. (e.g., "For who is this gift?" -> should be "For whom").</li>
+                        <li><strong>Mistake 2:</strong> Using "Whom" as a subject to sound smart. (e.g., "Whom is at the door?" -> should be "Who is at the door?").</li>
+                        <li><strong>Mistake 3:</strong> Confusing "What" with "Which". "What" is open-ended (Kya chahiye?), "Which" implies a limited choice (Kaunsa wala chahiye?).</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= STORY SECTION ================= -->
+        <section id="story-section" class="tab-content hidden">
+            <h1 class="text-2xl font-bold mb-6">Story Integration</h1>
+            <div class="glass-card rounded-3xl p-6 space-y-6 text-gray-300 text-sm leading-relaxed">
+                <p class="italic text-gray-400">Read this short story to see how Who, Whom, and What fit naturally into context.</p>
+                
+                <div class="bg-[#080D1A] p-5 rounded-xl border border-white/5 space-y-4">
+                    <h3 class="text-white font-bold text-lg">The Missing Wedding Gift</h3>
+                    <p>It was Rahul's wedding day. His mother looked stressed and asked, "<strong>Who</strong> is bringing the sweets?" (<em>Kaun la raha hai? - Subject</em>)</p>
+                    
+                    <p>Rahul replied, "I don't know <strong>who</strong> has the boxes, but I will find out." He then turned to his brother and asked, "<strong>Whom</strong> did you invite from the office?" (<em>Tumne kisko invite kiya? - Object</em>)</p>
+                    
+                    <p>"I invited the manager, but I don't know with <strong>whom</strong> he is coming," his brother said. (<em>Kiske saath aa raha hai? - Preposition + Object</em>)</p>
+                    
+                    <p>Suddenly, a loud crash was heard from the kitchen. "<strong>What</strong> was that sound?" Rahul's mother yelled. (<em>Kya tha? - Subject for a thing</em>)</p>
+                    
+                    <p>Rahul ran in. "I dropped the tray. <strong>What</strong> should I do now?" (<em>Main kya karu? - Object for an idea/thing</em>). His mother sighed, "Find the person to <strong>whom</strong> the catering is assigned and ask him to clean it up."</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= QUIZ SECTION ================= -->
+        <section id="quiz-section" class="tab-content hidden relative">
+            <div id="quiz-intro" class="glass-card rounded-3xl p-6 text-center space-y-6">
+                <h1 class="text-2xl font-bold text-white">Dynamic Quiz Engine</h1>
+                <p class="text-gray-400 text-sm">10 randomly shuffled questions from a pool of 100 to test your deep understanding of Who, Whom, and What. Beware of false positives!</p>
+                <button onclick="startQuizFlow()" class="w-full bg-[#2563EB] hover:bg-blue-600 text-white font-bold py-4 rounded-xl transition-all shadow-lg">Start Assessment</button>
+                <div class="mt-4 pt-4 border-t border-white/5">
+                    <button onclick="showAnkiModal()" class="text-gray-400 hover:text-white text-sm underline">Download Anki Flashcards (100 Questions)</button>
+                </div>
+            </div>
+
+            <div id="quiz-active" class="hidden space-y-6">
+                <div class="flex justify-between items-center text-sm font-semibold text-gray-400">
+                    <span id="quiz-progress-text">Question 1/10</span>
+                    <span id="quiz-score-text">Score: 0</span>
+                </div>
+                <div class="h-2 w-full bg-white/10 rounded-full overflow-hidden">
+                    <div id="quiz-progress-bar" class="h-full bg-[#2563EB] w-[10%] transition-all duration-300"></div>
+                </div>
+
+                <div class="glass-card rounded-3xl p-6 min-h-[250px] flex flex-col justify-center">
+                    <div id="question-type-badge" class="text-[10px] uppercase tracking-widest text-blue-400 mb-4 font-bold">Multiple Choice</div>
+                    <h2 id="question-text" class="text-xl font-bold text-white mb-6">Loading question...</h2>
+                    
+                    <div id="options-container" class="space-y-3">
+                        <!-- Options injected here -->
+                    </div>
+
+                    <div id="explanation-container" class="hidden mt-6 p-4 bg-white/5 border border-white/10 rounded-xl">
+                        <p id="explanation-text" class="text-sm text-gray-300"></p>
+                        <button id="next-q-btn" onclick="nextQuestion()" class="mt-4 w-full bg-[#2563EB] py-3 rounded-lg text-white font-bold">Next Question</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="quiz-result" class="hidden glass-card rounded-3xl p-6 text-center space-y-6">
+                <h1 class="text-3xl font-bold text-white">Assessment Complete</h1>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-white/5 p-4 rounded-xl border border-white/5">
+                        <p class="text-gray-400 text-xs uppercase tracking-widest">Final Score</p>
+                        <p id="final-score" class="text-3xl font-bold text-white mt-1">8/10</p>
+                    </div>
+                    <div class="bg-white/5 p-4 rounded-xl border border-white/5">
+                        <p class="text-gray-400 text-xs uppercase tracking-widest">Efficiency</p>
+                        <p id="final-efficiency" class="text-3xl font-bold text-white mt-1">12s <span class="text-sm font-normal text-gray-400">/q</span></p>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-400">Keep practicing to improve your intuition. The questions shuffle completely every time!</p>
+                <div class="flex gap-3">
+                    <button onclick="startQuizFlow()" class="flex-1 bg-[#2563EB] hover:bg-blue-600 text-white font-bold py-3 rounded-xl transition-all">Take Another Quiz</button>
+                    <button onclick="switchTab('notes')" class="flex-1 bg-white/5 hover:bg-white/10 text-white font-bold py-3 rounded-xl transition-all border border-white/5">Review Notes</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= REAL LIFE USAGE ================= -->
+        <section id="reallife-section" class="tab-content hidden">
+            <h1 class="text-2xl font-bold mb-6 text-white">Daily Life Contexts</h1>
+            <p class="text-gray-400 text-sm mb-6">Learn how to construct sentences in everyday Indian middle-class scenarios. Tap the eye icon to reveal.</p>
+            
+            <div id="rl-container" class="space-y-4">
+                <!-- Real life items injected here -->
+            </div>
+
+            <button onclick="loadNextRealLife()" class="w-full mt-6 bg-[#2563EB] hover:bg-blue-600 text-white font-bold py-4 rounded-xl transition-all shadow-lg">Load Next 5 Scenarios</button>
+        </section>
+
+    </main>
+
+    <!-- Footer / Navigation -->
+    <footer class="fixed bottom-0 left-0 right-0 bg-[#060B19]/90 backdrop-blur-md border-t border-white/5 p-4 no-print z-50">
+        <div class="max-w-2xl mx-auto flex justify-between items-center">
+            <button onclick="window.scrollTo(0,0)" class="text-gray-400 hover:text-white flex items-center gap-2 text-sm transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                Home
+            </button>
+            <button onclick="goBack()" class="text-gray-400 hover:text-white flex items-center gap-2 text-sm transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Back
+            </button>
+        </div>
+    </footer>
+
+    <!-- Anki Modal -->
+    <div id="anki-modal" class="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="glass-card rounded-2xl p-6 w-full max-w-2xl max-h-[80vh] flex flex-col">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-white">Anki Flashcards Data</h2>
+                <button onclick="closeAnkiModal()" class="text-gray-400 hover:text-white">✕</button>
+            </div>
+            <p class="text-xs text-gray-400 mb-4">Format strictly matches your requirements (Question,Answer). Copy the block below and save as a .txt or .csv file to import into Anki.</p>
+            <div class="flex-grow overflow-auto bg-[#080D1A] rounded-xl p-4 border border-white/5 relative">
+                <pre><code id="anki-code-block" class="text-xs text-green-400 whitespace-pre-wrap font-mono"></code></pre>
+            </div>
+            <button onclick="copyAnki()" class="mt-4 w-full bg-white/10 hover:bg-white/20 text-white py-3 rounded-lg font-bold border border-white/5 transition-all">Copy to Clipboard</button>
+        </div>
+    </div>
+
+    <!-- Application Logic -->
+    <script>
+        // ---------------------------------------------------------
+        // 1. DATA: 100 Questions Database
+        // ---------------------------------------------------------
+        // Types: mcq, tf (True/False), correctNot, flashcard (reasoning)
+        // Kept structurally dense to meet constraints without bloating file excessively.
+        const qDB = [
+            // MCQ: Who vs Whom (1-25)
+            { t: 'mcq', q: '___ is knocking at the door late at night?', o: ['Who', 'Whom', 'What'], a: 'Who', r: 'Who is the subject performing the action of knocking.' },
+            { t: 'mcq', q: 'To ___ should I address this formal letter?', o: ['Who', 'Whom', 'What'], a: 'Whom', r: 'Whom follows the preposition "To" and acts as the object.' },
+            { t: 'mcq', q: '___ do you think will win the cricket match?', o: ['Who', 'Whom', 'What'], a: 'Who', r: 'Who is the subject of the verb "will win". "Do you think" is an interjection.' },
+            { t: 'mcq', q: 'With ___ are you going to the movie theatre?', o: ['Who', 'Whom', 'What'], a: 'Whom', r: 'Whom is used after the preposition "With".' },
+            { t: 'mcq', q: '___ did they invite to the wedding reception?', o: ['Who', 'Whom', 'What'], a: 'Whom', r: 'They invited HIM. "Him" indicates object so we use Whom.' },
+            { t: 'mcq', q: '___ left the refrigerator open?', o: ['Who', 'Whom', 'What'], a: 'Who', r: 'He left it open. Subject = Who.' },
+            { t: 'mcq', q: 'For ___ did you bake this delicious cake?', o: ['Who', 'Whom', 'What'], a: 'Whom', r: 'Preposition "For" requires the object pronoun Whom.' },
+            { t: 'mcq', q: '___ is the person standing next to your brother?', o: ['Who', 'Whom', 'What'], a: 'Who', r: 'Asking for the identity of the subject standing there.' },
+            { t: 'mcq', q: '___ did you see at the mall yesterday?', o: ['Who', 'Whom', 'What'], a: 'Whom', r: 'You saw HIM. Object requires Whom.' },
+            { t: 'mcq', q: '___ should I say is calling?', o: ['Who', 'Whom', 'What'], a: 'Who', r: 'Who is the subject of the verb "is calling".' },
+            { t: 'mcq', q: 'From ___ did you borrow this expensive book?', o: ['Who', 'Whom', 'What'], a: 'Whom', r: 'Preposition "From" dictates the object case Whom.' },
+            { t: 'mcq', q: '___ let the dog out?', o: ['Who', 'Whom', 'What'], a: 'Who', r: 'Subject performing the action of letting out.' },
+            { t: 'mcq', q: '___ do you trust the most in your family?', o: ['Who', 'Whom', 'What'], a: 'Whom', r: 'You trust THEM. Object requires Whom.' },
+            { t: 'mcq', q: '___ is going to take out the trash?', o: ['Who', 'Whom', 'What'], a: 'Who', r: 'Subject doing the action.' },
+            { t: 'mcq', q: 'About ___ is this documentary?', o: ['Who', 'Whom', 'What'], a: 'Whom', r: 'Preposition "About" takes the object Whom.' },
+            { t: 'mcq', q: '___ is responsible for this mess?', o: ['Who', 'Whom', 'What'], a: 'Who', r: 'Subject required.' },
+            { t: 'mcq', q: '___ are you voting for in the elections?', o: ['Who', 'Whom', 'What'], a: 'Whom', r: 'Voting for HIM/HER. Preposition "for" at the end means object.' },
+            { t: 'mcq', q: '___ knows the answer to this puzzle?', o: ['Who', 'Whom', 'What'], a: 'Who', r: 'Subject of "knows".' },
+            { t: 'mcq', q: '___ did the teacher punish?', o: ['Who', 'Whom', 'What'], a: 'Whom', r: 'Teacher punished HIM. Object = Whom.' },
+            { t: 'mcq', q: 'By ___ was this beautiful painting made?', o: ['Who', 'Whom', 'What'], a: 'Whom', r: 'Passive construction with preposition "By" takes Whom.' },
+            { t: 'mcq', q: '___ told you that secret?', o: ['Who', 'Whom', 'What'], a: 'Who', r: 'Subject of "told".' },
+            { t: 'mcq', q: '___ is she talking to?', o: ['Who', 'Whom', 'What'], a: 'Whom', r: 'Talking to HIM. Preposition "to" expects object Whom.' },
+            { t: 'mcq', q: '___ wants ice cream?', o: ['Who', 'Whom', 'What'], a: 'Who', r: 'Subject of "wants".' },
+            { t: 'mcq', q: '___ did you give the keys to?', o: ['Who', 'Whom', 'What'], a: 'Whom', r: 'Give to HIM. Object case.' },
+            { t: 'mcq', q: '___ has the highest marks in the class?', o: ['Who', 'Whom', 'What'], a: 'Who', r: 'Subject having the marks.' },
+
+            // True / False (26-50)
+            { t: 'tf', q: 'In the sentence "To who should I speak" the word who is used correctly.', o: ['True', 'False'], a: 'False', r: 'After the preposition "To" you must use Whom.' },
+            { t: 'tf', q: '"Who" is always used as a subject.', o: ['True', 'False'], a: 'True', r: 'Who is exclusively a subjective pronoun.' },
+            { t: 'tf', q: '"Whom" can be used as a subject if the sentence sounds formal.', o: ['True', 'False'], a: 'False', r: 'Whom is ALWAYS an object. Formality does not change grammar rules.' },
+            { t: 'tf', q: '"What" can function as both a subject and an object.', o: ['True', 'False'], a: 'True', r: 'Yes. "What is falling?" (Subj) and "What did you drop?" (Obj).' },
+            { t: 'tf', q: 'If you can answer the question with "Him" you should use Whom.', o: ['True', 'False'], a: 'True', r: 'The He/Him trick works perfectly. Him = Whom.' },
+            { t: 'tf', q: '"Whom is at the door" is grammatically correct.', o: ['True', 'False'], a: 'False', r: 'The person at the door is doing the action of being there. It needs Who.' },
+            { t: 'tf', q: '"Who did you meet" is grammatically strict and correct.', o: ['True', 'False'], a: 'False', r: 'Strictly it should be "Whom did you meet" because you met THEM (object).' },
+            { t: 'tf', q: 'Prepositions usually signal that Whom should be used instead of Who.', o: ['True', 'False'], a: 'True', r: 'Prepositions take object pronouns like Whom.' },
+            { t: 'tf', q: '"What are you talking about" is correct for objects/ideas.', o: ['True', 'False'], a: 'True', r: 'What is used for ideas/things correctly here.' },
+            { t: 'tf', q: '"With who are you going" is correct.', o: ['True', 'False'], a: 'False', r: 'Should be With Whom.' },
+            { t: 'tf', q: '"Who ate my sandwich" correctly uses who as a subject.', o: ['True', 'False'], a: 'True', r: 'He ate it. Subject = Who.' },
+            { t: 'tf', q: '"Whom shall I fear" is a grammatically correct phrase.', o: ['True', 'False'], a: 'True', r: 'I shall fear HIM. Object requires Whom.' },
+            { t: 'tf', q: 'If the answer is "She" the question should use Whom.', o: ['True', 'False'], a: 'False', r: 'She is a subject pronoun so it pairs with Who.' },
+            { t: 'tf', q: '"What" can be used to refer to humans in normal contexts.', o: ['True', 'False'], a: 'False', r: 'What is for things/ideas. Who/Whom is for humans.' },
+            { t: 'tf', q: 'A sentence can have both Who and Whom.', o: ['True', 'False'], a: 'True', r: 'Yes e.g. "Who decided whom we should hire?"' },
+            { t: 'tf', q: '"Whom is the winner" is correct.', o: ['True', 'False'], a: 'False', r: 'Needs Who.' },
+            { t: 'tf', q: '"To whom it may concern" is a classic correct example.', o: ['True', 'False'], a: 'True', r: 'Preposition "to" takes object "whom".' },
+            { t: 'tf', q: '"Who do you love" is technically incorrect in strict grammar.', o: ['True', 'False'], a: 'True', r: 'Strictly it is Whom do you love (love HIM).' },
+            { t: 'tf', q: '"What is your name" uses What as a subject.', o: ['True', 'False'], a: 'True', r: 'Yes What is the subject here.' },
+            { t: 'tf', q: '"Whom is cooking dinner" is wrong.', o: ['True', 'False'], a: 'True', r: 'It should be Who is cooking.' },
+            { t: 'tf', q: '"For whom the bell tolls" is grammatically sound.', o: ['True', 'False'], a: 'True', r: 'For takes Whom.' },
+            { t: 'tf', q: '"Who did this" is wrong.', o: ['True', 'False'], a: 'False', r: 'It is perfectly correct.' },
+            { t: 'tf', q: '"What did he say" uses What as an object.', o: ['True', 'False'], a: 'True', r: 'He said WHAT. Object.' },
+            { t: 'tf', q: '"Who should we hire" should strictly be Whom should we hire.', o: ['True', 'False'], a: 'True', r: 'Hire HIM (object).' },
+            { t: 'tf', q: 'Using Who instead of Whom is common in spoken English but technically wrong for objects.', o: ['True', 'False'], a: 'True', r: 'Colloquially people use Who but Whom is grammar-accurate.' },
+
+            // Correct or Not (51-75)
+            { t: 'correctNot', q: 'Who did you talk to yesterday?', o: ['Correct', 'Incorrect'], a: 'Incorrect', r: 'Strictly it should be "Whom did you talk to" or "To whom did you talk".' },
+            { t: 'correctNot', q: 'Who is going to the market?', o: ['Correct', 'Incorrect'], a: 'Correct', r: 'Who is the subject here.' },
+            { t: 'correctNot', q: 'Whom left the car unlocked?', o: ['Correct', 'Incorrect'], a: 'Incorrect', r: 'He left it unlocked. Should be Who.' },
+            { t: 'correctNot', q: 'For whom are these flowers?', o: ['Correct', 'Incorrect'], a: 'Correct', r: 'Preposition for takes whom.' },
+            { t: 'correctNot', q: 'What is bothering you?', o: ['Correct', 'Incorrect'], a: 'Correct', r: 'What as a subject for a thing/idea.' },
+            { t: 'correctNot', q: 'Who should I write the cheque to?', o: ['Correct', 'Incorrect'], a: 'Incorrect', r: 'Should be Whom because of the preposition to.' },
+            { t: 'correctNot', q: 'With whom did you eat lunch?', o: ['Correct', 'Incorrect'], a: 'Correct', r: 'With requires object whom.' },
+            { t: 'correctNot', q: 'Whom is your favorite actor?', o: ['Correct', 'Incorrect'], a: 'Incorrect', r: 'Should be Who.' },
+            { t: 'correctNot', q: 'Who won the lottery?', o: ['Correct', 'Incorrect'], a: 'Correct', r: 'Subject required.' },
+            { t: 'correctNot', q: 'About who are they whispering?', o: ['Correct', 'Incorrect'], a: 'Incorrect', r: 'About requires whom.' },
+            { t: 'correctNot', q: 'To who did you send the email?', o: ['Correct', 'Incorrect'], a: 'Incorrect', r: 'To requires whom.' },
+            { t: 'correctNot', q: 'Whom did you see at the park?', o: ['Correct', 'Incorrect'], a: 'Correct', r: 'Saw HIM. Object.' },
+            { t: 'correctNot', q: 'Who did you vote for?', o: ['Correct', 'Incorrect'], a: 'Incorrect', r: 'Strictly Whom did you vote for.' },
+            { t: 'correctNot', q: 'What did you buy at the store?', o: ['Correct', 'Incorrect'], a: 'Correct', r: 'What as object.' },
+            { t: 'correctNot', q: 'Whom wants to play cricket?', o: ['Correct', 'Incorrect'], a: 'Incorrect', r: 'Should be Who wants to play.' },
+            { t: 'correctNot', q: 'Who is the boss firing today?', o: ['Correct', 'Incorrect'], a: 'Incorrect', r: 'Firing HIM. Should be Whom.' },
+            { t: 'correctNot', q: 'From whom did you get this information?', o: ['Correct', 'Incorrect'], a: 'Correct', r: 'From takes Whom.' },
+            { t: 'correctNot', q: 'Who did she marry?', o: ['Correct', 'Incorrect'], a: 'Incorrect', r: 'Marry HIM. Should be Whom.' },
+            { t: 'correctNot', q: 'What happened here?', o: ['Correct', 'Incorrect'], a: 'Correct', r: 'What as subject.' },
+            { t: 'correctNot', q: 'By who was the book written?', o: ['Correct', 'Incorrect'], a: 'Incorrect', r: 'By takes whom.' },
+            { t: 'correctNot', q: 'Who brought the snacks?', o: ['Correct', 'Incorrect'], a: 'Correct', r: 'Subject.' },
+            { t: 'correctNot', q: 'Whom is knocking?', o: ['Correct', 'Incorrect'], a: 'Incorrect', r: 'Who is knocking.' },
+            { t: 'correctNot', q: 'To whom does this belong?', o: ['Correct', 'Incorrect'], a: 'Correct', r: 'To takes Whom.' },
+            { t: 'correctNot', q: 'Who is he talking to?', o: ['Correct', 'Incorrect'], a: 'Incorrect', r: 'Strictly Whom is he talking to.' },
+            { t: 'correctNot', q: 'Whom did they elect?', o: ['Correct', 'Incorrect'], a: 'Correct', r: 'Elect HIM. Object.' },
+
+            // Flashcards/Reasoning (What vs Who/Whom & rules) (76-100)
+            { t: 'flashcard', q: 'If you ask about an action done to a person what word is used?', o: ['Who', 'Whom', 'What'], a: 'Whom', r: 'Action done TO a person makes them the object (Whom).' },
+            { t: 'flashcard', q: 'If you ask about the doer of an action who is human what word is used?', o: ['Who', 'Whom', 'What'], a: 'Who', r: 'The doer is the subject (Who).' },
+            { t: 'flashcard', q: 'Which word asks about non-living things as either subject or object?', o: ['Who', 'Whom', 'What'], a: 'What', r: 'What is versatile for things/ideas.' },
+            { t: 'flashcard', q: 'Replace the blank: The man ___ I saw yesterday was tall.', o: ['Who', 'Whom', 'What'], a: 'Whom', r: 'I saw HIM (the man). Object.' },
+            { t: 'flashcard', q: 'Replace the blank: The man ___ stole the bag ran away.', o: ['Who', 'Whom', 'What'], a: 'Who', r: 'HE stole it. Subject.' },
+            { t: 'flashcard', q: 'What pronoun does the He/Him rule map Whom to?', o: ['He', 'Him', 'They'], a: 'Him', r: 'Whom pairs with object pronouns like Him/Her/Them.' },
+            { t: 'flashcard', q: 'What pronoun does the He/Him rule map Who to?', o: ['He', 'Him', 'Them'], a: 'He', r: 'Who pairs with subject pronouns like He/She/They.' },
+            { t: 'flashcard', q: 'After words like By For With To you always use...', o: ['Who', 'Whom', 'What'], a: 'Whom', r: 'Prepositions require object pronouns.' },
+            { t: 'flashcard', q: '___ is the author of this book? (Human subject)', o: ['Who', 'Whom', 'What'], a: 'Who', r: 'Subject.' },
+            { t: 'flashcard', q: '___ color is the sky?', o: ['Who', 'Whom', 'What'], a: 'What', r: 'Asking about a thing/attribute.' },
+            { t: 'flashcard', q: 'I do not know to ___ I should complain.', o: ['Who', 'Whom', 'What'], a: 'Whom', r: 'After preposition To.' },
+            { t: 'flashcard', q: '___ is playing the guitar?', o: ['Who', 'Whom', 'What'], a: 'Who', r: 'Subject doing the playing.' },
+            { t: 'flashcard', q: '___ are you giving that present?', o: ['Who', 'Whom', 'What'], a: 'Whom', r: 'Giving to THEM. Object.' },
+            { t: 'flashcard', q: '___ time is it?', o: ['Who', 'Whom', 'What'], a: 'What', r: 'Thing/idea.' },
+            { t: 'flashcard', q: 'For ___ are you waiting?', o: ['Who', 'Whom', 'What'], a: 'Whom', r: 'Preposition For.' },
+            { t: 'flashcard', q: '___ made this delicious curry?', o: ['Who', 'Whom', 'What'], a: 'Who', r: 'Subject doer.' },
+            { t: 'flashcard', q: '___ did you hit with the ball?', o: ['Who', 'Whom', 'What'], a: 'Whom', r: 'Hit HIM. Object.' },
+            { t: 'flashcard', q: '___ are you staring at?', o: ['Who', 'Whom', 'What'], a: 'Whom', r: 'Staring at HIM. Object.' },
+            { t: 'flashcard', q: '___ is your favorite subject?', o: ['Who', 'Whom', 'What'], a: 'What', r: 'Thing.' },
+            { t: 'flashcard', q: '___ was the first president?', o: ['Who', 'Whom', 'What'], a: 'Who', r: 'Subject.' },
+            { t: 'flashcard', q: 'To ___ do these shoes belong?', o: ['Who', 'Whom', 'What'], a: 'Whom', r: 'Preposition To.' },
+            { t: 'flashcard', q: '___ did she invite to the party?', o: ['Who', 'Whom', 'What'], a: 'Whom', r: 'Invite THEM. Object.' },
+            { t: 'flashcard', q: '___ broke the window?', o: ['Who', 'Whom', 'What'], a: 'Who', r: 'Subject doer.' },
+            { t: 'flashcard', q: 'With ___ did you collaborate?', o: ['Who', 'Whom', 'What'], a: 'Whom', r: 'Preposition With.' },
+            { t: 'flashcard', q: '___ do you want for dinner?', o: ['Who', 'Whom', 'What'], a: 'What', r: 'Idea/Thing.' }
+        ];
+
+        // ---------------------------------------------------------
+        // 2. DATA: 50 Real Life Scenarios
+        // ---------------------------------------------------------
+        const rlDB = [
+            { ctx: 'Asking a shopkeeper about product owner', eng: 'To whom does this shop belong?', c: '"To" forces Whom.' },
+            { ctx: 'Finding out who called while you were busy', eng: 'Who called me just now?', c: 'Subject asking.' },
+            { ctx: 'Asking domestic help about broken glass', eng: 'Who broke this glass?', c: 'Subject asking for doer.' },
+            { ctx: 'Paying a vendor', eng: 'To whom should I transfer the money?', c: 'Preposition "to" takes Whom.' },
+            { ctx: 'Asking about dinner', eng: 'What is for dinner tonight?', c: 'What for things.' },
+            { ctx: 'Finding out who is coming to the wedding', eng: 'Who is coming from your family?', c: 'Subject (they are coming).' },
+            { ctx: 'Asking a friend about a date', eng: 'With whom did you go for coffee?', c: 'With takes Whom.' },
+            { ctx: 'Asking an auto driver about a route', eng: 'What is the fastest way there?', c: 'What for an idea/route.' },
+            { ctx: 'Asking boss about project assignment', eng: 'To whom was this task assigned?', c: 'Passive voice with "to".' },
+            { ctx: 'Gossiping about a neighbor', eng: 'Who bought the new car?', c: 'Subject doer.' },
+            { ctx: 'Asking teacher about childs friend', eng: 'With whom does my child sit?', c: 'With takes whom.' },
+            { ctx: 'Asking HR about a policy', eng: 'What are the new leave policies?', c: 'What for things.' },
+            { ctx: 'Finding the person in charge', eng: 'Who is the manager here?', c: 'Subject.' },
+            { ctx: 'Handing over a delivery package', eng: 'For whom is this package?', c: 'Preposition "For".' },
+            { ctx: 'Asking about an unknown noise', eng: 'What was that loud bang?', c: 'What for a sound.' },
+            { ctx: 'Booking a train ticket', eng: 'For whom are you booking the ticket?', c: 'Preposition "For".' },
+            { ctx: 'Asking about a lost item', eng: 'What did you lose?', c: 'What as object of lose.' },
+            { ctx: 'Asking about the cook', eng: 'Who made the paneer today?', c: 'Subject doer.' },
+            { ctx: 'Arguing with a sibling', eng: 'Whom are you calling a liar?', c: 'Calling HIM a liar (object).' },
+            { ctx: 'Complaining to customer care', eng: 'To whom do I escalate this issue?', c: 'Preposition "To".' },
+            { ctx: 'Asking about a guest', eng: 'Who is staying in the guest room?', c: 'Subject.' },
+            { ctx: 'Asking about a gift', eng: 'From whom did you receive this?', c: 'Preposition "From".' },
+            { ctx: 'Asking what happened in a serial/movie', eng: 'What happened in the last episode?', c: 'What as subject.' },
+            { ctx: 'Finding the owner of a parked car', eng: 'Who parked their car here?', c: 'Subject.' },
+            { ctx: 'Asking a child about their fight', eng: 'Whom did you hit?', c: 'Hit HIM (object).' },
+            { ctx: 'Asking about electricity bill', eng: 'What is the bill amount this month?', c: 'What for thing.' },
+            { ctx: 'Asking security guard about a visitor', eng: 'Whom is he looking for?', c: 'Preposition "for" at end makes it object.' },
+            { ctx: 'Asking doctor about medicine', eng: 'What are the side effects?', c: 'What for things.' },
+            { ctx: 'Inviting people for Puja', eng: 'Whom should we invite?', c: 'Invite THEM (object).' },
+            { ctx: 'Asking about a promotion', eng: 'Who got promoted this year?', c: 'Subject.' },
+            { ctx: 'Asking tailor about clothes', eng: 'For whom are you stitching this?', c: 'Preposition "For".' },
+            { ctx: 'Asking about a new recipe', eng: 'What did you add to the curry?', c: 'What as object.' },
+            { ctx: 'Discussing politics', eng: 'Who will win the next election?', c: 'Subject.' },
+            { ctx: 'Asking a teenager about their crush', eng: 'Whom do you like?', c: 'Like HIM (object).' },
+            { ctx: 'Asking mechanic about the car', eng: 'What is wrong with the engine?', c: 'What as subject.' },
+            { ctx: 'Asking about rent payment', eng: 'To whom should I pay the rent?', c: 'Preposition "To".' },
+            { ctx: 'Asking about a missing book', eng: 'Who took my book?', c: 'Subject doer.' },
+            { ctx: 'Discussing wedding arrangements', eng: 'Who is paying for the caterer?', c: 'Subject.' },
+            { ctx: 'Asking a child about school', eng: 'Next to whom do you sit?', c: 'Preposition "Next to".' },
+            { ctx: 'Asking a fruit vendor', eng: 'What is the price of apples?', c: 'What for thing.' },
+            { ctx: 'Finding a misplaced phone', eng: 'Who saw my phone last?', c: 'Subject.' },
+            { ctx: 'Asking about an email', eng: 'To whom did you forward it?', c: 'Preposition "To".' },
+            { ctx: 'Asking about weekend plans', eng: 'What are we doing Sunday?', c: 'What as object.' },
+            { ctx: 'Asking about a new colleague', eng: 'Who is the new guy?', c: 'Subject.' },
+            { ctx: 'Asking about a loan', eng: 'From whom did you borrow money?', c: 'Preposition "From".' },
+            { ctx: 'Asking about a strange smell', eng: 'What is that smell?', c: 'What for thing.' },
+            { ctx: 'Asking plumber about leak', eng: 'What caused the pipe to burst?', c: 'What as subject.' },
+            { ctx: 'Asking about an award', eng: 'To whom was the award given?', c: 'Preposition "To".' },
+            { ctx: 'Asking a child crying', eng: 'Who scolded you?', c: 'Subject doer.' },
+            { ctx: 'Asking about a secret', eng: 'Whom did you tell?', c: 'Tell HIM (object).' }
+        ];
+
+        // ---------------------------------------------------------
+        // 3. LOGIC: State & Timer
+        // ---------------------------------------------------------
+        let globalSeconds = 0;
+        let timerInterval;
+        let activeTab = 'notes';
+        
+        let currentQuiz = [];
+        let currentQIndex = 0;
+        let quizScore = 0;
+        let quizStartTime = 0;
+
+        let rlIndex = 0;
+
+        window.onload = () => {
+            startGlobalTimer();
+            loadNextRealLife();
+        };
+
+        function startGlobalTimer() {
+            timerInterval = setInterval(() => {
+                globalSeconds++;
+                let m = Math.floor(globalSeconds / 60).toString().padStart(2, '0');
+                let s = (globalSeconds % 60).toString().padStart(2, '0');
+                document.getElementById('global-timer').innerText = `${m}:${s}`;
+            }, 1000);
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`${tabId}-section`).classList.remove('hidden');
+            
+            document.querySelectorAll('nav button').forEach(el => {
+                el.classList.remove('bg-[#2563EB]', 'text-white');
+                el.classList.add('bg-white/5', 'text-gray-400');
+            });
+            let activeBtn = document.getElementById(`tab-${tabId}`);
+            activeBtn.classList.remove('bg-white/5', 'text-gray-400');
+            activeBtn.classList.add('bg-[#2563EB]', 'text-white');
+            activeTab = tabId;
+            window.scrollTo(0,0);
+        }
+
+        function goBack() {
+            if(activeTab === 'quiz') switchTab('notes');
+            else if(activeTab === 'story') switchTab('notes');
+            else if(activeTab === 'reallife') switchTab('notes');
+            else alert('Already at Home/Notes');
+        }
+
+        // ---------------------------------------------------------
+        // 4. LOGIC: Quiz Engine
+        // ---------------------------------------------------------
+        function shuffleArray(array) {
+            let curId = array.length;
+            while (0 !== curId) {
+                let randId = Math.floor(Math.random() * curId);
+                curId -= 1;
+                let tmp = array[curId];
+                array[curId] = array[randId];
+                array[randId] = tmp;
+            }
+            return array;
+        }
+
+        function startQuizFlow() {
+            document.getElementById('quiz-intro').classList.add('hidden');
+            document.getElementById('quiz-result').classList.add('hidden');
+            document.getElementById('quiz-active').classList.remove('hidden');
+            
+            let shuffled = shuffleArray([...qDB]);
+            currentQuiz = shuffled.slice(0, 10);
+            currentQIndex = 0;
+            quizScore = 0;
+            quizStartTime = Date.now();
+            
+            renderQuizQuestion();
+        }
+
+        function renderQuizQuestion() {
+            let q = currentQuiz[currentQIndex];
+            document.getElementById('quiz-progress-text').innerText = `Question ${currentQIndex + 1}/10`;
+            document.getElementById('quiz-score-text').innerText = `Score: ${quizScore}`;
+            document.getElementById('quiz-progress-bar').style.width = `${((currentQIndex + 1) / 10) * 100}%`;
+            
+            let typeMap = { mcq: 'Multiple Choice', tf: 'True / False', correctNot: 'Identify Correctness', flashcard: 'Reasoning' };
+            document.getElementById('question-type-badge').innerText = typeMap[q.t];
+            document.getElementById('question-text').innerText = q.q;
+            
+            let optsContainer = document.getElementById('options-container');
+            optsContainer.innerHTML = '';
+            document.getElementById('explanation-container').classList.add('hidden');
+
+            q.o.forEach((opt, idx) => {
+                let btn = document.createElement('button');
+                btn.className = 'w-full text-left p-4 rounded-xl input-dark hover:bg-white/10 text-white font-semibold transition-all flex items-center gap-3';
+                btn.innerHTML = `<span class="bg-white/10 text-xs px-2 py-1 rounded text-gray-400">${String.fromCharCode(65+idx)}</span> ${opt}`;
+                btn.onclick = () => handleAnswer(opt, btn, q);
+                optsContainer.appendChild(btn);
+            });
+        }
+
+        function handleAnswer(selected, btnElement, qObj) {
+            let optsContainer = document.getElementById('options-container');
+            let buttons = optsContainer.querySelectorAll('button');
+            buttons.forEach(b => { b.disabled = true; b.classList.remove('hover:bg-white/10'); });
+
+            let isCorrect = (selected === qObj.a);
+            if (isCorrect) {
+                btnElement.classList.add('bg-green-900/40', 'border-green-500/50');
+                quizScore++;
+            } else {
+                btnElement.classList.add('bg-red-900/40', 'border-red-500/50');
+                // Highlight correct
+                buttons.forEach(b => {
+                    if(b.innerText.includes(qObj.a)) b.classList.add('bg-green-900/40', 'border-green-500/50');
+                });
+            }
+
+            document.getElementById('quiz-score-text').innerText = `Score: ${quizScore}`;
+            
+            let expText = document.getElementById('explanation-text');
+            expText.innerHTML = `<strong>${isCorrect ? 'Correct!' : 'Incorrect.'}</strong> <br/> ${qObj.r}`;
+            document.getElementById('explanation-container').classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            currentQIndex++;
+            if(currentQIndex < 10) {
+                renderQuizQuestion();
+            } else {
+                endQuiz();
+            }
+        }
+
+        function endQuiz() {
+            document.getElementById('quiz-active').classList.add('hidden');
+            document.getElementById('quiz-result').classList.remove('hidden');
+            
+            document.getElementById('final-score').innerText = `${quizScore}/10`;
+            
+            let timeTaken = Math.floor((Date.now() - quizStartTime) / 1000);
+            let efficiency = Math.floor(timeTaken / 10); // seconds per question
+            document.getElementById('final-efficiency').innerHTML = `${efficiency}s <span class="text-sm font-normal text-gray-400">/q</span>`;
+        }
+
+        // ---------------------------------------------------------
+        // 5. LOGIC: Real Life Usage
+        // ---------------------------------------------------------
+        function loadNextRealLife() {
+            let container = document.getElementById('rl-container');
+            container.innerHTML = '';
+            
+            let slice = rlDB.slice(rlIndex, rlIndex + 5);
+            if(slice.length === 0) {
+                rlIndex = 0; // reset
+                slice = rlDB.slice(rlIndex, rlIndex + 5);
+            }
+
+            slice.forEach((item, idx) => {
+                let div = document.createElement('div');
+                div.className = 'glass-card p-4 rounded-xl flex items-center justify-between gap-4';
+                
+                let textDiv = document.createElement('div');
+                textDiv.className = 'flex-grow';
+                textDiv.innerHTML = `
+                    <p class="text-xs text-gray-400 uppercase tracking-wide mb-1">${item.ctx}</p>
+                    <p id="rl-sentence-${idx}" class="text-white font-bold blur-sm select-none transition-all duration-300">******************</p>
+                    <p id="rl-explain-${idx}" class="text-xs text-blue-400 mt-2 hidden">${item.c}</p>
+                `;
+
+                let btn = document.createElement('button');
+                btn.className = 'p-3 bg-white/5 hover:bg-white/10 rounded-lg text-gray-300 transition-all';
+                btn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>`;
+                
+                btn.onclick = () => {
+                    let sEl = document.getElementById(`rl-sentence-${idx}`);
+                    let eEl = document.getElementById(`rl-explain-${idx}`);
+                    if(sEl.classList.contains('blur-sm')) {
+                        sEl.classList.remove('blur-sm', 'select-none');
+                        sEl.innerText = item.eng;
+                        eEl.classList.remove('hidden');
+                        btn.classList.add('bg-blue-600', 'text-white');
+                    } else {
+                        sEl.classList.add('blur-sm', 'select-none');
+                        sEl.innerText = '******************';
+                        eEl.classList.add('hidden');
+                        btn.classList.remove('bg-blue-600', 'text-white');
+                    }
+                };
+
+                div.appendChild(textDiv);
+                div.appendChild(btn);
+                container.appendChild(div);
+            });
+
+            rlIndex += 5;
+        }
+
+        // ---------------------------------------------------------
+        // 6. LOGIC: Anki Export
+        // ---------------------------------------------------------
+        function showAnkiModal() {
+            let ankiCode = '';
+            // Format constraint: Question,Answer. ONLY ONE COMMA.
+            // Replace commas, colons, semicolons, and newlines.
+            qDB.forEach(q => {
+                let cleanQ = q.q.replace(/[,;:]/g, '').replace(/\n/g, ' ').trim();
+                let ansStr = String(q.a) + " - " + String(q.r);
+                let cleanA = ansStr.replace(/[,;:]/g, '').replace(/\n/g, ' ').trim();
+                ankiCode += `${cleanQ},${cleanA}\n`;
+            });
+            
+            document.getElementById('anki-code-block').innerText = ankiCode.trim();
+            document.getElementById('anki-modal').classList.remove('hidden');
+        }
+
+        function closeAnkiModal() {
+            document.getElementById('anki-modal').classList.add('hidden');
+        }
+
+        function copyAnki() {
+            let text = document.getElementById('anki-code-block').innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                let btn = document.querySelector('#anki-modal button:last-child');
+                let old = btn.innerText;
+                btn.innerText = 'Copied!';
+                btn.classList.replace('bg-white/10', 'bg-green-600');
+                setTimeout(() => {
+                    btn.innerText = old;
+                    btn.classList.replace('bg-green-600', 'bg-white/10');
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>
+
+```
