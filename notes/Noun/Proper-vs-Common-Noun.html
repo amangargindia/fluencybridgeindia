@@ -1,0 +1,719 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fluency Bridge | Proper vs Common Nouns</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@1,600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #060B19;
+            color: #ffffff;
+        }
+        .font-serif-italic {
+            font-family: 'Playfair Display', serif;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #060B19;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #111A2C;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #2563EB;
+        }
+        
+        /* Print Styles */
+        @media print {
+            body { background: white !important; color: black !important; }
+            #app-container { background: white !important; box-shadow: none !important; border: none !important; }
+            .no-print { display: none !important; }
+            .print-text-black { color: black !important; }
+            .print-bg-white { background: white !important; }
+            .print-border { border: 1px solid #ccc !important; }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen relative overflow-x-hidden selection:bg-blue-500/30">
+
+    <!-- Global Background & Soft Radial Blur -->
+    <div class="fixed inset-0 z-0 pointer-events-none bg-[#060B19] no-print">
+        <div class="absolute inset-0 bg-gradient-radial from-[#131E3A] to-transparent opacity-60 blur-3xl rounded-full scale-150 transform -translate-y-1/4"></div>
+    </div>
+
+    <!-- Main Application Container -->
+    <div class="relative z-10 flex flex-col min-h-screen max-w-4xl mx-auto p-4 sm:p-6" id="app-container">
+        
+        <!-- Header -->
+        <header class="flex justify-between items-center mb-8 no-print">
+            <div>
+                <div class="tracking-[0.3em] text-[10px] text-gray-300 uppercase font-bold">F L U E N C Y</div>
+                <div class="text-white text-4xl italic font-serif-italic mt-1 leading-none tracking-wide">bridge</div>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div id="global-timer" class="text-gray-400 text-sm font-mono bg-[#111A2C] px-4 py-1.5 rounded-xl border border-white/5 shadow-md">00:00</div>
+            </div>
+        </header>
+
+        <!-- Dynamic Content Area -->
+        <main id="main-content" class="flex-grow pb-24">
+            <!-- Content injected via JS -->
+        </main>
+
+        <!-- Fixed Footer Navigation -->
+        <footer class="fixed bottom-0 left-0 right-0 p-4 bg-[#060B19]/90 backdrop-blur-md border-t border-white/5 z-50 no-print">
+            <div class="max-w-4xl mx-auto flex justify-between items-center px-4">
+                <button onclick="navigate('back')" class="text-gray-400 hover:text-white transition flex items-center space-x-2 text-sm font-medium">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                    <span>Back</span>
+                </button>
+                <button onclick="navigate('home')" class="text-gray-400 hover:text-white transition flex items-center space-x-2 text-sm font-medium">
+                    <i data-lucide="home" class="w-4 h-4"></i>
+                    <span>Home</span>
+                </button>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // --- DATA GENERATION LAYER ---
+        
+        const concepts = [
+            { c: 'city', p: 'Mumbai' }, { c: 'boy', p: 'Rahul' }, { c: 'biscuit', p: 'Parle-G' },
+            { c: 'car', p: 'Tata Nexon' }, { c: 'festival', p: 'Diwali' }, { c: 'month', p: 'January' },
+            { c: 'school', p: 'Delhi Public School' }, { c: 'river', p: 'Ganga' }, { c: 'shoes', p: 'Bata' },
+            { c: 'country', p: 'India' }, { c: 'actor', p: 'Shahrukh Khan' }, { c: 'monument', p: 'Taj Mahal' }
+        ];
+
+        // 1. Generate 100 Quiz Questions
+        const quizBank = [];
+        const generateQuizData = () => {
+            // Hardcoded premium reasoning questions
+            quizBank.push({
+                type: 'reasoning', q: "Explain why 'I saw a Doctor' is incorrect.",
+                options: ["Doctor is a verb", "Doctor is a common noun here", "Doctor is spelled wrong"], correct: 1,
+                exp: "Yahan 'doctor' ek common noun hai (aam naam). Jab tak hum kisi specific doctor ka naam (e.g., Doctor Sharma) nahi lete, tab tak use Capital letter se start nahi karna chahiye. Sahi: 'I saw a doctor'."
+            });
+            quizBank.push({
+                type: 'correct_not', q: "Is this correct? 'we went to delhi by train.'",
+                options: ["Correct", "Not Correct"], correct: 1,
+                exp: "Not Correct. 'delhi' ek proper noun hai (khas shehar ka naam), isliye iska pehla letter hamesha Capital hona chahiye: 'Delhi'. Sentence ka pehla letter 'We' bhi capital hona chahiye."
+            });
+            quizBank.push({
+                type: 'mcq', q: "Which of the following is entirely made of Proper Nouns?",
+                options: ["Dog, Cat, Mouse", "Amit, Ganga, Sunday", "City, Mumbai, State"], correct: 1,
+                exp: "Amit (khas insaan), Ganga (khas nadi), Sunday (khas din). Baki options mein aam naam (common nouns) mix hain."
+            });
+
+            // Programmatically generate the rest to hit 100
+            let counter = quizBank.length;
+            while (counter < 100) {
+                let pair = concepts[counter % concepts.length];
+                let isProper = Math.random() > 0.5;
+                let targetWord = isProper ? pair.p : pair.c;
+                
+                if (counter % 4 === 0) {
+                    quizBank.push({
+                        type: 'mcq',
+                        q: `Identify the Proper Noun in this list: ${pair.c}, book, ${pair.p}, table.`,
+                        options: [pair.c, "book", pair.p],
+                        correct: 2,
+                        exp: `'${pair.p}' ek specific (khas) naam hai, isliye ye proper noun hai.`
+                    });
+                } else if (counter % 4 === 1) {
+                    quizBank.push({
+                        type: 'tf',
+                        q: `True/False: The word '${targetWord}' is a ${isProper ? 'Proper' : 'Common'} Noun.`,
+                        options: ["True", "False"],
+                        correct: 0,
+                        exp: `True. '${targetWord}' ek ${isProper ? 'khas' : 'aam'} naam hai.`
+                    });
+                } else if (counter % 4 === 2) {
+                    let incorrectTarget = isProper ? pair.p.toLowerCase() : pair.c;
+                    quizBank.push({
+                        type: 'correct_not',
+                        q: `Is the capitalization correct? "I love my ${incorrectTarget}."`,
+                        options: ["Correct", "Not Correct"],
+                        correct: isProper ? 1 : 0,
+                        exp: isProper ? `Not Correct. '${pair.p}' proper noun hai, Capital se start hona chahiye.` : `Correct. '${pair.c}' common noun hai, small letter theek hai (unless sentence ke start mein ho).`
+                    });
+                } else {
+                    quizBank.push({
+                        type: 'reasoning',
+                        q: `Why do we capitalize '${pair.p}' but not '${pair.c}'?`,
+                        options: ["It is a naming rule", "Proper nouns need capitals", "Both should be capitalized"],
+                        correct: 1,
+                        exp: "English grammar ka strict rule hai: Proper nouns (specific names) hamesha Capital letter se start hote hain."
+                    });
+                }
+                counter++;
+            }
+        };
+
+        // 2. Generate 50 Real Life Scenarios
+        const realLifeScenarios = [];
+        const generateRealLifeData = () => {
+            const base = [
+                { context: "Buying groceries", eng: "Bhaiya, give me two packets of biscuit.", exp: "Yahan 'biscuit' common noun hai (koi bhi biscuit chalega). Agar bolte 'Parle-G', toh wo Proper noun hota." },
+                { context: "Planning a trip", eng: "We are going to a city next month.", exp: "'city' aur 'month' dono common nouns hain. Exactly kahan aur kab? Nahi pata. Agar 'Mumbai' aur 'January' bolte, toh wo proper nouns hote." },
+                { context: "Talking about cars", eng: "I bought a Tata Nexon yesterday.", exp: "'Tata Nexon' ek proper noun hai kyunki ye ek khaas car ka brand aur model hai. Isliye 'T' aur 'N' capital hain." },
+                { context: "School admissions", eng: "My kid goes to a good school.", exp: "'school' aam naam (common) hai. Agar naam lete jaise 'St. Marys School', toh proper noun ban jata." },
+                { context: "Describing a friend", eng: "My friend Amit is very helpful.", exp: "'friend' common noun hai (koi bhi dost ho sakta hai), lekin 'Amit' proper noun hai (ek specific dost ka naam)." }
+            ];
+            realLifeScenarios.push(...base);
+
+            let counter = base.length;
+            while(counter < 50) {
+                let pair = concepts[counter % concepts.length];
+                let isSpecific = Math.random() > 0.5;
+                
+                realLifeScenarios.push({
+                    context: `Everyday Conversation ${counter}`,
+                    eng: isSpecific ? `I really love ${pair.p}.` : `I want to buy a new ${pair.c}.`,
+                    exp: isSpecific ? `Yahan '${pair.p}' ek proper noun hai kyunki ye ek dam specific cheez/insaan/jagah ka naam hai.` : `Yahan '${pair.c}' ek common noun hai kyunki ye ek general category hai.`
+                });
+                counter++;
+            }
+        };
+
+        // 3. Generate exactly 100 Anki Cards (Strict format)
+        const generateAnkiCSV = () => {
+            let csv = "";
+            let ankiData = [
+                ["What type of noun is the word boy","Common Noun"],
+                ["What type of noun is Rahul","Proper Noun"],
+                ["Should the word city be capitalized in the middle of a sentence","No"],
+                ["Should Mumbai be capitalized in the middle of a sentence","Yes"],
+                ["What is the general name given to a person place or thing","Common Noun"],
+                ["What is the specific name given to a person place or thing","Proper Noun"]
+            ];
+            
+            let count = ankiData.length;
+            while(count < 100) {
+                let pair = concepts[count % concepts.length];
+                if(count % 2 === 0) {
+                    ankiData.push([`Is the word ${pair.c} a common noun or proper noun`,`Common Noun`]);
+                } else {
+                    ankiData.push([`Does the word ${pair.p} always start with a capital letter`,`Yes`]);
+                }
+                count++;
+            }
+
+            ankiData.forEach(pair => {
+                // EXTREMELY STRICT FORMATTING: Remove all colons, semicolons, extra commas, bullet numbering
+                let q = pair[0].replace(/[,:;]/g, '').replace(/^[0-9]+\.\s*/, '').trim();
+                let a = pair[1].replace(/[,:;]/g, '').trim();
+                csv += `${q},${a}\n`;
+            });
+            return csv;
+        };
+
+        // Init Data
+        generateQuizData();
+        generateRealLifeData();
+
+        // --- STATE MANAGEMENT ---
+        let state = {
+            currentPage: 'home',
+            history: [],
+            timerSeconds: 0,
+            timerInterval: null,
+            quiz: {
+                active: false,
+                questions: [],
+                currentIndex: 0,
+                score: 0,
+                answers: [],
+                startTime: 0
+            },
+            realLifeIndex: 0
+        };
+
+        // --- UTILS ---
+        const shuffleArray = (array) => {
+            let curId = array.length;
+            while (0 !== curId) {
+                let randId = Math.floor(Math.random() * curId);
+                curId -= 1;
+                let tmp = array[curId];
+                array[curId] = array[randId];
+                array[randId] = tmp;
+            }
+            return array;
+        };
+
+        const formatTime = (totalSeconds) => {
+            const m = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+            const s = (totalSeconds % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
+        };
+
+        // --- CORE LOGIC ---
+        const startGlobalTimer = () => {
+            state.timerInterval = setInterval(() => {
+                state.timerSeconds++;
+                const timerEl = document.getElementById('global-timer');
+                if(timerEl) timerEl.innerText = formatTime(state.timerSeconds);
+            }, 1000);
+        };
+
+        const navigate = (page) => {
+            if(page === 'back') {
+                if(state.history.length > 0) page = state.history.pop();
+                else page = 'home';
+            } else if (page !== 'home') {
+                if(state.currentPage !== 'home') state.history.push(state.currentPage);
+            } else {
+                state.history = [];
+            }
+            state.currentPage = page;
+            render();
+        };
+
+        const downloadAnki = () => {
+            const csvData = generateAnkiCSV();
+            const blob = new Blob([csvData], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('href', url);
+            a.setAttribute('download', 'Proper_vs_Common_Nouns.csv');
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        };
+
+        // --- QUIZ LOGIC ---
+        const startQuiz = () => {
+            let shuffled = shuffleArray([...quizBank]);
+            state.quiz = {
+                active: true,
+                questions: shuffled.slice(0, 10),
+                currentIndex: 0,
+                score: 0,
+                answers: [],
+                startTime: state.timerSeconds
+            };
+            navigate('quiz_active');
+        };
+
+        const submitQuizAnswer = (selectedIndex) => {
+            const currentQ = state.quiz.questions[state.quiz.currentIndex];
+            const isCorrect = selectedIndex === currentQ.correct;
+            
+            if(isCorrect) state.quiz.score++;
+            state.quiz.answers.push({ q: currentQ, selected: selectedIndex, isCorrect });
+
+            document.getElementById('quiz-options').style.pointerEvents = 'none';
+            
+            const btns = document.querySelectorAll('.quiz-opt-btn');
+            btns.forEach((btn, idx) => {
+                if(idx === currentQ.correct) {
+                    btn.classList.add('bg-green-600/40', 'border-green-500', 'text-white');
+                    btn.classList.remove('bg-white/5', 'text-gray-300');
+                } else if (idx === selectedIndex && !isCorrect) {
+                    btn.classList.add('bg-red-600/40', 'border-red-500', 'text-white');
+                    btn.classList.remove('bg-white/5', 'text-gray-300');
+                }
+            });
+
+            document.getElementById('quiz-explanation').classList.remove('hidden');
+            document.getElementById('quiz-next-btn').classList.remove('hidden');
+        };
+
+        const nextQuizQuestion = () => {
+            state.quiz.currentIndex++;
+            if(state.quiz.currentIndex >= 10) {
+                navigate('quiz_results');
+            } else {
+                render(); // FIX applied here!
+            }
+        };
+
+        // --- RENDERERS ---
+        const render = () => {
+            const main = document.getElementById('main-content');
+            main.innerHTML = ''; 
+
+            switch(state.currentPage) {
+                case 'home': main.innerHTML = getHomeHTML(); break;
+                case 'notes': main.innerHTML = getNotesHTML(); break;
+                case 'story': main.innerHTML = getStoryHTML(); break;
+                case 'quiz_intro': main.innerHTML = getQuizIntroHTML(); break;
+                case 'quiz_active': main.innerHTML = getQuizActiveHTML(); break;
+                case 'quiz_results': main.innerHTML = getQuizResultsHTML(); break;
+                case 'reallife': main.innerHTML = getRealLifeHTML(); break;
+            }
+            lucide.createIcons();
+            window.scrollTo(0, 0);
+        };
+
+        const getHomeHTML = () => `
+            <div class="flex flex-col items-center justify-center space-y-6 mt-6 sm:mt-12 animate-fade-in">
+                <div class="text-center mb-6 sm:mb-8">
+                    <h1 class="text-2xl sm:text-3xl font-bold text-white mb-2 tracking-tight">Proper vs Common Nouns</h1>
+                    <p class="text-gray-400 text-sm sm:text-base">Mastering the foundation of naming words.</p>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-2xl px-2">
+                    <button onclick="navigate('notes')" class="bg-[#111A2C] border-t border-white/5 shadow-xl rounded-2xl p-6 flex flex-col items-center hover:bg-[#16223A] transition group">
+                        <i data-lucide="book-open" class="w-8 h-8 text-blue-500 mb-3 group-hover:scale-110 transition-transform"></i>
+                        <h2 class="text-lg font-semibold text-white">Revise Notes</h2>
+                        <p class="text-xs text-gray-400 text-center mt-2 leading-relaxed">Hinglish explanations, mind-maps & rules.</p>
+                    </button>
+                    
+                    <button onclick="navigate('reallife')" class="bg-[#111A2C] border-t border-white/5 shadow-xl rounded-2xl p-6 flex flex-col items-center hover:bg-[#16223A] transition group">
+                        <i data-lucide="users" class="w-8 h-8 text-green-500 mb-3 group-hover:scale-110 transition-transform"></i>
+                        <h2 class="text-lg font-semibold text-white">Real Life Usage</h2>
+                        <p class="text-xs text-gray-400 text-center mt-2 leading-relaxed">50 everyday Indian contexts.</p>
+                    </button>
+
+                    <button onclick="navigate('story')" class="bg-[#111A2C] border-t border-white/5 shadow-xl rounded-2xl p-6 flex flex-col items-center hover:bg-[#16223A] transition group">
+                        <i data-lucide="book-text" class="w-8 h-8 text-purple-500 mb-3 group-hover:scale-110 transition-transform"></i>
+                        <h2 class="text-lg font-semibold text-white">Read Story</h2>
+                        <p class="text-xs text-gray-400 text-center mt-2 leading-relaxed">Learn contextually via a simple story.</p>
+                    </button>
+
+                    <button onclick="navigate('quiz_intro')" class="bg-[#111A2C] border-t border-white/5 shadow-xl rounded-2xl p-6 flex flex-col items-center hover:bg-[#16223A] transition group relative overflow-hidden">
+                        <div class="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition"></div>
+                        <i data-lucide="brain-circuit" class="w-8 h-8 text-orange-500 mb-3 group-hover:scale-110 transition-transform relative z-10"></i>
+                        <h2 class="text-lg font-semibold text-white relative z-10">Take Quiz</h2>
+                        <p class="text-xs text-gray-400 text-center mt-2 leading-relaxed relative z-10">10 random questions from 100 bank.</p>
+                    </button>
+                </div>
+
+                <div class="mt-8">
+                    <button onclick="downloadAnki()" class="flex items-center space-x-2 text-gray-400 hover:text-white transition text-xs font-medium px-4 py-2 rounded-lg hover:bg-white/5">
+                        <i data-lucide="download" class="w-4 h-4"></i>
+                        <span>Download Anki Deck (100 Cards)</span>
+                    </button>
+                </div>
+            </div>
+        `;
+
+        const getNotesHTML = () => `
+            <div class="bg-[#111A2C] border-t border-white/5 shadow-2xl rounded-3xl p-6 sm:p-8 relative print-bg-white print-text-black print-border animate-fade-in">
+                <div class="flex justify-between items-start mb-6 no-print">
+                    <h1 class="text-2xl font-bold text-white">Revise: Proper vs Common Nouns</h1>
+                    <div class="flex space-x-2">
+                        <button onclick="window.print()" class="p-2 bg-[#080D1A] rounded-xl hover:bg-white/10 text-gray-400 transition" title="Print Notes">
+                            <i data-lucide="printer" class="w-5 h-5"></i>
+                        </button>
+                        <button onclick="navigate('quiz_intro')" class="px-4 py-2 bg-[#2563EB] rounded-xl text-white text-sm font-semibold hover:bg-blue-600 transition shadow-lg shadow-blue-500/20">
+                            Jump to Quiz
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-[#080D1A] rounded-2xl p-5 mb-8 border border-white/5 no-print">
+                    <h3 class="text-gray-400 text-xs font-bold mb-3 uppercase tracking-widest">Table of Contents</h3>
+                    <ul class="text-sm space-y-3 text-blue-400 font-medium">
+                        <li><a href="#intro" class="hover:text-blue-300 flex items-center"><i data-lucide="chevron-right" class="w-4 h-4 mr-1"></i> 1. Introduction & Prerequisites</a></li>
+                        <li><a href="#common" class="hover:text-blue-300 flex items-center"><i data-lucide="chevron-right" class="w-4 h-4 mr-1"></i> 2. Common Noun (Aam Naam)</a></li>
+                        <li><a href="#proper" class="hover:text-blue-300 flex items-center"><i data-lucide="chevron-right" class="w-4 h-4 mr-1"></i> 3. Proper Noun (Khaas Naam)</a></li>
+                        <li><a href="#mistakes" class="hover:text-blue-300 flex items-center text-red-400"><i data-lucide="chevron-right" class="w-4 h-4 mr-1"></i> 4. Top Mistakes</a></li>
+                    </ul>
+                </div>
+
+                <div class="space-y-10 text-gray-300 text-sm sm:text-base print-text-black leading-relaxed">
+                    
+                    <section id="intro">
+                        <h2 class="text-lg font-bold text-white print-text-black mb-3">1. Introduction & Prerequisites</h2>
+                        <p class="mb-4">Duniya mein har cheez ka koi na koi naam hota hai. Grammar ki duniya mein in naamon ko hi 'Noun' kehte hain. Ab ye naam do tarah ke hote hain: General (Aam) aur Specific (Khaas).</p>
+                        
+                        <div class="bg-white/5 border border-l-4 border-blue-500 p-4 rounded-r-xl">
+                            <strong class="text-white text-sm block mb-2 uppercase tracking-wide">Prerequisites (Pehle ye samjhein):</strong>
+                            <ul class="list-disc pl-5 space-y-2 text-sm">
+                                <li><a href="https://www.google.com/search?q=What+is+a+Noun+in+English+Grammar" target="_blank" class="text-blue-400 hover:underline inline-flex items-center">What is a Noun? <i data-lucide="external-link" class="w-3 h-3 ml-1"></i></a> - Naming word (kisi insaan, jagah, ya cheez ka naam).</li>
+                                <li><a href="https://www.google.com/search?q=Capitalization+rules+in+English" target="_blank" class="text-blue-400 hover:underline inline-flex items-center">Capital Letters <i data-lucide="external-link" class="w-3 h-3 ml-1"></i></a> - A, B, C (Bade akshar).</li>
+                            </ul>
+                        </div>
+                    </section>
+
+                    <section id="common">
+                        <h2 class="text-lg font-bold text-white print-text-black mb-3">2. Common Noun (Aam Naam)</h2>
+                        <p><strong>Use Case:</strong> Jab hum kisi category ya aam cheez ki baat karte hain, jiska koi specific naam humne nahi liya. Jaise 'ladka' (boy) – koi bhi ladka ho sakta hai.</p>
+                        
+                        <div class="mt-4 p-5 bg-[#080D1A] rounded-2xl border border-white/5">
+                            <h4 class="text-white font-semibold text-sm mb-3">Mind Map / Hierarchy:</h4>
+                            <ul class="list-[square] pl-5 space-y-2 text-gray-400 text-sm">
+                                <li><strong>People:</strong> boy, girl, doctor, teacher, uncle</li>
+                                <li><strong>Places:</strong> city, state, country, hospital, park</li>
+                                <li><strong>Things:</strong> car, biscuit, phone, book, dog</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="mt-4 border-l-2 border-gray-600 pl-4 text-sm italic">
+                            <strong class="text-white not-italic">Rule:</strong> Inko Capital letter se shuru NAHI karte, jab tak ye sentence ka pehla word na ho.
+                        </div>
+                    </section>
+
+                    <section id="proper">
+                        <h2 class="text-lg font-bold text-white print-text-black mb-3">3. Proper Noun (Khaas Naam)</h2>
+                        <p><strong>Use Case:</strong> Jab hum us 'aam cheez' ko ek proper tag ya identity de dete hain. Jaise 'ladka' ban gaya 'Rahul', 'city' ban gayi 'Delhi'.</p>
+                        
+                        <div class="mt-4 p-5 bg-[#080D1A] rounded-2xl border border-white/5">
+                            <h4 class="text-white font-semibold text-sm mb-3">Mind Map / Hierarchy:</h4>
+                            <ul class="list-[square] pl-5 space-y-2 text-gray-400 text-sm">
+                                <li><strong>People:</strong> Rahul, Priya, Dr. Sharma, Mr. Gupta</li>
+                                <li><strong>Places:</strong> Delhi, Maharashtra, India, Apollo Hospital</li>
+                                <li><strong>Things/Brands:</strong> Tata Nexon, Parle-G, iPhone, Harry Potter, Tommy (dog's name)</li>
+                            </ul>
+                        </div>
+
+                        <div class="mt-4 border-l-2 border-blue-500 pl-4 text-sm italic">
+                            <strong class="text-white not-italic">Rule:</strong> Proper Nouns ka pehla letter HAMESHA Capital hoga, chahe wo sentence ke beech mein hi kyun na aaye.
+                        </div>
+                    </section>
+
+                    <section id="mistakes" class="border-t border-red-500/20 pt-8">
+                        <h2 class="text-lg font-bold text-red-400 mb-4 flex items-center"><i data-lucide="alert-triangle" class="w-5 h-5 mr-2"></i> 4. Top Mistakes</h2>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="bg-red-500/5 p-5 rounded-2xl border border-red-500/10">
+                                <h4 class="text-white text-sm font-semibold mb-2">Mistake 1: Capitalizing Titles</h4>
+                                <p class="text-xs text-gray-400 mb-2">"My Uncle is coming." (Galat)</p>
+                                <p class="text-xs">Yahan 'uncle' aam naam hai. Capital nahi hoga. <br>Sahi: "My uncle is coming." <br>(Lekin "Uncle Raj is coming" sahi hai kyunki naam jud gaya).</p>
+                            </div>
+                            
+                            <div class="bg-red-500/5 p-5 rounded-2xl border border-red-500/10">
+                                <h4 class="text-white text-sm font-semibold mb-2">Mistake 2: Forgetting brand names</h4>
+                                <p class="text-xs text-gray-400 mb-2">"i use a macbook." (Galat)</p>
+                                <p class="text-xs">MacBook ek proper brand hai. Sahi: "I use a MacBook." (aur I ko bhi bada karo sentence start pe).</p>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        `;
+
+        const getStoryHTML = () => `
+            <div class="bg-[#111A2C] border-t border-white/5 shadow-2xl rounded-3xl p-6 sm:p-8 animate-fade-in">
+                <div class="flex items-center mb-6">
+                    <div class="p-3 bg-purple-500/10 rounded-xl mr-4">
+                        <i data-lucide="book-text" class="text-purple-400 w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-white">Contextual Story</h1>
+                        <p class="text-xs text-gray-400 mt-1">Pay attention to capitalization.</p>
+                    </div>
+                </div>
+                
+                <div class="prose prose-invert max-w-none text-gray-300 leading-loose text-sm sm:text-base">
+                    <p class="mb-5">
+                        <span class="text-blue-400 font-medium">Amit</span> woke up early in his <span class="text-gray-400 font-medium">city</span>, <span class="text-blue-400 font-medium">Mumbai</span>. He looked out the <span class="text-gray-400 font-medium">window</span> and saw a <span class="text-gray-400 font-medium">dog</span> chasing a <span class="text-gray-400 font-medium">cat</span>. The <span class="text-gray-400 font-medium">dog</span>'s name was <span class="text-blue-400 font-medium">Tommy</span>. 
+                    </p>
+                    <p class="mb-5">
+                        He had to catch a <span class="text-gray-400 font-medium">train</span> to <span class="text-blue-400 font-medium">Delhi</span> for a <span class="text-gray-400 font-medium">meeting</span>. He packed his <span class="text-gray-400 font-medium">laptop</span>, which was an <span class="text-blue-400 font-medium">Apple MacBook</span>, into his <span class="text-gray-400 font-medium">bag</span>. Before leaving the <span class="text-gray-400 font-medium">house</span>, he grabbed a packet of <span class="text-blue-400 font-medium">Britannia</span> <span class="text-gray-400 font-medium">biscuits</span> to eat on the way.
+                    </p>
+                    <p class="mb-5">
+                        At the <span class="text-gray-400 font-medium">station</span>, he bought a <span class="text-gray-400 font-medium">bottle</span> of <span class="text-blue-400 font-medium">Kinley</span> <span class="text-gray-400 font-medium">water</span>. He smiled, knowing this <span class="text-gray-400 font-medium">trip</span> in <span class="text-blue-400 font-medium">January</span> was going to be successful.
+                    </p>
+                </div>
+                
+                <div class="mt-8 p-5 bg-[#080D1A] rounded-2xl border border-white/5 text-sm">
+                    <div class="flex items-start">
+                        <i data-lucide="info" class="w-5 h-5 text-blue-400 mr-3 shrink-0 mt-0.5"></i>
+                        <p class="text-gray-400 leading-relaxed"><strong class="text-white block mb-1">Analysis:</strong>
+                        Notice the blue words (Proper Nouns) always start with a capital letter because they are specific names (Amit, Mumbai, Tommy, Britannia). The gray words (Common Nouns) are lowercase because they are general categories (city, dog, bag, water).</p>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        const getQuizIntroHTML = () => `
+            <div class="bg-[#111A2C] border-t border-white/5 shadow-2xl rounded-3xl p-8 sm:p-12 text-center animate-fade-in max-w-xl mx-auto">
+                <div class="inline-block p-5 bg-[#080D1A] rounded-2xl mb-6 shadow-inner border border-white/5">
+                    <i data-lucide="brain-circuit" class="w-10 h-10 text-orange-500"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-white mb-3">Noun Assessment</h1>
+                <p class="text-gray-400 mb-10 text-sm leading-relaxed">
+                    Test your understanding of Proper vs Common Nouns. You will get 10 random questions from our 100-question databank.
+                </p>
+                <button onclick="startQuiz()" class="w-full sm:w-auto px-8 py-4 bg-[#2563EB] rounded-2xl text-white font-bold hover:bg-blue-600 transition shadow-xl shadow-blue-500/20 active:scale-95">
+                    Start Assessment
+                </button>
+            </div>
+        `;
+
+        const getQuizActiveHTML = () => {
+            if(!state.quiz.active) return '';
+            const qData = state.quiz.questions[state.quiz.currentIndex];
+            const progress = ((state.quiz.currentIndex) / 10) * 100;
+
+            let optionsHtml = '';
+            qData.options.forEach((opt, idx) => {
+                optionsHtml += `
+                    <button onclick="submitQuizAnswer(${idx})" class="quiz-opt-btn w-full text-left p-4 sm:p-5 rounded-2xl bg-[#080D1A] border border-white/5 text-gray-300 font-medium hover:bg-white/5 transition mt-3">
+                        ${opt}
+                    </button>
+                `;
+            });
+
+            return `
+                <div class="bg-[#111A2C] border-t border-white/5 shadow-2xl rounded-3xl p-6 sm:p-8 animate-fade-in">
+                    <!-- Progress Bar -->
+                    <div class="w-full bg-[#080D1A] rounded-full h-1.5 mb-8 overflow-hidden border border-white/5">
+                        <div class="bg-[#2563EB] h-full rounded-full transition-all duration-500 ease-out" style="width: ${progress}%"></div>
+                    </div>
+                    
+                    <div class="flex justify-between items-center mb-6">
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Question ${state.quiz.currentIndex + 1} of 10</span>
+                        <span class="text-[10px] font-mono font-bold tracking-widest bg-[#080D1A] px-2 py-1 rounded-lg text-orange-400 uppercase border border-white/5">${qData.type.replace('_', ' ')}</span>
+                    </div>
+
+                    <h2 class="text-lg sm:text-xl font-bold text-white mb-8 leading-relaxed">${qData.q}</h2>
+
+                    <div id="quiz-options" class="space-y-3">
+                        ${optionsHtml}
+                    </div>
+
+                    <div id="quiz-explanation" class="hidden mt-8 p-5 bg-[#080D1A] rounded-2xl border border-white/5 border-l-4 border-l-[#2563EB] animate-fade-in">
+                        <div class="flex items-center mb-2">
+                            <i data-lucide="lightbulb" class="w-4 h-4 text-[#2563EB] mr-2"></i>
+                            <h4 class="text-white font-bold text-xs uppercase tracking-wider">Reasoning</h4>
+                        </div>
+                        <p class="text-gray-300 text-sm leading-relaxed">${qData.exp}</p>
+                        <button onclick="navigate('notes')" class="mt-4 text-xs font-semibold text-[#2563EB] hover:text-blue-400 transition flex items-center">
+                            Review Notes <i data-lucide="arrow-up-right" class="w-3 h-3 ml-1"></i>
+                        </button>
+                    </div>
+
+                    <div id="quiz-next-btn" class="hidden mt-8 flex justify-end animate-fade-in">
+                        <button onclick="nextQuizQuestion()" class="px-6 py-3.5 bg-[#2563EB] rounded-2xl text-white font-bold text-sm hover:bg-blue-600 transition shadow-lg shadow-blue-500/20 flex items-center space-x-2 active:scale-95">
+                            <span>Next Question</span>
+                            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        };
+
+        const getQuizResultsHTML = () => {
+            const timeTaken = state.timerSeconds - state.quiz.startTime;
+            const efficiency = Math.round((state.quiz.score / 10) * 100);
+            
+            return `
+                <div class="bg-[#111A2C] border-t border-white/5 shadow-2xl rounded-3xl p-8 sm:p-12 text-center animate-fade-in max-w-xl mx-auto">
+                    <div class="inline-block p-5 ${efficiency >= 70 ? 'bg-green-500/10' : 'bg-orange-500/10'} rounded-2xl mb-6 shadow-inner border border-white/5">
+                        <i data-lucide="${efficiency >= 70 ? 'trophy' : 'target'}" class="w-10 h-10 ${efficiency >= 70 ? 'text-green-500' : 'text-orange-500'}"></i>
+                    </div>
+                    <h1 class="text-2xl font-bold text-white mb-2">Assessment Complete</h1>
+                    
+                    <div class="grid grid-cols-3 gap-3 my-8">
+                        <div class="bg-[#080D1A] p-4 rounded-2xl border border-white/5">
+                            <div class="text-2xl font-bold text-white mb-1">${state.quiz.score}/10</div>
+                            <div class="text-[10px] text-gray-500 uppercase tracking-widest font-semibold">Score</div>
+                        </div>
+                        <div class="bg-[#080D1A] p-4 rounded-2xl border border-white/5">
+                            <div class="text-2xl font-bold text-white mb-1">${formatTime(timeTaken)}</div>
+                            <div class="text-[10px] text-gray-500 uppercase tracking-widest font-semibold">Time</div>
+                        </div>
+                        <div class="bg-[#080D1A] p-4 rounded-2xl border border-white/5">
+                            <div class="text-2xl font-bold text-white mb-1">${efficiency}%</div>
+                            <div class="text-[10px] text-gray-500 uppercase tracking-widest font-semibold">Efficiency</div>
+                        </div>
+                    </div>
+
+                    <p class="text-gray-400 text-xs sm:text-sm mb-10 leading-relaxed max-w-sm mx-auto">
+                        Your quiz generated 10 random questions from the pool. Start another to practice new, randomly shuffled concepts!
+                    </p>
+
+                    <div class="flex flex-col sm:flex-row justify-center items-center space-y-3 sm:space-y-0 sm:space-x-3">
+                        <button onclick="startQuiz()" class="w-full sm:w-auto px-6 py-3.5 bg-[#2563EB] rounded-2xl text-white font-bold text-sm hover:bg-blue-600 transition shadow-lg shadow-blue-500/20 active:scale-95">
+                            Play Again
+                        </button>
+                        <button onclick="navigate('notes')" class="w-full sm:w-auto px-6 py-3.5 bg-[#080D1A] border border-white/5 rounded-2xl text-white font-bold text-sm hover:bg-white/5 transition active:scale-95">
+                            Review Notes
+                        </button>
+                    </div>
+                </div>
+            `;
+        };
+
+        const getRealLifeHTML = () => {
+            const start = state.realLifeIndex;
+            const end = start + 5;
+            let currentScenarios = realLifeScenarios.slice(start, end);
+            
+            if(currentScenarios.length === 0) {
+                shuffleArray(realLifeScenarios);
+                state.realLifeIndex = 0;
+                currentScenarios = realLifeScenarios.slice(0, 5);
+            }
+
+            let listHtml = '';
+            currentScenarios.forEach((s, i) => {
+                const uniqueId = `rl-${start+i}`;
+                listHtml += `
+                    <div class="bg-[#080D1A] border border-white/5 rounded-2xl p-5 mb-4 group transition hover:border-white/10">
+                        <div class="flex justify-between items-start">
+                            <div class="pr-4">
+                                <span class="text-[10px] text-[#2563EB] font-bold uppercase tracking-widest mb-2 block">${s.context}</span>
+                                <p class="text-white text-base sm:text-lg font-medium leading-relaxed">"${s.eng}"</p>
+                            </div>
+                            <button onclick="document.getElementById('${uniqueId}').classList.toggle('hidden')" class="p-2.5 bg-white/5 rounded-xl hover:bg-[#2563EB] text-gray-400 hover:text-white transition shrink-0" title="Reveal Explanation">
+                                <i data-lucide="eye" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                        <div id="${uniqueId}" class="hidden mt-5 pt-5 border-t border-white/5 text-sm text-gray-300 bg-black/20 -mx-5 -mb-5 p-5 rounded-b-2xl">
+                            <strong class="text-white text-xs uppercase tracking-wider mb-2 block">Construction logic:</strong>
+                            <span class="leading-relaxed text-gray-400">${s.exp}</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            return `
+                <div class="bg-[#111A2C] border-t border-white/5 shadow-2xl rounded-3xl p-6 sm:p-8 animate-fade-in">
+                    <div class="flex justify-between items-center mb-8">
+                        <div>
+                            <h1 class="text-xl sm:text-2xl font-bold text-white">Real Life Usage</h1>
+                            <p class="text-xs text-gray-500 mt-1 uppercase tracking-widest font-semibold">Showing 5 of 50 scenarios</p>
+                        </div>
+                        <div class="p-3 bg-green-500/10 rounded-xl">
+                            <i data-lucide="users" class="text-green-500 w-5 h-5"></i>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        ${listHtml}
+                    </div>
+
+                    <div class="mt-8 flex justify-end">
+                        <button onclick="state.realLifeIndex += 5; render();" class="px-6 py-3.5 bg-[#2563EB] rounded-2xl text-white font-bold text-sm hover:bg-blue-600 transition shadow-lg shadow-blue-500/20 flex items-center space-x-2 active:scale-95">
+                            <i data-lucide="shuffle" class="w-4 h-4"></i>
+                            <span>Shuffle Next 5</span>
+                        </button>
+                    </div>
+                </div>
+            `;
+        };
+
+        // --- INIT ---
+        window.onload = () => {
+            startGlobalTimer();
+            shuffleArray(realLifeScenarios); 
+            render();
+        };
+    </script>
+</body>
+</html>
+
+
+```
