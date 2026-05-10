@@ -1,0 +1,663 @@
+```html
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fluency Bridge | Article Reader</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:ital,wght@1,600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #060B19;
+            color: #ffffff;
+            /* Subtly hide scrollbars but keep functionality for clean UI */
+            scrollbar-width: thin;
+            scrollbar-color: #111A2C transparent;
+        }
+        body::-webkit-scrollbar {
+            width: 6px;
+        }
+        body::-webkit-scrollbar-thumb {
+            background-color: #111A2C;
+            border-radius: 10px;
+        }
+        .font-serif-italic {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+        }
+        /* Flashcard Flip Animation */
+        .perspective-1000 { perspective: 1000px; }
+        .transform-style-3d { transform-style: preserve-3d; }
+        .backface-hidden { backface-visibility: hidden; }
+        .rotate-y-180 { transform: rotateY(180deg); }
+        
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="relative min-h-screen pb-20">
+    <!-- Global Atmosphere Background -->
+    <div class="fixed inset-0 z-[-1] bg-gradient-to-br from-[#131E3A] to-transparent backdrop-blur-3xl"></div>
+
+    <!-- Top Branding & Navigation -->
+    <header class="fixed top-0 w-full z-40 bg-[#111A2C]/80 backdrop-blur-md border-b border-white/5 flex flex-col items-center pt-4 pb-2 shadow-2xl">
+        <a href="https://fluencybridgeedu.online" class="flex flex-col items-center justify-center cursor-pointer mb-3 group">
+            <div class="tracking-[0.3em] text-[10px] text-gray-300 uppercase group-hover:text-white transition-colors duration-300">F L U E N C Y</div>
+            <div class="text-white text-4xl font-serif-italic leading-none">bridge</div>
+        </a>
+        <!-- Section Navigation -->
+        <nav class="w-full flex justify-center gap-4 px-4 overflow-x-auto hide-scrollbar text-sm font-semibold text-gray-400">
+            <button onclick="scrollToSection('read-section')" class="hover:text-white pb-2 border-b-2 border-transparent hover:border-[#2563EB] transition-all whitespace-nowrap">Read</button>
+            <button onclick="scrollToSection('vocab-section')" class="hover:text-white pb-2 border-b-2 border-transparent hover:border-[#2563EB] transition-all whitespace-nowrap">Vocab</button>
+            <button onclick="scrollToSection('grammar-section')" class="hover:text-white pb-2 border-b-2 border-transparent hover:border-[#2563EB] transition-all whitespace-nowrap">Grammar</button>
+            <button onclick="scrollToSection('quiz-section')" class="hover:text-white pb-2 border-b-2 border-transparent hover:border-[#2563EB] transition-all whitespace-nowrap">Quiz</button>
+        </nav>
+    </header>
+
+    <!-- Main Content Containers -->
+    <main class="mt-32 max-w-3xl mx-auto px-4 sm:px-6 space-y-8">
+        
+        <!-- Section: Read Article -->
+        <section id="read-section" class="bg-[#111A2C] rounded-2xl sm:rounded-3xl border-t border-white/5 shadow-2xl p-4 sm:p-6">
+            <h2 class="text-xl font-bold mb-4 text-white">Read Article</h2>
+            <p class="text-sm text-gray-400 mb-6 border-b border-white/10 pb-4">
+                Click on any phrase below with a dotted line to understand its vocabulary and grammar.
+            </p>
+            <div id="article-content" class="text-lg leading-loose space-y-4 text-gray-100">
+                <!-- Dynamically injected by JS -->
+            </div>
+        </section>
+
+        <!-- Section: Main Vocab -->
+        <section id="vocab-section" class="bg-[#111A2C] rounded-2xl sm:rounded-3xl border-t border-white/5 shadow-2xl p-4 sm:p-6">
+            <h2 class="text-xl font-bold mb-4 text-white">Main Vocabulary</h2>
+            <div id="main-vocab-list" class="space-y-3">
+                <!-- Dynamically injected by JS -->
+            </div>
+        </section>
+
+        <!-- Section: Main Grammar Structure -->
+        <section id="grammar-section" class="bg-[#111A2C] rounded-2xl sm:rounded-3xl border-t border-white/5 shadow-2xl p-4 sm:p-6">
+            <h2 class="text-xl font-bold mb-4 text-white">Grammar Structures</h2>
+            <div id="main-grammar-list" class="space-y-3">
+                <!-- Dynamically injected by JS -->
+            </div>
+        </section>
+
+        <!-- Section: Quiz -->
+        <section id="quiz-section" class="bg-[#111A2C] rounded-2xl sm:rounded-3xl border-t border-white/5 shadow-2xl p-4 sm:p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold text-white">Knowledge Check</h2>
+                <div class="text-xs font-bold text-[#2563EB] bg-[#2563EB]/10 px-3 py-1 rounded-full" id="quiz-progress-text">1 / 18</div>
+            </div>
+            
+            <!-- Progress Bar -->
+            <div class="w-full bg-white/10 rounded-full h-1.5 mb-6 overflow-hidden">
+                <div id="quiz-progress-bar" class="bg-[#2563EB] h-1.5 rounded-full transition-all duration-300 w-[5%]"></div>
+            </div>
+
+            <!-- Quiz Content Box -->
+            <div id="quiz-container" class="min-h-[250px] flex flex-col justify-center">
+                <!-- Dynamically injected by JS -->
+            </div>
+            
+        </section>
+    </main>
+
+    <!-- Bottom Fixed Footer Navigation -->
+    <footer class="fixed bottom-0 w-full z-40 bg-[#111A2C]/90 backdrop-blur-md border-t border-white/5 px-6 py-3 flex justify-between items-center">
+        <button onclick="window.scrollTo(0,0)" class="flex flex-col items-center text-gray-400 hover:text-white transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mb-1"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span class="text-[10px]">Home</span>
+        </button>
+        <button onclick="history.back()" class="flex flex-col items-center text-gray-400 hover:text-white transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mb-1"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+            <span class="text-[10px]">Back</span>
+        </button>
+    </footer>
+
+    <!-- Universal Modal for Phrase/Sentence Breakdown -->
+    <div id="phrase-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm hidden transition-opacity duration-300 opacity-0">
+        <!-- Close overlay trigger -->
+        <div class="absolute inset-0" onclick="closeModal()"></div>
+        
+        <!-- Modal Content -->
+        <div class="relative bg-[#111A2C] rounded-2xl sm:rounded-3xl border-t border-white/5 shadow-2xl p-4 sm:p-6 w-11/12 max-w-xl max-h-[85vh] flex flex-col transform scale-95 transition-transform duration-300" id="modal-box">
+            
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-full p-2 transition-all">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </button>
+
+            <div class="pr-8 mb-4">
+                <h3 id="modal-title" class="text-lg font-bold text-white border-l-4 border-[#2563EB] pl-3 py-1"></h3>
+            </div>
+
+            <!-- Modal Tabs -->
+            <div class="flex gap-2 mb-4 bg-[#080D1A] p-1 rounded-xl">
+                <button onclick="switchTab('vocab')" id="tab-vocab" class="flex-1 py-2 text-sm font-bold rounded-lg bg-[#2563EB] text-white transition-colors">Vocab</button>
+                <button onclick="switchTab('grammar')" id="tab-grammar" class="flex-1 py-2 text-sm font-bold rounded-lg text-gray-400 hover:text-white transition-colors">Grammar</button>
+                <button onclick="switchTab('sentence')" id="tab-sentence" class="flex-1 py-2 text-sm font-bold rounded-lg text-gray-400 hover:text-white transition-colors">Full Sentence</button>
+            </div>
+
+            <!-- Modal Content Areas -->
+            <div class="overflow-y-auto hide-scrollbar flex-1 pb-4">
+                <div id="content-vocab" class="space-y-3"></div>
+                <div id="content-grammar" class="hidden text-gray-200 leading-relaxed text-sm"></div>
+                <div id="content-sentence" class="hidden text-gray-200 leading-relaxed text-sm"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- DATA STRUCTURE ---
+        const articleData = [
+            {
+                id: "s1",
+                fullSentence: "Petrol and diesel price in India will be hiked before May 15 as oil companies face mounting financial losses estimated at nearly Rs 30,000 crore per month amid soaring global crude rates, sources told India Today TV.",
+                fullMeaning: "India Today TV ko sources ne bataya ki 15 May se pehle India mein petrol aur diesel ke daam badhaye jayenge kyunki oil companies ko har mahine lagbhag 30,000 crore rupaye ka bhari nuksan ho raha hai, aur global level par kachche tel (crude oil) ke daam tezi se badh rahe hain.",
+                phrases: [
+                    {
+                        text: "Petrol and diesel price in India",
+                        vocab: [
+                            { word: "Petrol/Diesel", meaning: "ईंधन (Fuel)", pos: "Noun", detail: "Gadiyon mein use hone wala fuel." },
+                            { word: "price", meaning: "दाम (Cost)", pos: "Noun", detail: "Kisi cheez ki keemat." }
+                        ],
+                        grammar: "Yeh sentence ka Subject (Karta) hai. Hum yahan petrol aur diesel ki keemato ke baare mein baat kar rahe hain."
+                    },
+                    {
+                        text: "will be hiked",
+                        vocab: [
+                            { word: "hiked", meaning: "बढ़ाया जाएगा (Increased)", pos: "Verb (Past Participle)", detail: "Base word: hike. Yahan badhane ke context mein hai." }
+                        ],
+                        grammar: "Yeh 'Future Indefinite tense' ka 'Passive Voice' hai (will + be + 3rd form). Kyunki daam khud nahi badhenge, unhe badhaya jayega. Example: The rules will be changed (Niyam badle jayenge)."
+                    },
+                    {
+                        text: "before May 15",
+                        vocab: [
+                            { word: "before", meaning: "से पहले (Prior to)", pos: "Preposition", detail: "Samay darshata hai." }
+                        ],
+                        grammar: "Time phrase. Yeh batata hai action kab hoga."
+                    },
+                    {
+                        text: "as oil companies face",
+                        vocab: [
+                            { word: "as", meaning: "क्योंकि / जैसे कि (Because)", pos: "Conjunction", detail: "Yahan reason batane ke liye use hua hai." },
+                            { word: "face", meaning: "सामना करना (Experience/Confront)", pos: "Verb", detail: "Yahan mushkil ka samna karne ke context mein." }
+                        ],
+                        grammar: "'As' yahan reason join kar raha hai. 'companies face' Present Indefinite hai, jo ek current reality ya fact batata hai."
+                    },
+                    {
+                        text: "mounting financial losses",
+                        vocab: [
+                            { word: "mounting", meaning: "बढ़ता हुआ (Increasing/Growing)", pos: "Adjective (Present Participle)", detail: "Jo lagaatar badh raha ho." },
+                            { word: "financial", meaning: "आर्थिक (Relating to money)", pos: "Adjective", detail: "Paison se juda hua." },
+                            { word: "losses", meaning: "नुकसान (Deficits)", pos: "Noun (Plural)", detail: "Base: Loss." }
+                        ],
+                        grammar: "Noun phrase. 'Mounting' (v+ing) yahan adjective ka kaam kar raha hai jo losses ko describe kar raha hai (kaise losses? badhte hue losses)."
+                    },
+                    {
+                        text: "estimated at nearly Rs 30,000 crore per month",
+                        vocab: [
+                            { word: "estimated", meaning: "अनुमानित (Calculated roughly)", pos: "Adjective/Participle", detail: "Andaza lagaya gaya." },
+                            { word: "nearly", meaning: "लगभग (Almost)", pos: "Adverb", detail: "Thoda kam ya aas-paas." }
+                        ],
+                        grammar: "Yeh phrase 'losses' ko aur detail de raha hai. Losses ka anuman lagaya gaya hai. 'at' preposition exact figure dikhane ke liye use hua hai."
+                    },
+                    {
+                        text: "amid soaring global crude rates,",
+                        vocab: [
+                            { word: "amid", meaning: "के बीच (In the middle of / During)", pos: "Preposition", detail: "Kisi situation ke dauran." },
+                            { word: "soaring", meaning: "तेजी से बढ़ता हुआ (Rising rapidly)", pos: "Adjective", detail: "Aasman chuta hua." },
+                            { word: "crude rates", meaning: "कच्चे तेल के दाम", pos: "Noun Phrase", detail: "Unrefined oil prices." }
+                        ],
+                        grammar: "Prepositional phrase. 'Amid' dikhata hai ki yeh sab kis mahaul ya situation ke beech ho raha hai. 'Soaring' phir se present participle hai as an adjective."
+                    },
+                    {
+                        text: "sources told India Today TV.",
+                        vocab: [
+                            { word: "sources", meaning: "सूत्र (Informants)", pos: "Noun", detail: "Jahan se khabar aati hai." },
+                            { word: "told", meaning: "बताया (Said to)", pos: "Verb (V2)", detail: "Tell ka past tense." }
+                        ],
+                        grammar: "Past Indefinite tense. Yeh main reporting clause hai jisse pata chalta hai yeh puri news kisne di."
+                    }
+                ]
+            },
+            {
+                id: "s2",
+                fullSentence: "“Oil companies are facing under-recoveries of nearly 30,000 crore per month,” sources said, pointing to a sharp mismatch between retail fuel prices and rising input costs.",
+                fullMeaning: "Sources ne bataya ki oil companies ko har mahine lagbhag 30,000 crore rupaye ki laagat se kam wasooli (nuksan) ho rahi hai. Unhone bataya ki jo daam hum petrol pump par dete hain aur jo tel kharidne ki asli laagat hai, uske beech bahut bada asantulan hai.",
+                phrases: [
+                    {
+                        text: "“Oil companies are facing",
+                        vocab: [
+                            { word: "are facing", meaning: "सामना कर रही हैं (Experiencing)", pos: "Verb", detail: "Continuous action." }
+                        ],
+                        grammar: "Present Continuous Tense (is/are/am + verb+ing). Yeh batata hai ki action abhi chal raha hai aur companies currently yeh problem face kar rahi hain."
+                    },
+                    {
+                        text: "under-recoveries of nearly 30,000 crore per month,”",
+                        vocab: [
+                            { word: "under-recoveries", meaning: "लागत से कम वसूली (Losses / Selling below cost)", pos: "Noun", detail: "Jab saman banane/kharidne ka kharcha zyada ho aur bechne par paise kam mile." }
+                        ],
+                        grammar: "Compound noun. Industry term used instead of direct 'losses' to show they are not recovering their invested money."
+                    },
+                    {
+                        text: "sources said,",
+                        vocab: [
+                            { word: "said", meaning: "कहा (Spoke)", pos: "Verb (V2)", detail: "Say ka past form." }
+                        ],
+                        grammar: "Past Indefinite. Reporting verb for the direct quote."
+                    },
+                    {
+                        text: "pointing to a sharp mismatch",
+                        vocab: [
+                            { word: "pointing to", meaning: "इशारा करते हुए (Indicating)", pos: "Phrasal Verb / Participle", detail: "Kisi cheez par dhyan dilana." },
+                            { word: "sharp", meaning: "तीखा / बहुत ज्यादा (Severe/Clear)", pos: "Adjective", detail: "Yahan clear aur bada difference batane ke liye." },
+                            { word: "mismatch", meaning: "असंतुलन (Lack of balance/match)", pos: "Noun", detail: "Jab do cheezein apas mein mel nahi khati." }
+                        ],
+                        grammar: "'Pointing to' present participle phrase hai jo sentence ko join kar raha hai aur additional action bata raha hai ki sources ne aur kya kiya."
+                    },
+                    {
+                        text: "between retail fuel prices and rising input costs.",
+                        vocab: [
+                            { word: "between... and", meaning: "के बीच (In the middle of two things)", pos: "Preposition pairing", detail: "Do alag elements ko compare karne ke liye." },
+                            { word: "retail", meaning: "खुदरा (Sold to public)", pos: "Adjective", detail: "Direct customers ke liye." },
+                            { word: "input costs", meaning: "लागत (Cost to produce/buy)", pos: "Noun phrase", detail: "Raw material ka kharcha." }
+                        ],
+                        grammar: "Rule: 'Between' ke baad hamesha 'and' aata hai (e.g. Between X and Y). Yahan customer price aur company ke cost ko compare kiya gaya hai."
+                    }
+                ]
+            },
+            {
+                id: "s3",
+                fullSentence: "The strain has intensified after crude oil prices surged from around USD 70 to USD 126 per barrel amid the ongoing Middle East war.",
+                fullMeaning: "Middle East mein chal rahe yuddh ke beech, jab kachche tel (crude oil) ke daam 70 dollar se badhkar 126 dollar per barrel ho gaye, uske baad se yeh dabaav (strain) aur zyada tez ho gaya hai.",
+                phrases: [
+                    {
+                        text: "The strain has intensified",
+                        vocab: [
+                            { word: "strain", meaning: "दबाव / तनाव (Pressure/Tension)", pos: "Noun", detail: "Financial pressure ki baat ho rahi hai." },
+                            { word: "intensified", meaning: "और तेज हो गया है (Became stronger)", pos: "Verb (V3)", detail: "Base: Intensify." }
+                        ],
+                        grammar: "Present Perfect Tense (has/have + 3rd form). Action past mein shuru hua par uska asar abhi hai (strain pehle bhi tha, par ab badh gaya hai)."
+                    },
+                    {
+                        text: "after crude oil prices surged",
+                        vocab: [
+                            { word: "surged", meaning: "अचानक और तेजी से बढ़े (Increased suddenly and powerfully)", pos: "Verb (V2)", detail: "Base: Surge." }
+                        ],
+                        grammar: "'After' conjunction hai jo do clauses ko jod raha hai. 'surged' Past Indefinite hai."
+                    },
+                    {
+                        text: "from around USD 70 to USD 126 per barrel",
+                        vocab: [
+                            { word: "from... to...", meaning: "से... तक", pos: "Prepositional pair", detail: "Range batata hai." },
+                            { word: "barrel", meaning: "बैरल (Large container unit)", pos: "Noun", detail: "Oil napne ki unit (approx 159 litres)." }
+                        ],
+                        grammar: "Rule: 'From' ke sath hamesha 'to' aata hai range dikhane ke liye (From X to Y)."
+                    },
+                    {
+                        text: "amid the ongoing Middle East war.",
+                        vocab: [
+                            { word: "ongoing", meaning: "चल रहा (Continuing/In progress)", pos: "Adjective", detail: "Jo abhi khatam nahi hua." }
+                        ],
+                        grammar: "'Amid' (preposition) batata hai background context. 'Ongoing' ek adjective hai jo 'war' noun ko describe kar raha hai."
+                    }
+                ]
+            }
+        ];
+
+        const mainVocabData = [
+            { word: "Mounting", meaning: "बढ़ता हुआ (Increasing)", context: "Financial losses are mounting. (Aarthik nuksan badh raha hai.)", usage: "Mounting pressure, mounting debt." },
+            { word: "Soaring", meaning: "तेजी से बढ़ता हुआ (Rising rapidly)", context: "Soaring global crude rates. (Duniya bhar mein tezi se badhte tel ke daam.)", usage: "Soaring temperatures, soaring prices." },
+            { word: "Under-recoveries", meaning: "लागत से कम वसूली (Losses against cost)", context: "Companies facing under-recoveries. (Companies apne lagaye paise wapas nahi nikal pa rahi hain.)", usage: "Mostly used in financial/business contexts." },
+            { word: "Mismatch", meaning: "असंतुलन / बेमेल (Lack of match)", context: "Mismatch between retail price and input cost. (Kharid rate aur bechne ke rate mein antar.)", usage: "Skill mismatch, schedule mismatch." },
+            { word: "Strain", meaning: "दबाव (Pressure/Tension)", context: "The strain has intensified. (Aarthik dabaav aur tez ho gaya hai.)", usage: "Mental strain, financial strain." },
+            { word: "Surged", meaning: "अचानक बढ़ जाना (Increased suddenly)", context: "Prices surged from 70 to 126. (Daam achanak 70 se 126 pahunch gaye.)", usage: "Crowd surged, water surged." }
+        ];
+
+        const mainGrammarData = [
+            { title: "Future Passive Voice (will be + V3)", rule: "Use this when the action is done TO the subject, not BY the subject in the future.", example: "'Prices will be hiked.' (Daam badhaye jayenge - kisi aur ke dwara). Other: The homework will be checked tomorrow." },
+            { title: "Present Perfect Tense (has/have + V3)", rule: "Use for actions that happened in the past but their effect/result is important NOW.", example: "'The strain has intensified.' (Dabaav badh gaya hai - aur abhi bhi bada hua hai). Other: I have finished my meal." },
+            { title: "Preposition Pairs (between...and / from...to)", rule: "Specific prepositions travel in pairs.", example: "1. 'mismatch BETWEEN retail AND input costs'. 2. 'surged FROM USD 70 TO USD 126'." },
+            { title: "Present Continuous for Current Reality (is/are/am + V-ing)", rule: "Shows actions happening right now around the current time.", example: "'Oil companies are facing under-recoveries.' (Companies filhal nuksan ka samna kar rahi hain)." }
+        ];
+
+        const quizData = [
+            { type: "tf", q: "Petrol and diesel prices will be hiked after May 15.", a: false, exp: "The article says it will be hiked BEFORE May 15." },
+            { type: "mcq", q: "Why are oil companies facing financial losses?", options: ["People are buying less fuel", "Rising input costs and global crude rates", "Government taxes are too high"], correct: 1 },
+            { type: "flash", front: "Translate to English: 'Badhta hua' (context: losses)", back: "Mounting" },
+            { type: "mcq", q: "What is the grammatical tense of 'will be hiked'?", options: ["Future Active", "Future Passive", "Past Passive"], correct: 1 },
+            { type: "tf", q: "'Under-recoveries' means companies are making an extra profit.", a: false, exp: "It means they are suffering losses by selling below their cost." },
+            { type: "mcq", q: "Which word means 'a sudden and powerful increase'?", options: ["Mismatch", "Strain", "Surged"], correct: 2 },
+            { type: "flash", front: "What does 'amid' mean in Hindi/Hinglish?", back: "के बीच (In the middle of a situation)" },
+            { type: "tf", q: "The ongoing Middle East war caused crude oil prices to drop.", a: false, exp: "Prices surged (increased) from 70 to 126 USD." },
+            { type: "mcq", q: "Identify the tense: 'The strain has intensified'", options: ["Present Perfect", "Past Perfect", "Present Continuous"], correct: 0 },
+            { type: "flash", front: "What is 'Crude oil'?", back: "Kachcha tel (Unrefined oil)" },
+            { type: "mcq", q: "How much are the estimated monthly losses for the oil companies?", options: ["Rs 30,000", "Rs 30,000 crore", "Rs 126 crore"], correct: 1 },
+            { type: "tf", q: "'are facing' is an example of the Present Continuous tense.", a: true, exp: "are + verb(ing) is present continuous." },
+            { type: "flash", front: "What is the meaning of 'Mismatch'?", back: "Asantulan / Lack of match or balance." },
+            { type: "mcq", q: "What was the crude oil price before it surged to USD 126?", options: ["USD 30,000", "USD 70", "USD 15"], correct: 1 },
+            { type: "flash", front: "Meaning of 'Intensified'?", back: "Aur tez ho gaya (Became stronger/more severe)." },
+            { type: "mcq", q: "'Retail fuel prices' refers to:", options: ["Price for oil companies to buy", "Price for normal customers at petrol pumps", "Price of unrefined crude oil"], correct: 1 },
+            { type: "tf", q: "The word 'soaring' is used to describe something falling rapidly.", a: false, exp: "Soaring means rising or flying high very quickly." },
+            { type: "flash", front: "Meaning of 'Ongoing'?", back: "Jo abhi chal raha hai (Continuing / in progress)." }
+        ];
+
+        // --- INIT & RENDER LOGIC ---
+        let currentModalSentence = null;
+        let currentModalPhrase = null;
+        let currentQuizIndex = 0;
+        let quizScore = 0;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            renderArticle();
+            renderMainVocab();
+            renderMainGrammar();
+            renderQuizQuestion();
+        });
+
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // Render Article Section
+        function renderArticle() {
+            const container = document.getElementById('article-content');
+            container.innerHTML = '';
+            
+            articleData.forEach((sentenceData, sIdx) => {
+                const p = document.createElement('p');
+                
+                sentenceData.phrases.forEach((phrase, pIdx) => {
+                    const span = document.createElement('span');
+                    span.textContent = phrase.text + " ";
+                    span.className = "border-b border-dashed border-gray-500 cursor-pointer hover:text-[#2563EB] hover:bg-white/5 transition-colors duration-200 rounded px-1 -mx-1";
+                    span.onclick = () => openModal(sIdx, pIdx);
+                    p.appendChild(span);
+                });
+                
+                container.appendChild(p);
+            });
+        }
+
+        // Render Vocab Section
+        function renderMainVocab() {
+            const container = document.getElementById('main-vocab-list');
+            mainVocabData.forEach(item => {
+                container.innerHTML += `
+                    <div class="bg-[#080D1A] border border-white/5 p-4 rounded-xl hover:bg-white/5 transition-colors">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="font-bold text-white text-lg">${item.word}</span>
+                            <span class="text-sm text-gray-400">${item.meaning}</span>
+                        </div>
+                        <div class="text-sm text-gray-300 mt-2">
+                            <p><span class="text-[#2563EB] font-semibold">In context:</span> ${item.context}</p>
+                            <p class="mt-1"><span class="text-gray-500">Other usage:</span> ${item.usage}</p>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // Render Grammar Section
+        function renderMainGrammar() {
+            const container = document.getElementById('main-grammar-list');
+            mainGrammarData.forEach((item, idx) => {
+                container.innerHTML += `
+                    <div class="bg-[#080D1A] border border-white/5 rounded-xl overflow-hidden">
+                        <button onclick="toggleAccordion('grammar-${idx}')" class="w-full text-left p-4 font-bold text-white hover:bg-white/5 flex justify-between items-center transition-colors">
+                            ${item.title}
+                            <svg id="icon-grammar-${idx}" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-200"><path d="m6 9 6 6 6-6"/></svg>
+                        </button>
+                        <div id="grammar-${idx}" class="hidden px-4 pb-4 text-sm text-gray-300 space-y-2">
+                            <p><span class="text-gray-400 font-semibold block mb-1">Rule:</span> ${item.rule}</p>
+                            <p><span class="text-[#2563EB] font-semibold block mb-1">Example:</span> ${item.example}</p>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function toggleAccordion(id) {
+            const content = document.getElementById(id);
+            const icon = document.getElementById('icon-' + id);
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                icon.classList.add('rotate-180');
+            } else {
+                content.classList.add('hidden');
+                icon.classList.remove('rotate-180');
+            }
+        }
+
+        // --- MODAL LOGIC ---
+        function openModal(sIdx, pIdx) {
+            currentModalSentence = articleData[sIdx];
+            currentModalPhrase = currentModalSentence.phrases[pIdx];
+
+            document.getElementById('modal-title').textContent = currentModalPhrase.text;
+            
+            // Populate Vocab
+            const vocabContainer = document.getElementById('content-vocab');
+            vocabContainer.innerHTML = '';
+            currentModalPhrase.vocab.forEach(v => {
+                vocabContainer.innerHTML += `
+                    <div class="bg-white/5 p-3 rounded-lg border border-white/5">
+                        <div class="flex justify-between items-start mb-1">
+                            <span class="font-bold text-[#2563EB]">${v.word}</span>
+                            <span class="text-xs bg-[#111A2C] px-2 py-1 rounded text-gray-400">${v.pos}</span>
+                        </div>
+                        <p class="text-white text-sm mb-1">${v.meaning}</p>
+                        <p class="text-gray-400 text-xs">${v.detail}</p>
+                    </div>
+                `;
+            });
+
+            // Populate Grammar
+            document.getElementById('content-grammar').innerHTML = `<div class="bg-white/5 p-4 rounded-lg border border-white/5"><p>${currentModalPhrase.grammar}</p></div>`;
+
+            // Populate Full Sentence
+            document.getElementById('content-sentence').innerHTML = `
+                <div class="space-y-4">
+                    <div class="bg-white/5 p-4 rounded-lg border border-white/5">
+                        <h4 class="text-gray-500 text-xs uppercase tracking-wider mb-2 font-bold">English</h4>
+                        <p class="text-white">${currentModalSentence.fullSentence}</p>
+                    </div>
+                    <div class="bg-[#2563EB]/10 p-4 rounded-lg border border-[#2563EB]/20">
+                        <h4 class="text-[#2563EB] text-xs uppercase tracking-wider mb-2 font-bold">Meaning</h4>
+                        <p class="text-gray-200">${currentModalSentence.fullMeaning}</p>
+                    </div>
+                </div>
+            `;
+
+            switchTab('vocab');
+            
+            const modal = document.getElementById('phrase-modal');
+            const box = document.getElementById('modal-box');
+            modal.classList.remove('hidden');
+            // Small delay for transition
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                box.classList.remove('scale-95');
+            }, 10);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('phrase-modal');
+            const box = document.getElementById('modal-box');
+            modal.classList.add('opacity-0');
+            box.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        function switchTab(tabId) {
+            ['vocab', 'grammar', 'sentence'].forEach(id => {
+                document.getElementById('tab-' + id).className = "flex-1 py-2 text-sm font-bold rounded-lg text-gray-400 hover:text-white transition-colors";
+                document.getElementById('content-' + id).classList.add('hidden');
+            });
+            
+            document.getElementById('tab-' + tabId).className = "flex-1 py-2 text-sm font-bold rounded-lg bg-[#2563EB] text-white transition-colors";
+            document.getElementById('content-' + tabId).classList.remove('hidden');
+        }
+
+        // --- QUIZ LOGIC ---
+        function renderQuizQuestion() {
+            const container = document.getElementById('quiz-container');
+            const progressText = document.getElementById('quiz-progress-text');
+            const progressBar = document.getElementById('quiz-progress-bar');
+            
+            if (currentQuizIndex >= quizData.length) {
+                // Quiz End
+                container.innerHTML = `
+                    <div class="text-center space-y-4">
+                        <div class="w-16 h-16 bg-[#2563EB]/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white">Quiz Complete!</h3>
+                        <p class="text-gray-400">Great job reviewing the article.</p>
+                        <button onclick="resetQuiz()" class="mt-4 bg-[#2563EB] text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-600 transition-colors w-full sm:w-auto">Retake Quiz</button>
+                    </div>
+                `;
+                return;
+            }
+
+            const q = quizData[currentQuizIndex];
+            progressText.innerText = `${currentQuizIndex + 1} / ${quizData.length}`;
+            progressBar.style.width = `${((currentQuizIndex + 1) / quizData.length) * 100}%`;
+
+            let html = '';
+
+            if (q.type === 'mcq') {
+                html = `
+                    <h3 class="text-lg font-semibold text-white mb-6">${q.q}</h3>
+                    <div class="space-y-3" id="options-container">
+                        ${q.options.map((opt, idx) => `
+                            <button onclick="handleMCQ(${idx}, ${q.correct})" id="opt-${idx}" class="w-full text-left p-4 rounded-xl bg-[#080D1A] border border-white/5 hover:bg-white/10 transition-colors text-gray-200">
+                                ${opt}
+                            </button>
+                        `).join('')}
+                    </div>
+                    <div id="quiz-feedback" class="hidden mt-6 p-4 rounded-xl border"></div>
+                    <button id="next-btn" onclick="nextQuestion()" class="hidden mt-6 w-full bg-[#2563EB] text-white py-3 rounded-xl font-bold hover:bg-blue-600 transition-colors">Next Question</button>
+                `;
+            } else if (q.type === 'tf') {
+                html = `
+                    <div class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">True or False</div>
+                    <h3 class="text-lg font-semibold text-white mb-6">${q.q}</h3>
+                    <div class="grid grid-cols-2 gap-4" id="options-container">
+                        <button onclick="handleTF(true, ${q.a}, '${q.exp.replace(/'/g, "\\'")}')" id="tf-true" class="p-4 rounded-xl bg-[#080D1A] border border-white/5 hover:bg-white/10 transition-colors text-center text-white font-bold">True</button>
+                        <button onclick="handleTF(false, ${q.a}, '${q.exp.replace(/'/g, "\\'")}')" id="tf-false" class="p-4 rounded-xl bg-[#080D1A] border border-white/5 hover:bg-white/10 transition-colors text-center text-white font-bold">False</button>
+                    </div>
+                    <div id="quiz-feedback" class="hidden mt-6 p-4 rounded-xl border"></div>
+                    <button id="next-btn" onclick="nextQuestion()" class="hidden mt-6 w-full bg-[#2563EB] text-white py-3 rounded-xl font-bold hover:bg-blue-600 transition-colors">Next Question</button>
+                `;
+            } else if (q.type === 'flash') {
+                html = `
+                    <div class="text-xs font-bold text-[#2563EB] uppercase tracking-wider mb-4 text-center">Flashcard</div>
+                    
+                    <div class="relative w-full h-48 perspective-1000 cursor-pointer group" onclick="flipCard()">
+                        <div id="flashcard-inner" class="w-full h-full relative transform-style-3d transition-transform duration-500">
+                            <!-- Front -->
+                            <div class="absolute w-full h-full backface-hidden bg-[#080D1A] border border-white/5 rounded-xl p-6 flex flex-col justify-center items-center shadow-lg group-hover:border-white/20 transition-colors">
+                                <span class="text-lg text-center text-white font-semibold">${q.front}</span>
+                                <span class="text-xs text-gray-500 mt-4 absolute bottom-4">Tap to flip</span>
+                            </div>
+                            <!-- Back -->
+                            <div class="absolute w-full h-full backface-hidden rotate-y-180 bg-[#2563EB]/10 border border-[#2563EB]/30 rounded-xl p-6 flex flex-col justify-center items-center shadow-lg">
+                                <span class="text-xl text-center text-white font-bold">${q.back}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="flash-actions" class="hidden mt-8 grid grid-cols-2 gap-4">
+                        <button onclick="nextQuestion()" class="p-3 rounded-xl bg-gray-800 text-white font-bold hover:bg-gray-700 transition-colors">Needs Review</button>
+                        <button onclick="nextQuestion()" class="p-3 rounded-xl bg-[#2563EB] text-white font-bold hover:bg-blue-600 transition-colors">Got it</button>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+        }
+
+        function handleMCQ(selectedIndex, correctIndex) {
+            const container = document.getElementById('options-container');
+            const buttons = container.querySelectorAll('button');
+            const feedback = document.getElementById('quiz-feedback');
+            const nextBtn = document.getElementById('next-btn');
+
+            buttons.forEach(btn => btn.disabled = true);
+
+            if (selectedIndex === correctIndex) {
+                document.getElementById('opt-' + selectedIndex).classList.add('bg-green-900/30', 'border-green-500/50', 'text-green-400');
+                feedback.innerHTML = `<span class="font-bold text-green-400">Correct!</span>`;
+                feedback.classList.add('block', 'bg-green-900/10', 'border-green-500/20');
+            } else {
+                document.getElementById('opt-' + selectedIndex).classList.add('bg-red-900/30', 'border-red-500/50', 'text-red-400');
+                document.getElementById('opt-' + correctIndex).classList.add('bg-green-900/30', 'border-green-500/50', 'text-green-400');
+                feedback.innerHTML = `<span class="font-bold text-red-400">Incorrect.</span>`;
+                feedback.classList.add('block', 'bg-red-900/10', 'border-red-500/20');
+            }
+            
+            feedback.classList.remove('hidden');
+            nextBtn.classList.remove('hidden');
+        }
+
+        function handleTF(selectedAns, correctAns, explanation) {
+            const container = document.getElementById('options-container');
+            const buttons = container.querySelectorAll('button');
+            const feedback = document.getElementById('quiz-feedback');
+            const nextBtn = document.getElementById('next-btn');
+
+            buttons.forEach(btn => btn.disabled = true);
+
+            const selectedBtnId = selectedAns ? 'tf-true' : 'tf-false';
+            const correctBtnId = correctAns ? 'tf-true' : 'tf-false';
+
+            if (selectedAns === correctAns) {
+                document.getElementById(selectedBtnId).classList.add('bg-green-900/30', 'border-green-500/50', 'text-green-400');
+                feedback.innerHTML = `<span class="font-bold text-green-400 block mb-1">Correct!</span> <span class="text-sm text-gray-300">${explanation}</span>`;
+                feedback.classList.add('block', 'bg-green-900/10', 'border-green-500/20');
+            } else {
+                document.getElementById(selectedBtnId).classList.add('bg-red-900/30', 'border-red-500/50', 'text-red-400');
+                document.getElementById(correctBtnId).classList.add('bg-green-900/30', 'border-green-500/50', 'text-green-400');
+                feedback.innerHTML = `<span class="font-bold text-red-400 block mb-1">Incorrect.</span> <span class="text-sm text-gray-300">${explanation}</span>`;
+                feedback.classList.add('block', 'bg-red-900/10', 'border-red-500/20');
+            }
+
+            feedback.classList.remove('hidden');
+            nextBtn.classList.remove('hidden');
+        }
+
+        function flipCard() {
+            const inner = document.getElementById('flashcard-inner');
+            const actions = document.getElementById('flash-actions');
+            
+            // Only flip once per question
+            if (!inner.classList.contains('rotate-y-180')) {
+                inner.classList.add('rotate-y-180');
+                setTimeout(() => {
+                    actions.classList.remove('hidden');
+                }, 300);
+            }
+        }
+
+        function nextQuestion() {
+            currentQuizIndex++;
+            renderQuizQuestion();
+        }
+
+        function resetQuiz() {
+            currentQuizIndex = 0;
+            renderQuizQuestion();
+        }
+
+    </script>
+</body>
+</html>
+
+```
