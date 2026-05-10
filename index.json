@@ -1,5 +1,12 @@
 [
   {
+    "title": "Article Reader",
+    "slug": "TEST-2",
+    "folder": "Reader",
+    "category": "Reader",
+    "rootGroup": "Reader"
+  },
+  {
     "title": "Interactive Phrase Reader",
     "slug": "TEST-ARTICLE",
     "folder": "Reader",
