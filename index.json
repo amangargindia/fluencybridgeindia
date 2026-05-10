@@ -1,5 +1,12 @@
 [
   {
+    "title": "Interactive Phrase Reader",
+    "slug": "TEST-ARTICLE",
+    "folder": "Reader",
+    "category": "Reader",
+    "rootGroup": "Reader"
+  },
+  {
     "title": "Present Simple Mistakes",
     "slug": "mistakes-in-present-simple",
     "folder": "mistakes",
