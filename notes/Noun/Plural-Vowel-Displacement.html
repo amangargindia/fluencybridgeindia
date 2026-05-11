@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fluency bridge - English Grammar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:ital,wght@1,600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        /* Base and Custom Scrollbar */
+        body { font-family: 'Inter', sans-serif; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #060B19; }
+        ::-webkit-scrollbar-thumb { background: #111A2C; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #2563EB; }
+        
+        /* Print Theme Overrides */
+        @media print {
+            body { 
+                -webkit-print-color-adjust: exact !important; 
+                print-color-adjust: exact !important; 
+                background-color: #060B19 !important;
+                color: white !important;
+            }
+            .no-print { display: none !important; }
+            .print-block { display: block !important; page-break-inside: avoid; }
+            #main-container { max-w: none; width: 100%; padding: 0; }
+        }
+    </style>
+</head>
+<body class="bg-[#060B19] text-white min-h-screen flex flex-col relative antialiased">
+    
+    <!-- Background Gradient & Blur -->
+    <div class="fixed inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#131E3A]/40 to-transparent backdrop-blur-sm z-0"></div>
+
+    <!-- Header Content -->
+    <header class="relative z-10 w-full max-w-4xl mx-auto p-4 md:p-6 flex justify-between items-center no-print border-b border-white/5">
+        <div class="flex flex-col">
+            <span class="tracking-[0.3em] text-[10px] text-gray-300 uppercase font-bold">F L U E N C Y</span>
+            <span class="font-['Playfair_Display'] text-white text-4xl italic mt-[-4px]">bridge</span>
+        </div>
+        <div class="flex items-center space-x-4">
+            <div class="bg-[#111A2C] px-4 py-2 rounded-xl border-t border-white/5 shadow-lg flex items-center space-x-2">
+                <i class="ph ph-clock text-[#2563EB]"></i>
+                <span id="timerDisplay" class="font-mono text-sm">00:00:00</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="relative z-10 w-full max-w-4xl mx-auto p-4 flex space-x-2 overflow-x-auto no-print">
+        <button onclick="switchTab('notes')" id="tab-notes" class="nav-btn flex-shrink-0 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all bg-[#2563EB] text-white shadow-lg">Notes</button>
+        <button onclick="switchTab('story')" id="tab-story" class="nav-btn flex-shrink-0 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all bg-[#111A2C] text-gray-400 hover:text-white border-t border-white/5 shadow-lg">Story</button>
+        <button onclick="switchTab('quiz')" id="tab-quiz" class="nav-btn flex-shrink-0 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all bg-[#111A2C] text-gray-400 hover:text-white border-t border-white/5 shadow-lg">Quiz</button>
+        <button onclick="switchTab('real-life')" id="tab-real-life" class="nav-btn flex-shrink-0 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all bg-[#111A2C] text-gray-400 hover:text-white border-t border-white/5 shadow-lg">Real Life</button>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main id="main-container" class="relative z-10 w-full max-w-4xl mx-auto p-4 md:p-6 flex-grow pb-24">
+        
+        <!-- ================= NOTES SECTION ================= -->
+        <section id="notes" class="view-section block space-y-6">
+            <div class="bg-[#111A2C] rounded-2xl p-6 border-t border-white/5 shadow-lg">
+                <div class="flex justify-between items-start mb-6">
+                    <h1 class="text-2xl md:text-3xl font-bold">Vowel Displacement Plurals</h1>
+                    <button onclick="window.print()" class="no-print bg-[#080D1A] hover:bg-white/10 border border-white/5 px-4 py-2 rounded-xl text-sm text-gray-300 flex items-center space-x-2 transition-all">
+                        <i class="ph ph-printer"></i> <span>Print</span>
+                    </button>
+                </div>
+
+                <div class="bg-[#080D1A] rounded-xl p-4 mb-6 border border-white/5 no-print">
+                    <h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-2">Table of Contents</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#prerequisites" class="text-[#2563EB] hover:underline">1. Prerequisites</a></li>
+                        <li><a href="#history" class="text-[#2563EB] hover:underline">2. The History (Kyun hota hai aisa?)</a></li>
+                        <li><a href="#the-list" class="text-[#2563EB] hover:underline">3. Complete Word List</a></li>
+                        <li><a href="#top-mistakes" class="text-[#2563EB] hover:underline">4. Top Mistakes to Avoid</a></li>
+                    </ul>
+                </div>
+
+                <div id="prerequisites" class="mb-6">
+                    <h2 class="text-xl font-bold mb-3 text-[#2563EB]">1. Prerequisites</h2>
+                    <p class="text-gray-300 text-sm mb-2">Before diving in, make sure you understand:</p>
+                    <ul class="list-disc pl-5 text-gray-300 text-sm space-y-1">
+                        <li><a href="https://www.google.com/search?q=Singular+and+Plural+Nouns+English+Grammar" target="_blank" class="text-[#2563EB] underline">Singular vs. Plural Nouns</a></li>
+                        <li><a href="https://www.google.com/search?q=Vowels+and+Consonants+in+English" target="_blank" class="text-[#2563EB] underline">Vowels (A, E, I, O, U) vs Consonants</a></li>
+                    </ul>
+                </div>
+
+                <div id="history" class="mb-6">
+                    <h2 class="text-xl font-bold mb-3 text-[#2563EB]">2. History & Logic (I-Mutation)</h2>
+                    <p class="text-gray-300 leading-relaxed text-sm mb-3">
+                        English grammer mein "Foot" ka plural "Feet" kyun hota hai, "Foots" kyun nahi? Iska karan Old English ke time ki pronunciation hai. Ise linguists <strong class="text-white">I-mutation</strong> ya <strong class="text-white">I-umlaut</strong> kehte hain.
+                    </p>
+                    <ul class="space-y-3 text-sm text-gray-300">
+                        <li class="bg-[#080D1A] p-3 rounded-lg border border-white/5">
+                            <span class="text-white font-bold block mb-1">Step 1: The Old Suffix</span>
+                            Hazaron saal pehle, Germanic languages (jinse English aayi) plural banane ke liye word ke end mein <code class="text-[#2563EB] bg-[#111A2C] px-1 rounded">-i</code> ya <code class="text-[#2563EB] bg-[#111A2C] px-1 rounded">-iz</code> lagate the. Jaise 'fōt' (foot) ka plural tha 'fōti'.
+                        </li>
+                        <li class="bg-[#080D1A] p-3 rounded-lg border border-white/5">
+                            <span class="text-white font-bold block mb-1">Step 2: Lazy Pronunciation (Assimilation)</span>
+                            Jab log 'fōti' bolte the, 'o' (jo piche se bolte hain) ke baad turant 'i' (jo aage se bolte hain) bolna mushkil hota tha. Muh ko jaldi aage laane ke chakkar mein, beecho-beech ka vowel badal gaya. 'o' dheere-dheere 'e' ban gaya.
+                        </li>
+                        <li class="bg-[#080D1A] p-3 rounded-lg border border-white/5">
+                            <span class="text-white font-bold block mb-1">Step 3: The Suffix Drops</span>
+                            Waqt ke sath, end ka '-i' sound bilkul drop ho gaya, aur sirf badla hua beech ka vowel reh gaya. <br>
+                            <em>Result: fōt ➔ fōti ➔ fēt ➔ Feet.</em>
+                        </li>
+                    </ul>
+                </div>
+
+                <div id="the-list" class="mb-6 print-block">
+                    <h2 class="text-xl font-bold mb-3 text-[#2563EB]">3. The Complete List</h2>
+                    <p class="text-gray-300 text-sm mb-4">English mein aise bas kuch hi common words bache hain. You just need to memorize these 7:</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="bg-[#080D1A] p-4 rounded-xl border border-white/5 flex justify-between items-center">
+                            <span class="text-gray-400">Foot</span>
+                            <i class="ph ph-arrow-right text-[#2563EB]"></i>
+                            <span class="text-white font-bold text-lg">Feet</span>
+                        </div>
+                        <div class="bg-[#080D1A] p-4 rounded-xl border border-white/5 flex justify-between items-center">
+                            <span class="text-gray-400">Tooth</span>
+                            <i class="ph ph-arrow-right text-[#2563EB]"></i>
+                            <span class="text-white font-bold text-lg">Teeth</span>
+                        </div>
+                        <div class="bg-[#080D1A] p-4 rounded-xl border border-white/5 flex justify-between items-center">
+                            <span class="text-gray-400">Goose</span>
+                            <i class="ph ph-arrow-right text-[#2563EB]"></i>
+                            <span class="text-white font-bold text-lg">Geese</span>
+                        </div>
+                        <div class="bg-[#080D1A] p-4 rounded-xl border border-white/5 flex justify-between items-center">
+                            <span class="text-gray-400">Man</span>
+                            <i class="ph ph-arrow-right text-[#2563EB]"></i>
+                            <span class="text-white font-bold text-lg">Men</span>
+                        </div>
+                        <div class="bg-[#080D1A] p-4 rounded-xl border border-white/5 flex justify-between items-center">
+                            <span class="text-gray-400">Woman</span>
+                            <i class="ph ph-arrow-right text-[#2563EB]"></i>
+                            <span class="text-white font-bold text-lg">Women</span>
+                        </div>
+                        <div class="bg-[#080D1A] p-4 rounded-xl border border-white/5 flex justify-between items-center">
+                            <span class="text-gray-400">Mouse</span>
+                            <i class="ph ph-arrow-right text-[#2563EB]"></i>
+                            <span class="text-white font-bold text-lg">Mice</span>
+                        </div>
+                        <div class="bg-[#080D1A] p-4 rounded-xl border border-white/5 flex justify-between items-center sm:col-span-2">
+                            <span class="text-gray-400">Louse (Joon / head insect)</span>
+                            <i class="ph ph-arrow-right text-[#2563EB]"></i>
+                            <span class="text-white font-bold text-lg">Lice</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="top-mistakes" class="mb-6 print-block">
+                    <h2 class="text-xl font-bold mb-3 text-[#2563EB]">4. Top Mistakes</h2>
+                    <div class="space-y-4">
+                        <div class="bg-[#080D1A] p-4 rounded-xl border border-red-500/20 border-l-4 border-l-red-500">
+                            <h4 class="font-bold text-white mb-1">Mistake 1: Adding 's' to mutated plurals</h4>
+                            <p class="text-sm text-gray-300">Log bolte hain "mens" ya "womens". <br>
+                                <span class="text-red-400">Wrong:</span> "I saw many womens."<br>
+                                <span class="text-green-400">Right:</span> "I saw many women."<br>
+                                <span class="text-xs text-gray-500 italic">Note: "Women's" with an apostrophe is possessive (auraton ka), not plural.</span>
+                            </p>
+                        </div>
+                        <div class="bg-[#080D1A] p-4 rounded-xl border border-red-500/20 border-l-4 border-l-red-500">
+                            <h4 class="font-bold text-white mb-1">Mistake 2: Using 'a/an' with plurals</h4>
+                            <p class="text-sm text-gray-300">Kyunki word mein 's' nahi laga hota, log bhool jate hain ki ye plural hai. <br>
+                                <span class="text-red-400">Wrong:</span> "He is a men."<br>
+                                <span class="text-green-400">Right:</span> "He is a man." OR "They are men."
+                            </p>
+                        </div>
+                        <div class="bg-[#080D1A] p-4 rounded-xl border border-red-500/20 border-l-4 border-l-red-500">
+                            <h4 class="font-bold text-white mb-1">Mistake 3: Over-applying the rule</h4>
+                            <p class="text-sm text-gray-300">Har 'oo' wala word 'ee' nahi banta. Jaise Book ka plural Beak nahi hota. <br>
+                                <span class="text-green-400">Right:</span> Book -> Books, Boot -> Boots.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-4 no-print border-t border-white/5 flex justify-end">
+                    <button onclick="switchTab('quiz')" class="bg-[#2563EB] px-6 py-3 rounded-xl text-white font-bold flex items-center space-x-2 shadow-lg shadow-blue-500/20 hover:bg-blue-600 transition-all">
+                        <span>Take the Quiz</span>
+                        <i class="ph ph-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= STORY SECTION ================= -->
+        <section id="story" class="view-section hidden space-y-6">
+            <div class="bg-[#111A2C] rounded-2xl p-6 md:p-8 border-t border-white/5 shadow-lg">
+                <h1 class="text-2xl font-bold mb-6">A Day in the Village</h1>
+                <div class="prose prose-invert max-w-none text-gray-300 leading-relaxed space-y-4">
+                    <p>
+                        In a quiet little village, an old <span class="text-white font-bold bg-[#2563EB]/20 px-1 rounded">man</span> named Arthur lived near a large pond. He had a peculiar habit; every morning, he would walk barefoot, letting the wet grass tickle his <span class="text-white font-bold bg-[#2563EB]/20 px-1 rounded">feet</span>. He believed it was good for his health, though other <span class="text-white font-bold bg-[#2563EB]/20 px-1 rounded">men</span> in the village thought it was just silly.
+                    </p>
+                    <p>
+                        Arthur had a beautiful flock of birds. Usually, a single <span class="text-white font-bold bg-[#2563EB]/20 px-1 rounded">goose</span> would guard the yard, but by the water, dozens of <span class="text-white font-bold bg-[#2563EB]/20 px-1 rounded">geese</span> would gather and honk loudly at anyone passing by. 
+                    </p>
+                    <p>
+                        One afternoon, a <span class="text-white font-bold bg-[#2563EB]/20 px-1 rounded">woman</span> from the neighborhood came running to Arthur. She was terrified. "There is a <span class="text-white font-bold bg-[#2563EB]/20 px-1 rounded">mouse</span> in my kitchen!" she cried. Arthur chuckled, knowing that where there is one, there are usually several <span class="text-white font-bold bg-[#2563EB]/20 px-1 rounded">mice</span> hiding in the walls.
+                    </p>
+                    <p>
+                        He grabbed a wooden trap and gave her a wide smile, showing off his perfectly white <span class="text-white font-bold bg-[#2563EB]/20 px-1 rounded">teeth</span>. Surprisingly, he had never lost a single <span class="text-white font-bold bg-[#2563EB]/20 px-1 rounded">tooth</span> despite his old age. As he walked toward her house, he noticed a group of <span class="text-white font-bold bg-[#2563EB]/20 px-1 rounded">women</span> chatting outside. They were complaining about the schools checking the children's hair for <span class="text-white font-bold bg-[#2563EB]/20 px-1 rounded">lice</span>, making sure no child brought even a single <span class="text-white font-bold bg-[#2563EB]/20 px-1 rounded">louse</span> back home. 
+                    </p>
+                    <p>
+                        Arthur solved the kitchen problem quickly. He washed his <span class="text-white font-bold bg-[#2563EB]/20 px-1 rounded">foot</span> before entering his own home, content with another simple day.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= QUIZ SECTION ================= -->
+        <section id="quiz" class="view-section hidden space-y-6">
+            
+            <!-- Quiz Start Screen -->
+            <div id="quiz-start" class="bg-[#111A2C] rounded-2xl p-8 border-t border-white/5 shadow-lg text-center">
+                <i class="ph ph-exam text-6xl text-[#2563EB] mb-4"></i>
+                <h1 class="text-2xl font-bold mb-2">Knowledge Assessment</h1>
+                <p class="text-gray-400 mb-8 max-w-md mx-auto">You will be presented with 10 randomly selected questions from our database of 100 variations to test your grasp on vowel displacement plurals.</p>
+                
+                <div class="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4">
+                    <button onclick="startQuiz()" class="bg-[#2563EB] px-8 py-3 rounded-xl text-white font-bold hover:bg-blue-600 transition-all shadow-lg w-full sm:w-auto">Start Quiz</button>
+                    <button onclick="showAnkiModal()" class="bg-[#080D1A] border border-white/5 px-6 py-3 rounded-xl text-gray-300 hover:text-white hover:bg-white/5 transition-all w-full sm:w-auto flex items-center justify-center space-x-2">
+                        <i class="ph ph-download-simple"></i> <span>Download Anki Deck</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quiz Active Screen -->
+            <div id="quiz-active" class="hidden bg-[#111A2C] rounded-2xl p-6 border-t border-white/5 shadow-lg">
+                <div class="flex justify-between items-center mb-4 text-sm text-gray-400 font-bold tracking-wider">
+                    <span id="quiz-progress-text">Question 1/10</span>
+                    <span id="quiz-type-badge" class="bg-[#2563EB]/20 text-[#2563EB] px-2 py-1 rounded-md uppercase text-xs">MCQ</span>
+                </div>
+                
+                <div class="w-full bg-white/10 rounded-full h-1.5 mb-8">
+                    <div id="quiz-progress-bar" class="bg-[#2563EB] h-1.5 rounded-full transition-all duration-300" style="width: 10%;"></div>
+                </div>
+
+                <h2 id="question-text" class="text-xl md:text-2xl font-bold mb-8 leading-snug"></h2>
+
+                <div id="options-container" class="space-y-3 mb-8">
+                    <!-- Options injected here by JS -->
+                </div>
+
+                <div id="reasoning-box" class="hidden mb-6 p-4 rounded-xl bg-[#080D1A] border border-white/5">
+                    <h4 class="text-sm font-bold text-white mb-1 flex items-center space-x-2">
+                        <i class="ph ph-info text-[#2563EB]"></i> <span>Explanation</span>
+                    </h4>
+                    <p id="reasoning-text" class="text-gray-300 text-sm"></p>
+                </div>
+
+                <div class="flex justify-between">
+                    <button onclick="switchTab('notes')" class="text-gray-400 hover:text-white text-sm flex items-center space-x-1">
+                        <i class="ph ph-book-open"></i> <span>Read Notes</span>
+                    </button>
+                    <button id="next-q-btn" onclick="nextQuestion()" class="hidden bg-[#2563EB] px-6 py-2 rounded-xl text-white font-bold hover:bg-blue-600 transition-all">Next</button>
+                </div>
+            </div>
+
+            <!-- Quiz Results Screen -->
+            <div id="quiz-results" class="hidden bg-[#111A2C] rounded-2xl p-8 border-t border-white/5 shadow-lg text-center">
+                <div class="w-24 h-24 rounded-full bg-[#080D1A] border-4 border-[#2563EB] flex items-center justify-center mx-auto mb-6">
+                    <span id="final-score" class="text-3xl font-bold text-white">8/10</span>
+                </div>
+                <h2 class="text-2xl font-bold mb-2">Assessment Complete</h2>
+                <p id="efficiency-text" class="text-gray-400 mb-8">You finished in 02:15 with an 80% accuracy.</p>
+                
+                <div class="p-4 bg-[#080D1A] border border-white/5 rounded-xl mb-8 text-left">
+                    <h4 class="font-bold text-[#2563EB] mb-2">Reminder:</h4>
+                    <p class="text-sm text-gray-300">We have 100 unique questions in the database. Start another quiz to practice new scenarios and test different concepts!</p>
+                </div>
+
+                <button onclick="resetQuiz()" class="bg-[#2563EB] px-8 py-3 rounded-xl text-white font-bold hover:bg-blue-600 transition-all shadow-lg w-full sm:w-auto">Retake Quiz</button>
+            </div>
+        </section>
+
+        <!-- ================= REAL LIFE USAGE SECTION ================= -->
+        <section id="real-life" class="view-section hidden space-y-6">
+            <div class="bg-[#111A2C] rounded-2xl p-6 border-t border-white/5 shadow-lg mb-6">
+                <h1 class="text-2xl font-bold mb-2">Real Life Usage</h1>
+                <p class="text-gray-400 text-sm">Common sentences used by Indians everyday. Click the eye icon to reveal the correct grammar construction.</p>
+            </div>
+
+            <div id="scenarios-container" class="space-y-4">
+                <!-- Injected via JS -->
+            </div>
+
+            <button onclick="loadNextScenarios()" class="w-full bg-[#080D1A] hover:bg-white/5 border border-white/5 py-4 rounded-xl text-gray-300 font-bold transition-all flex items-center justify-center space-x-2">
+                <i class="ph ph-arrows-clockwise"></i> <span>Load Next 5 Scenarios</span>
+            </button>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="fixed bottom-0 left-0 w-full bg-[#060B19]/90 backdrop-blur-md border-t border-white/5 p-4 z-50 no-print">
+        <div class="max-w-4xl mx-auto flex justify-between items-center px-4">
+            <button onclick="switchTab('notes')" class="text-gray-400 hover:text-white flex flex-col items-center transition-colors">
+                <i class="ph ph-house text-2xl mb-1"></i>
+                <span class="text-[10px] font-bold uppercase tracking-wider">Home</span>
+            </button>
+            <button onclick="goBack()" class="text-gray-400 hover:text-white flex flex-col items-center transition-colors">
+                <i class="ph ph-arrow-u-up-left text-2xl mb-1"></i>
+                <span class="text-[10px] font-bold uppercase tracking-wider">Back</span>
+            </button>
+        </div>
+    </footer>
+
+    <!-- Anki Modal -->
+    <div id="anki-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-[#060B19]/90 backdrop-blur-md">
+        <div class="bg-[#111A2C] border-t border-white/5 rounded-2xl p-6 w-full max-w-2xl shadow-2xl flex flex-col max-h-[90vh]">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold">Anki Deck Export</h2>
+                <button onclick="closeAnkiModal()" class="text-gray-400 hover:text-white"><i class="ph ph-x text-2xl"></i></button>
+            </div>
+            <p class="text-sm text-gray-400 mb-4">Copy the exact code block below or download the file. Formatted strictly as <code>Question,Answer</code>.</p>
+            
+            <div class="flex-grow overflow-auto bg-[#080D1A] border border-white/5 rounded-xl p-4 mb-4">
+<pre><code id="anki-code-block" class="text-xs text-gray-300 whitespace-pre-wrap font-mono">
+</code></pre>
+            </div>
+            
+            <button onclick="downloadAnkiCSV()" class="bg-[#2563EB] w-full py-3 rounded-xl text-white font-bold hover:bg-blue-600 transition-all flex items-center justify-center space-x-2">
+                <i class="ph ph-download-simple"></i> <span>Download .csv</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Application Logic -->
+    <script>
+        /* ================= STATE & TIMER ================= */
+        let timeSeconds = 0;
+        setInterval(() => {
+            timeSeconds++;
+            const hrs = Math.floor(timeSeconds / 3600).toString().padStart(2, '0');
+            const mins = Math.floor((timeSeconds % 3600) / 60).toString().padStart(2, '0');
+            const secs = (timeSeconds % 60).toString().padStart(2, '0');
+            document.getElementById('timerDisplay').innerText = `${hrs}:${mins}:${secs}`;
+        }, 1000);
+
+        let navHistory = ['notes'];
+
+        /* ================= NAVIGATION LOGIC ================= */
+        function switchTab(tabId) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+            document.getElementById(tabId).classList.remove('hidden');
+            
+            document.querySelectorAll('.nav-btn').forEach(el => {
+                el.classList.remove('bg-[#2563EB]', 'text-white');
+                el.classList.add('bg-[#111A2C]', 'text-gray-400');
+            });
+            const activeBtn = document.getElementById(`tab-${tabId}`);
+            if(activeBtn) {
+                activeBtn.classList.remove('bg-[#111A2C]', 'text-gray-400');
+                activeBtn.classList.add('bg-[#2563EB]', 'text-white');
+            }
+            window.scrollTo(0, 0);
+
+            if (navHistory[navHistory.length - 1] !== tabId) {
+                navHistory.push(tabId);
+            }
+        }
+
+        function goBack() {
+            if (navHistory.length > 1) {
+                navHistory.pop(); 
+                switchTab(navHistory[navHistory.length - 1]);
+            }
+        }
+
+        /* ================= RAW DATA: 100 QUESTIONS ================= */
+        // Generator format mapping: [Question, Options (delimited by |) OR answer, correct index / text, reasoning, type]
+        const rawQData = [
+            // MCQ - Foot/Feet
+            ["What is the plural form of foot?", "feet|foots|foot|feets", 0, "Old English vowel displacement changes 'oo' to 'ee'", "mcq"],
+            ["My new shoes are hurting my ___", "foot|foots|feet|feets", 2, "Plural of foot is feet. Do not add 's'.", "mcq"],
+            ["A centipede has a hundred ___", "feet|foot|foots|feetes", 0, "More than one foot is feet.", "mcq"],
+            ["The boy washed his left ___", "feet|foot|foots|feetes", 1, "Left refers to a single limb hence foot.", "mcq"],
+            ["She stood on her own two ___", "foot|feet|foots|feets", 1, "Two indicates plural so we use feet.", "mcq"],
+            
+            // True/False - Foot/Feet
+            ["The word 'foots' is a correct plural form.", "True|False", 1, "Foot takes an irregular plural form 'feet'.", "tf"],
+            ["'Feet' is a singular noun.", "True|False", 1, "Feet is strictly plural.", "tf"],
+            ["Vowel mutation causes foot to become feet.", "True|False", 0, "Yes this is known as i-mutation or i-umlaut.", "tf"],
+            ["You should say 'I have two feets'.", "True|False", 1, "Feet is already plural so adding 's' is incorrect.", "tf"],
+            ["A table has four feet.", "True|False", 0, "Inanimate objects also use the plural feet.", "tf"],
+
+            // Correct or Not
+            ["Statement: His foots are very large.", "Correct|Not Correct", 1, "It should be 'His feet are very large'.", "correct_not"],
+            ["Statement: The cat has four feet.", "Correct|Not Correct", 0, "This is grammatically perfect.", "correct_not"],
+            ["Statement: My right foot is asleep.", "Correct|Not Correct", 0, "Right implies one so foot is correct.", "correct_not"],
+            ["Statement: Six feet under the ground.", "Correct|Not Correct", 0, "Plural measurement uses feet.", "correct_not"],
+            ["Statement: She is five foot tall.", "Correct|Not Correct", 0, "In measurements 'foot' is often acceptable informally but feet is also used.", "correct_not"],
+
+            // MCQ - Tooth/Teeth
+            ["What is the plural of tooth?", "tooths|teeth|teethes|teeths", 1, "Tooth undergoes vowel displacement to become teeth.", "mcq"],
+            ["The dentist checked my ___", "tooth|tooths|teeth|teethes", 2, "Checking all of them means using the plural teeth.", "mcq"],
+            ["My front ___ fell out today.", "tooth|teeth|tooths|teethes", 0, "Usually one falls out at a time unless specified.", "mcq"],
+            ["Brushing your ___ is important.", "tooths|teeth|tooth|teethes", 1, "You brush all of them so teeth is used.", "mcq"],
+            ["Sharks have rows of sharp ___", "tooth|tooths|teeths|teeth", 3, "Rows imply many so teeth is correct.", "mcq"],
+
+            // True/False - Tooth/Teeth
+            ["The word 'teeths' is valid English.", "True|False", 1, "Teeth is already plural so no 's' is needed.", "tf"],
+            ["'Teeth' represents more than one tooth.", "True|False", 0, "Yes it is the mutated plural form.", "tf"],
+            ["Baby tooths fall out.", "True|False", 1, "It should be baby teeth.", "tf"],
+            ["A comb has teeth.", "True|False", 0, "Inanimate objects like combs or gears use teeth.", "tf"],
+            ["Toothache means pain in multiple teeth.", "True|False", 1, "Toothache usually implies pain in one specific area though it can feel general.", "tf"],
+
+            // Correct or Not
+            ["Statement: I brush my tooths daily.", "Correct|Not Correct", 1, "Must be 'I brush my teeth'.", "correct_not"],
+            ["Statement: He lost a teeth in the fight.", "Correct|Not Correct", 1, "'A' denotes singular so it must be 'a tooth'.", "correct_not"],
+            ["Statement: That dog has sharp teeth.", "Correct|Not Correct", 0, "Perfect usage of plural.", "correct_not"],
+            ["Statement: The gear lost two teeth.", "Correct|Not Correct", 0, "Mechanical teeth also follow the rule.", "correct_not"],
+            ["Statement: Sweet tooths are bad.", "Correct|Not Correct", 1, "Should be 'sweet teeth' if referring to multiple people with the craving.", "correct_not"],
+
+            // MCQ - Goose/Geese
+            ["Look at that flock of ___", "gooses|goose|geese|geeses", 2, "The plural of goose is geese via i-mutation.", "mcq"],
+            ["One ___ is swimming in the lake.", "geese|goose|gooses|geeses", 1, "One indicates singular so goose is correct.", "mcq"],
+            ["The ___ are migrating south.", "goose|geese|gooses|geeses", 1, "The verb 'are' indicates plural so geese is needed.", "mcq"],
+            ["Mother ___ is a famous character.", "Geese|Gooses|Goose|Geeses", 2, "It refers to a single character.", "mcq"],
+            ["Those ___ are very aggressive.", "goose|gooses|geese|geeses", 2, "Those indicates plural so geese is used.", "mcq"],
+
+            // True/False - Goose/Geese
+            ["'Gooses' is the correct plural form.", "True|False", 1, "Gooses is incorrect; it is geese.", "tf"],
+            ["A male goose is called a gander.", "True|False", 0, "True though geese is the general plural.", "tf"],
+            ["Geese is a singular noun.", "True|False", 1, "Geese is strictly plural.", "tf"],
+            ["You can say 'a flock of geese'.", "True|False", 0, "Flock is a collective noun for birds like geese.", "tf"],
+            ["'Geeses' is grammatically correct.", "True|False", 1, "Adding 's' to an already mutated plural is wrong.", "tf"],
+
+            // Correct or Not
+            ["Statement: The gooses honked loudly.", "Correct|Not Correct", 1, "Should be 'The geese honked loudly'.", "correct_not"],
+            ["Statement: I saw a geese flying.", "Correct|Not Correct", 1, "'A' requires singular so it should be 'a goose'.", "correct_not"],
+            ["Statement: Geese mate for life.", "Correct|Not Correct", 0, "Correct general statement using plural.", "correct_not"],
+            ["Statement: That goose is huge.", "Correct|Not Correct", 0, "Correct singular usage.", "correct_not"],
+            ["Statement: The farmer has ten geeses.", "Correct|Not Correct", 1, "Ten implies plural but 'geeses' is a double plural mistake.", "correct_not"],
+
+            // MCQ - Man/Men
+            ["There were three ___ at the door.", "man|mans|men|mens", 2, "Man becomes men in plural form.", "mcq"],
+            ["He is a very kind ___", "men|mans|man|mens", 2, "A implies singular so man is used.", "mcq"],
+            ["The ___ in black suits.", "man|mans|mens|men", 3, "Usually refers to a group so men.", "mcq"],
+            ["All ___ are created equal.", "man|men|mans|mens", 1, "All implies plural.", "mcq"],
+            ["Spider-___ is a superhero.", "Men|Mans|Mens|Man", 3, "It refers to one person.", "mcq"],
+
+            // True/False - Man/Men
+            ["'Mans' is the plural of man.", "True|False", 1, "Man mutates to men.", "tf"],
+            ["'Men's' is a possessive form not a simple plural.", "True|False", 0, "Yes the apostrophe indicates possession.", "tf"],
+            ["You should write 'mens room'.", "True|False", 1, "It must be 'men's room' (possessive).", "tf"],
+            ["A group of guys can be called men.", "True|False", 0, "Yes men is the plural for adult males.", "tf"],
+            ["'He is a men' is correct.", "True|False", 1, "You cannot use 'a' with a plural noun.", "tf"],
+
+            // Correct or Not
+            ["Statement: The mens went to work.", "Correct|Not Correct", 1, "Never add 's' to men unless it is possessive.", "correct_not"],
+            ["Statement: A men was walking his dog.", "Correct|Not Correct", 1, "A requires the singular 'man'.", "correct_not"],
+            ["Statement: The men are playing chess.", "Correct|Not Correct", 0, "Correct use of plural subject and plural verb.", "correct_not"],
+            ["Statement: Where is the men's toilet?", "Correct|Not Correct", 0, "Correct possessive usage.", "correct_not"],
+            ["Statement: I saw two mans fighting.", "Correct|Not Correct", 1, "Should be 'two men fighting'.", "correct_not"],
+
+            // MCQ - Woman/Women
+            ["That ___ is my aunt.", "women|woman|womans|womens", 1, "That refers to a singular person.", "mcq"],
+            ["The ___ organized a meeting.", "woman|womans|women|womens", 2, "Implies a group so women is appropriate.", "mcq"],
+            ["International ___'s Day.", "Woman|Women|Womans|Womens", 1, "It celebrates all women.", "mcq"],
+            ["She is a strong ___", "women|woman|womens|womans", 1, "A requires the singular woman.", "mcq"],
+            ["Many ___ attended the seminar.", "woman|women|womans|womens", 1, "Many requires the plural women.", "mcq"],
+
+            // True/False - Woman/Women
+            ["'Women' is pronounced exactly like 'woman'.", "True|False", 1, "Woman is wu-man; Women is wi-min.", "tf"],
+            ["The plural of woman is womans.", "True|False", 1, "The plural is women.", "tf"],
+            ["'Womens' without an apostrophe is always wrong.", "True|False", 0, "Yes 'women' is already plural.", "tf"],
+            ["You can say 'one women'.", "True|False", 1, "One requires the singular woman.", "tf"],
+            ["Women is an irregular plural.", "True|False", 0, "Yes because it changes the internal vowel.", "tf"],
+
+            // Correct or Not
+            ["Statement: The womens are here.", "Correct|Not Correct", 1, "Should be 'The women are here'.", "correct_not"],
+            ["Statement: She is the only women in the room.", "Correct|Not Correct", 1, "Should be 'only woman'.", "correct_not"],
+            ["Statement: Three women walked past.", "Correct|Not Correct", 0, "Correct use of number and plural.", "correct_not"],
+            ["Statement: The woman's purse was stolen.", "Correct|Not Correct", 0, "Correct singular possessive.", "correct_not"],
+            ["Statement: I respect all woman.", "Correct|Not Correct", 1, "Should be 'all women'.", "correct_not"],
+
+            // MCQ - Mouse/Mice
+            ["My cat caught a ___", "mice|mices|mouse|mouses", 2, "A indicates singular so mouse is correct.", "mcq"],
+            ["There are ___ in the attic.", "mouse|mouses|mice|mices", 2, "Plural of mouse is mice.", "mcq"],
+            ["We bought three computer ___", "mouse|mouses|mice|mices", 2, "Computer mice is standard though mouses is sometimes accepted in tech.", "mcq"],
+            ["Mickey is a famous ___", "mice|mouse|mouses|mices", 1, "Refers to one specific character.", "mcq"],
+            ["Blind ___ ran after the farmer.", "mouse|mouses|mice|mices", 2, "Like the nursery rhyme Three Blind Mice.", "mcq"],
+
+            // True/False - Mouse/Mice
+            ["The plural of mouse is mouses.", "True|False", 1, "The standard plural is mice.", "tf"],
+            ["Mice is a singular noun.", "True|False", 1, "Mice is plural.", "tf"],
+            ["You can have one mice.", "True|False", 1, "It is one mouse.", "tf"],
+            ["Mice are afraid of cats.", "True|False", 0, "Correct plural usage.", "tf"],
+            ["'Mices' is correct.", "True|False", 1, "Adding 's' to mice is a double plural error.", "tf"],
+
+            // Correct or Not
+            ["Statement: The mouses ate the cheese.", "Correct|Not Correct", 1, "Should be 'The mice ate the cheese'.", "correct_not"],
+            ["Statement: I saw a mice.", "Correct|Not Correct", 1, "Should be 'I saw a mouse'.", "correct_not"],
+            ["Statement: The mice are hiding.", "Correct|Not Correct", 0, "Correct plural subject and verb.", "correct_not"],
+            ["Statement: He is as quiet as a mouse.", "Correct|Not Correct", 0, "Correct idiom.", "correct_not"],
+            ["Statement: The house is full of mices.", "Correct|Not Correct", 1, "Double plural error.", "correct_not"],
+
+            // MCQ - Louse/Lice
+            ["The child had a single ___ in his hair.", "lice|louse|louses|lices", 1, "A single parasite is a louse.", "mcq"],
+            ["The shampoo treats head ___", "louse|lice|louses|lices", 1, "Infestations are plural so lice is used.", "mcq"],
+            ["He is a ___ for lying to me.", "lice|louse|lices|louses", 1, "Used as a singular insult.", "mcq"],
+            ["They found ___ on the dog.", "louse|louses|lice|lices", 2, "Plural parasite form is lice.", "mcq"],
+            ["Wood___ live under logs.", "lice|louse|lices|louses", 0, "Woodlice is the plural form.", "mcq"],
+
+            // True/False - Louse/Lice
+            ["The plural of louse is lice.", "True|False", 0, "Yes this is the correct i-mutation.", "tf"],
+            ["Lice is singular.", "True|False", 1, "Lice is plural.", "tf"],
+            ["You can say 'one lice'.", "True|False", 1, "One requires the singular louse.", "tf"],
+            ["'Louses' is never used.", "True|False", 1, "Louses is sometimes used for the verb form or insult plural but lice is the insect plural.", "tf"],
+            ["Lice are common in schools.", "True|False", 0, "Correct plural usage.", "tf"],
+
+            // Flashcard/Reasoning (Format: Q | A | correct index | reasoning | type)
+            // Note: For flashcards in this UI, I will present as a question, user taps to see answer.
+            ["Why does 'foot' become 'feet' instead of 'foots'?", "Vowel displacement (I-mutation)", 0, "Old English suffixes caused speakers to alter the root vowel for easier pronunciation.", "flashcard"],
+            ["What is the plural of 'goose'?", "geese", 0, "The double O changes to double E.", "flashcard"],
+            ["Why is 'womens' incorrect?", "Women is already plural", 0, "Adding an S creates a double plural.", "flashcard"],
+            ["What is the singular form of 'teeth'?", "tooth", 0, "Tooth is one, teeth are many.", "flashcard"],
+            ["If 'mouse' becomes 'mice', does 'house' become 'hice'?", "No", 0, "House does not follow this Old English rule; it becomes houses.", "flashcard"],
+            ["What do we call the linguistic rule that changes 'man' to 'men'?", "I-mutation or I-umlaut", 0, "This rule changed internal vowels based on a now-lost suffix.", "flashcard"],
+            ["Is 'a men' grammatically correct?", "No", 0, "'A' is singular, 'men' is plural.", "flashcard"],
+            ["What is the plural of 'louse'?", "lice", 0, "Similar to mouse/mice, the 'ou' becomes 'i'.", "flashcard"],
+            ["Can 'teeth' be used as a singular noun?", "No", 0, "Teeth is strictly plural.", "flashcard"],
+            ["What is the plural of 'woman'?", "women", 0, "The internal 'a' changes to 'e'.", "flashcard"],
+
+            // Correct or Not - Mixed
+            ["Statement: Both of my feet are sore.", "Correct|Not Correct", 0, "Correct usage.", "correct_not"],
+            ["Statement: The mens room is on the left.", "Correct|Not Correct", 1, "Must have an apostrophe: men's room.", "correct_not"],
+            ["Statement: Brush your tooths before bed.", "Correct|Not Correct", 1, "Should be teeth.", "correct_not"],
+            ["Statement: A flock of geese flew by.", "Correct|Not Correct", 0, "Correct usage.", "correct_not"],
+            ["Statement: I caught two mouses yesterday.", "Correct|Not Correct", 1, "Should be two mice.", "correct_not"]
+        ];
+
+        // Format to actual objects and ensure we have 100
+        let questionsList = [];
+        rawQData.forEach(item => {
+            let options = item[1].split('|');
+            questionsList.push({
+                q: item[0],
+                options: options,
+                ansIndex: item[2],
+                reason: item[3],
+                type: item[4]
+            });
+        });
+
+        // Fill remaining up to 100 by procedural variations
+        const templates = [
+            { q: "Choose the correct plural: The lake was full of [TARGET].", valid: "geese", invalid: "gooses|goose", r: "Goose becomes geese." },
+            { q: "Is this correct? 'He hurt his [TARGET].'", valid: "foot", invalid: "feets", r: "Singular context requires foot." },
+            { q: "Identify the error: 'The [TARGET] are working hard.'", valid: "men", invalid: "mans", r: "Plural of man is men." },
+            { q: "Identify the error: 'All [TARGET] must attend.'", valid: "women", invalid: "womens", r: "Women is already plural." },
+            { q: "Fill in the blank: The trap caught the [TARGET].", valid: "mice", invalid: "mouses", r: "Mouse becomes mice." }
+        ];
+
+        let index = 0;
+        while(questionsList.length < 100) {
+            let t = templates[index % templates.length];
+            let isTf = index % 2 === 0;
+            if(isTf) {
+                questionsList.push({
+                    q: `Statement: '${t.valid}' is grammatically correct.`,
+                    options: ["True", "False"],
+                    ansIndex: 0,
+                    reason: t.r,
+                    type: "tf"
+                });
+            } else {
+                questionsList.push({
+                    q: `Which is correct?`,
+                    options: [t.valid, t.invalid.split('|')[0]],
+                    ansIndex: 0,
+                    reason: t.r,
+                    type: "mcq"
+                });
+            }
+            index++;
+        }
+
+        /* ================= QUIZ LOGIC ================= */
+        let currentQuizQueue = [];
+        let currentQIndex = 0;
+        let quizScore = 0;
+        let quizStartTime = 0;
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function startQuiz() {
+            document.getElementById('quiz-start').classList.add('hidden');
+            document.getElementById('quiz-results').classList.add('hidden');
+            document.getElementById('quiz-active').classList.remove('hidden');
+            
+            // Pick 10 random
+            let copyList = [...questionsList];
+            shuffleArray(copyList);
+            currentQuizQueue = copyList.slice(0, 10);
+            
+            currentQIndex = 0;
+            quizScore = 0;
+            quizStartTime = timeSeconds;
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const qObj = currentQuizQueue[currentQIndex];
+            document.getElementById('quiz-progress-text').innerText = `Question ${currentQIndex + 1}/10`;
+            document.getElementById('quiz-progress-bar').style.width = `${((currentQIndex) / 10) * 100}%`;
+            
+            let typeLabel = qObj.type.toUpperCase();
+            if(typeLabel === "CORRECT_NOT") typeLabel = "ANALYSIS";
+            document.getElementById('quiz-type-badge').innerText = typeLabel;
+            
+            document.getElementById('question-text').innerText = qObj.q;
+            
+            const optsContainer = document.getElementById('options-container');
+            optsContainer.innerHTML = '';
+            document.getElementById('reasoning-box').classList.add('hidden');
+            document.getElementById('next-q-btn').classList.add('hidden');
+
+            if(qObj.type === 'flashcard') {
+                // Flashcard mode
+                optsContainer.innerHTML = `
+                    <button id="fc-reveal" onclick="revealFlashcard('${qObj.options[0]}')" class="w-full text-left p-4 rounded-xl border border-white/5 bg-[#080D1A] hover:bg-white/10 transition-all font-bold text-[#2563EB] flex justify-center items-center space-x-2">
+                        <i class="ph ph-eye"></i> <span>Tap to Reveal Answer</span>
+                    </button>
+                `;
+                // Store answer logic directly in window for simplicity
+                window.currentFcAnswer = qObj.options[0];
+            } else {
+                // MCQ / TF / CorrectNot Mode
+                // To avoid guessing by position, shuffle options but track correct index
+                let optionsWithIndex = qObj.options.map((opt, i) => ({ text: opt, originalIndex: i }));
+                if(qObj.type === "mcq") shuffleArray(optionsWithIndex);
+
+                optionsWithIndex.forEach(optObj => {
+                    const btn = document.createElement('button');
+                    btn.className = 'w-full text-left p-4 rounded-xl border border-white/5 bg-[#080D1A] hover:bg-white/10 transition-all quiz-option-btn';
+                    btn.innerText = optObj.text;
+                    btn.onclick = () => selectAnswer(btn, optObj.originalIndex === parseInt(qObj.ansIndex), qObj.reason);
+                    optsContainer.appendChild(btn);
+                });
+            }
+        }
+
+        function revealFlashcard(ansText) {
+            const opts = document.getElementById('options-container');
+            opts.innerHTML = `
+                <div class="w-full text-center p-4 rounded-xl border border-[#2563EB]/30 bg-[#2563EB]/10 text-white font-bold text-xl mb-4">
+                    ${ansText}
+                </div>
+                <div class="flex space-x-2 mt-4">
+                    <button onclick="handleFcScore(false)" class="flex-1 bg-red-500/20 text-red-400 py-3 rounded-xl border border-red-500/30 hover:bg-red-500/30 font-bold">Did not know</button>
+                    <button onclick="handleFcScore(true)" class="flex-1 bg-green-500/20 text-green-400 py-3 rounded-xl border border-green-500/30 hover:bg-green-500/30 font-bold">Got it right</button>
+                </div>
+            `;
+        }
+
+        function handleFcScore(correct) {
+            if(correct) quizScore++;
+            showReasoning(currentQuizQueue[currentQIndex].reason);
+        }
+
+        function selectAnswer(btnElement, isCorrect, reasoning) {
+            // Disable all buttons
+            document.querySelectorAll('.quiz-option-btn').forEach(b => {
+                b.onclick = null;
+                b.classList.remove('hover:bg-white/10');
+            });
+
+            if (isCorrect) {
+                btnElement.classList.add('bg-green-500/20', 'border-green-500', 'text-green-400');
+                quizScore++;
+            } else {
+                btnElement.classList.add('bg-red-500/20', 'border-red-500', 'text-red-400');
+                // Highlight correct one
+                document.querySelectorAll('.quiz-option-btn').forEach(b => {
+                    // Re-calculate the right one visually isn't strictly necessary if reasoning explains it, but good UX.
+                });
+            }
+            showReasoning(reasoning);
+        }
+
+        function showReasoning(text) {
+            document.getElementById('reasoning-text').innerText = text;
+            document.getElementById('reasoning-box').classList.remove('hidden');
+            document.getElementById('next-q-btn').classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            currentQIndex++;
+            if(currentQIndex < 10) {
+                renderQuestion();
+            } else {
+                finishQuiz();
+            }
+        }
+
+        function finishQuiz() {
+            document.getElementById('quiz-active').classList.add('hidden');
+            document.getElementById('quiz-results').classList.remove('hidden');
+            
+            let timeTaken = timeSeconds - quizStartTime;
+            let m = Math.floor(timeTaken / 60).toString().padStart(2, '0');
+            let s = (timeTaken % 60).toString().padStart(2, '0');
+            
+            document.getElementById('final-score').innerText = `${quizScore}/10`;
+            document.getElementById('efficiency-text').innerText = `You finished in ${m}:${s} with a ${(quizScore/10)*100}% accuracy.`;
+            document.getElementById('quiz-progress-bar').style.width = `100%`;
+        }
+
+        function resetQuiz() {
+            startQuiz();
+        }
+
+        /* ================= REAL LIFE SCENARIOS LOGIC ================= */
+        const rawScenarios = [
+            "Mujhe naye joote lene hain, mere purane jooton se dono [feet] mein dard hota hai.",
+            "Dentist ne kaha hai ki din mein do baar apne [teeth] brush karne chahiye.",
+            "Kal gaon ke talab ke paas mainne bahut saari [geese] dekhi thi.",
+            "Local train mein ladies compartment mein bahut saari [women] travel karti hain.",
+            "Mumbai ki baarish mein local trains mein bahut [men] fass jate hain.",
+            "Ghar ke piche godown mein aaj subah mainne do [mice] dekhe.",
+            "Bacchon ke school mein checkup hua, kisi ke baalo mein [lice] nahi mili.",
+            "Mera ek [tooth] toot gaya hai, kal doctor ko dikhana padega.",
+            "Usne ek pair par khade hokar balance banaya, uska dusra [foot] hawa mein tha.",
+            "Mandi mein aaj ek hi [woman] sabzi bech rahi thi.",
+            "Security guard ek akela [man] tha jo puri building dekh raha tha.",
+            "Maine ek chota sa [mouse] kitchen mein dekha, mummy darr gayi.",
+            "Sardiyon mein mere [feet] bahut thande ho jate hain.",
+            "Chai zyada peene se mere [teeth] peele ho rahe hain.",
+            "Garden mein ek [goose] baithi thi akeli.",
+            "Function mein saari [women] ne saree pehni thi.",
+            "Cricketers sabhi fit [men] hote hain.",
+            "Computer ka [mouse] kharab ho gaya hai naya lana padega. (Tech exception)",
+            "Sirf ek [louse] se infection shuru ho sakta hai.",
+            "Football khelte waqt mera right [foot] twist ho gaya.",
+            "Chocolate khane se tumhara [tooth] kharab ho jayega.",
+            "Wo [man] subah se newspaper padh raha hai.",
+            "Wo [woman] roz mandir aati hai.",
+            "Billi ne do [mice] pakde aaj subah.",
+            "In jooton mein mere [feet] fit nahi ho rahe.",
+            "Doctor ne uske saare [teeth] nikal diye kyuki cavities thi.",
+            "Dono [men] ne milkar bhari almari uthayi.",
+            "Teen [women] milkar startup chala rahi hain.",
+            "Khet mein bahut saari [geese] dana chug rahi thi.",
+            "Sir mein khujli ho rahi hai, shayad [lice] ho gayi hain.",
+            "Dadi ma ko chalne mein dikkat hoti hai kyuki unke [feet] dard karte hain.",
+            "Uska samne wala [tooth] nakli hai.",
+            "Meeting room mein 5 [men] aur 4 [women] baithe the.",
+            "Jungle safari mein humne ek wild [goose] dekhi.",
+            "Ghar ke basement mein hamesha [mice] ghoomte rehte hain.",
+            "Ek [mouse] ne mera saara document kaat diya.",
+            "Shaadi mein aayi ek [woman] bahut acha gaana ga rahi thi.",
+            "Ek [man] ne raasta bataya tha humein.",
+            "Gym mein zyada wazan uthane se mere [feet] dukhne lage.",
+            "Mujhe lagta hai mere [teeth] mein sensitivity ho gayi hai.",
+            "Bachpan mein mere baalon mein [lice] pad gayi thi.",
+            "Baarish ke mausam mein kheton mein [geese] aati hain.",
+            "Ye joote dono [feet] ke liye comfortable hain.",
+            "Apne [teeth] dikhao, doctor ne bache se kaha.",
+            "Police ne un do [men] ko arrest kar liya.",
+            "Office ki saari [women] aaj jaldi ghar chali gayi.",
+            "Kal raat mere kamre mein ek [mouse] ghus aaya tha.",
+            "Humne zoo mein ek bada sa [goose] dekha.",
+            "Dard ke mare uska ek [foot] uth nahi raha tha.",
+            "Vo akela [man] gaadi dhakka maar raha tha."
+        ];
+
+        let scenariosData = [];
+        rawScenarios.forEach(sentence => {
+            const match = sentence.match(/\[(.*?)\]/);
+            if(match) {
+                const target = match[1];
+                const hiddenStr = sentence.replace(`[${target}]`, `_____`);
+                const revealedStr = sentence.replace(`[${target}]`, `<span class="text-[#2563EB] font-bold underline bg-[#2563EB]/10 px-1 rounded">${target}</span>`);
+                scenariosData.push({ hidden: hiddenStr, revealed: revealedStr, word: target });
+            }
+        });
+
+        let currentScenarioIndex = 0;
+
+        function renderScenarios() {
+            const container = document.getElementById('scenarios-container');
+            container.innerHTML = '';
+            
+            // Render 5 at a time
+            for(let i=0; i<5; i++) {
+                if(currentScenarioIndex >= scenariosData.length) {
+                    currentScenarioIndex = 0; // wrap around
+                    shuffleArray(scenariosData);
+                }
+                const sc = scenariosData[currentScenarioIndex];
+                
+                const div = document.createElement('div');
+                div.className = 'bg-[#080D1A] border border-white/5 p-4 rounded-xl flex justify-between items-center group relative';
+                
+                div.innerHTML = `
+                    <p class="text-gray-300 text-sm md:text-base pr-12 transition-all" id="sc-text-${currentScenarioIndex}">${sc.hidden}</p>
+                    <button onclick="revealScenario(${currentScenarioIndex}, '${encodeURIComponent(sc.revealed)}')" class="absolute right-4 text-gray-400 hover:text-[#2563EB] bg-[#111A2C] p-2 rounded-lg border border-white/5 transition-all">
+                        <i class="ph ph-eye"></i>
+                    </button>
+                `;
+                container.appendChild(div);
+                currentScenarioIndex++;
+            }
+        }
+
+        function revealScenario(id, encodedRevealed) {
+            const decoded = decodeURIComponent(encodedRevealed);
+            document.getElementById(`sc-text-${id}`).innerHTML = decoded;
+        }
+
+        function loadNextScenarios() {
+            renderScenarios();
+        }
+
+        /* ================= ANKI EXPORT LOGIC ================= */
+        function showAnkiModal() {
+            // Generate CSV string strictly formatted as Q,A without internal commas
+            let csvLines = [];
+            questionsList.forEach(item => {
+                // Remove commas from question
+                let qClean = item.q.replace(/,/g, '');
+                
+                // Determine answer string
+                let ansString = "";
+                if(item.type === "mcq" || item.type === "correct_not" || item.type === "tf") {
+                    ansString = item.options[item.ansIndex];
+                } else if (item.type === "flashcard") {
+                    ansString = item.options[0];
+                }
+                
+                // Remove commas from answer
+                let ansClean = ansString.replace(/,/g, '');
+                
+                csvLines.push(`${qClean},${ansClean}`);
+            });
+            
+            const finalCSV = csvLines.join('\n');
+            document.getElementById('anki-code-block').innerText = finalCSV;
+            document.getElementById('anki-modal').classList.remove('hidden');
+        }
+
+        function closeAnkiModal() {
+            document.getElementById('anki-modal').classList.add('hidden');
+        }
+
+        function downloadAnkiCSV() {
+            const content = document.getElementById('anki-code-block').innerText;
+            const blob = new Blob([content], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('hidden', '');
+            a.setAttribute('href', url);
+            a.setAttribute('download', 'Fluency_Grammar_VowelDisplacement.csv');
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        /* ================= INITIALIZATION ================= */
+        window.onload = () => {
+            shuffleArray(scenariosData);
+            renderScenarios();
+        };
+    </script>
+</body>
+</html>
