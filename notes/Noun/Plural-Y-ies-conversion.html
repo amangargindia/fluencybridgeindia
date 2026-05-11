@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fluency Bridge - Y to IES Plurals</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        midnight: '#060B19',
+                        frosted: '#111A2C',
+                        surface: '#080D1A',
+                        brand: '#2563EB',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #060B19; color: white; -webkit-tap-highlight-color: transparent; }
+        .font-serif-italic { font-family: 'Playfair Display', serif; font-style: italic; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #060B19; }
+        ::-webkit-scrollbar-thumb { background: #111A2C; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #1f2d4a; }
+
+        /* Smooth fade transition */
+        .tab-content { display: none; animation: fadeIn 0.3s ease-in-out; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Print Styles - Maintaining Dark Theme */
+        @media print {
+            body { background-color: #060B19 !important; color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .no-print { display: none !important; }
+            .print-full-width { max-width: 100% !important; margin: 0 !important; padding: 0 !important; box-shadow: none !important; border: none !important; }
+            #notes-content { display: block !important; } /* Force notes to show in print */
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col relative pb-20">
+    <!-- Background Blur & Gradient -->
+    <div class="fixed inset-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-[#131E3A]/80 via-midnight to-midnight -z-10 pointer-events-none"></div>
+
+    <!-- Header -->
+    <header class="text-center pt-8 pb-4 relative z-10 no-print">
+        <div class="flex justify-between items-start px-6">
+            <div class="w-16"></div> <!-- Spacer -->
+            <div>
+                <h1 class="tracking-[0.3em] text-[10px] text-gray-300 uppercase font-bold">F L U E N C Y</h1>
+                <h2 class="text-white text-4xl font-serif-italic mt-1 drop-shadow-md">bridge</h2>
+            </div>
+            <div class="w-16 text-right">
+                <div class="text-xs text-gray-400 bg-surface/50 border border-white/5 px-2 py-1 rounded-lg backdrop-blur inline-block">
+                    ⏱ <span id="global-timer" class="font-mono font-medium text-white">00:00</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="w-full max-w-4xl mx-auto px-4 mb-6 no-print z-10">
+        <div class="flex flex-wrap gap-2 justify-center bg-frosted/50 p-2 rounded-2xl border border-white/5 backdrop-blur-sm">
+            <button onclick="switchTab('notes')" id="tab-notes" class="flex-1 min-w-[100px] text-sm py-2 px-3 rounded-xl transition-colors bg-surface border border-white/10 text-white font-medium">Notes</button>
+            <button onclick="switchTab('story')" id="tab-story" class="flex-1 min-w-[100px] text-sm py-2 px-3 rounded-xl transition-colors text-gray-400 hover:text-white hover:bg-surface/50">Story</button>
+            <button onclick="switchTab('realLife')" id="tab-realLife" class="flex-1 min-w-[100px] text-sm py-2 px-3 rounded-xl transition-colors text-gray-400 hover:text-white hover:bg-surface/50">IRL Usage</button>
+            <button onclick="switchTab('quiz')" id="tab-quiz" class="flex-1 min-w-[100px] text-sm py-2 px-3 rounded-xl transition-colors text-gray-400 hover:text-white hover:bg-surface/50">Quiz</button>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <main class="flex-1 w-full max-w-4xl mx-auto px-4 z-10">
+        <div class="bg-frosted border-t border-white/5 shadow-2xl rounded-3xl p-5 md:p-8 print-full-width relative">
+            
+            <!-- NOTES SECTION -->
+            <section id="notes-content" class="tab-content active space-y-6">
+                <div class="flex justify-between items-center no-print">
+                    <h3 class="text-2xl font-bold text-white">Revise This Topic</h3>
+                    <div class="flex gap-2">
+                        <button onclick="printPage()" class="p-2 bg-surface hover:bg-white/10 border border-white/5 rounded-xl transition" title="Print Notes">
+                            <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                        </button>
+                        <button onclick="openAnkiModal()" class="p-2 bg-surface hover:bg-white/10 border border-white/5 rounded-xl transition" title="Download Anki Deck">
+                            <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Table of Contents -->
+                <div class="bg-surface/50 border border-white/5 rounded-2xl p-4 md:p-6 text-sm text-gray-300">
+                    <h4 class="font-bold text-white mb-3">Table of Contents</h4>
+                    <ul class="space-y-2 list-disc pl-5">
+                        <li><a href="#prerequisites" class="hover:text-brand transition-colors">Prerequisites (Zaroori Concepts)</a></li>
+                        <li><a href="#main-rule" class="hover:text-brand transition-colors">Main Concept: The 'Y' Rule (Hinglish)</a></li>
+                        <li><a href="#nuances" class="hover:text-brand transition-colors">Nuances & Deep Dive</a></li>
+                        <li><a href="#top-mistakes" class="hover:text-brand transition-colors">Top Mistakes to Avoid</a></li>
+                    </ul>
+                </div>
+
+                <div id="prerequisites" class="pt-2">
+                    <h4 class="text-lg font-bold text-brand mb-2">1. Prerequisites</h4>
+                    <p class="text-gray-300 mb-2">Topic samajhne se pehle in basic grammar terms ko samajhna zaroori hai. Click to learn more on Google:</p>
+                    <ul class="list-none space-y-2 text-sm">
+                        <li class="bg-surface p-3 rounded-xl border border-white/5">🔹 <a href="https://www.google.com/search?q=What+are+Singular+and+Plural+Nouns" target="_blank" class="text-blue-400 hover:underline font-semibold">Singular vs Plural Nouns</a>: Ek cheez (Singular) aur ek se zyada (Plural).</li>
+                        <li class="bg-surface p-3 rounded-xl border border-white/5">🔹 <a href="https://www.google.com/search?q=Vowels+and+Consonants+in+English+grammar" target="_blank" class="text-blue-400 hover:underline font-semibold">Vowels & Consonants</a>: English alphabet mein <span class="font-bold text-white">a, e, i, o, u</span> vowels hote hain. Baaki saare letters (b, c, d, z, etc.) consonants hote hain.</li>
+                    </ul>
+                </div>
+
+                <div id="main-rule" class="pt-4">
+                    <h4 class="text-lg font-bold text-brand mb-3">2. The Rule: Words Ending in 'Y'</h4>
+                    <p class="text-gray-300 mb-4 leading-relaxed">
+                        Jab koi english word <span class="text-white font-bold">'y'</span> par end hota hai aur humein usko plural (bahuvachan) banana hota hai, toh do alag cases aate hain. Yeh completely is baat par depend karta hai ki <span class="text-white italic">'y' se theek pehle wala letter kya hai.</span>
+                    </p>
+
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <!-- Case 1 -->
+                        <div class="bg-surface p-5 rounded-2xl border border-white/5">
+                            <h5 class="font-bold text-white mb-2 flex items-center gap-2">
+                                <span class="bg-brand text-white text-xs px-2 py-1 rounded">Rule 1</span> Consonant + Y
+                            </h5>
+                            <p class="text-sm text-gray-400 mb-3">Agar 'y' se pehle koi consonant (a, e, i, o, u ke alawa) hai, toh 'y' ko hata kar <strong class="text-white">ies</strong> laga do.</p>
+                            <ul class="text-sm text-gray-300 space-y-2">
+                                <li>Bab<strong class="text-red-400">y</strong> ➔ Bab<strong class="text-green-400">ies</strong> (b is consonant)</li>
+                                <li>Cit<strong class="text-red-400">y</strong> ➔ Cit<strong class="text-green-400">ies</strong> (t is consonant)</li>
+                                <li>Stor<strong class="text-red-400">y</strong> ➔ Stor<strong class="text-green-400">ies</strong> (r is consonant)</li>
+                            </ul>
+                            <div class="mt-4 p-3 bg-white/5 rounded-xl text-xs text-gray-400">
+                                <strong class="text-white block mb-1">Aisa kyun hota hai? (Logic)</strong>
+                                English pronunciation mein consonants ki bheed (cluster) ek saath bolna mushkil hota hai. 'y' ek vowel sound (/i/ ya /aɪ/) deta hai. Ise likhne me 'ies' se replace karne par word ka syllable structure aur bolne ka flow clear rehta hai.
+                            </div>
+                        </div>
+
+                        <!-- Case 2 -->
+                        <div class="bg-surface p-5 rounded-2xl border border-white/5">
+                            <h5 class="font-bold text-white mb-2 flex items-center gap-2">
+                                <span class="bg-brand text-white text-xs px-2 py-1 rounded">Rule 2</span> Vowel + Y
+                            </h5>
+                            <p class="text-sm text-gray-400 mb-3">Agar 'y' se pehle koi vowel (a, e, i, o, u) hai, toh simply <strong class="text-white">s</strong> laga do. Kuch aur change nahi hoga.</p>
+                            <ul class="text-sm text-gray-300 space-y-2">
+                                <li>B<strong class="text-blue-400">o</strong>y ➔ B<strong class="text-blue-400">o</strong>y<strong class="text-green-400">s</strong> ('o' is vowel)</li>
+                                <li>D<strong class="text-blue-400">a</strong>y ➔ D<strong class="text-blue-400">a</strong>y<strong class="text-green-400">s</strong> ('a' is vowel)</li>
+                                <li>K<strong class="text-blue-400">e</strong>y ➔ K<strong class="text-blue-400">e</strong>y<strong class="text-green-400">s</strong> ('e' is vowel)</li>
+                            </ul>
+                            <div class="mt-4 p-3 bg-white/5 rounded-xl text-xs text-gray-400">
+                                <strong class="text-white block mb-1">Aisa kyun hota hai? (Logic)</strong>
+                                Jab 'y' se pehle vowel aata hai (jaise 'ay', 'ey', 'oy'), toh dono milkar ek solid vowel sound (diphthong) banate hain. Iske aage sirf 's' lagane se koi awkward consonant sound nahi banta, isliye yaha 'y' ko change karne ki zarurat nahi hoti.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="nuances" class="pt-4">
+                    <h4 class="text-lg font-bold text-brand mb-2">3. Nuances & Proper Nouns (Exceptions)</h4>
+                    <p class="text-sm text-gray-300 mb-3">Kya kabhi kisi consonant + Y wale word mein sirf 's' lagta hai? <strong class="text-white">Yes!</strong> Proper nouns (kisi insaan ya jagah ke special naam) mein spelling change nahi karte.</p>
+                    <div class="bg-surface p-4 rounded-xl border border-white/5">
+                        <ul class="list-disc pl-5 text-sm text-gray-300 space-y-2">
+                            <li>Mere class mein do Mary padhti hain ➔ There are two <strong class="text-white">Marys</strong> in my class. (Maries NAHI hoga kyunki yeh ek naam hai).</li>
+                            <li>Main Germany ke kayi shehro me gaya hun ➔ I visited two <strong class="text-white">Germanys</strong>. (Historical context me, East and West Germany).</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div id="top-mistakes" class="pt-4 pb-6">
+                    <h4 class="text-lg font-bold text-red-400 mb-2">4. Top Mistakes People Make</h4>
+                    <ul class="space-y-3">
+                        <li class="bg-surface p-4 rounded-xl border border-red-500/20 text-sm text-gray-300">
+                            ❌ <span class="line-through text-gray-500">Monkeies</span> | ✅ <strong class="text-white">Monkeys</strong>
+                            <br><span class="text-xs text-gray-400 mt-1 block">Log sochte hain har 'y' wale word me 'ies' lagega. Par 'monkey' me 'e' (vowel) hai 'y' se pehle. So just add 's'.</span>
+                        </li>
+                        <li class="bg-surface p-4 rounded-xl border border-red-500/20 text-sm text-gray-300">
+                            ❌ <span class="line-through text-gray-500">Familys</span> | ✅ <strong class="text-white">Families</strong>
+                            <br><span class="text-xs text-gray-400 mt-1 block">Family me 'l' (consonant) hai. Sirf 's' lagana galat hai, 'ies' chahiye.</span>
+                        </li>
+                        <li class="bg-surface p-4 rounded-xl border border-red-500/20 text-sm text-gray-300">
+                            ❌ <span class="line-through text-gray-500">Journies</span> | ✅ <strong class="text-white">Journeys</strong>
+                            <br><span class="text-xs text-gray-400 mt-1 block">Safar ko journey kehte hain. 'e' vowel hone ki wajah se sirf 's' lagega.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="text-center pt-4 no-print border-t border-white/10">
+                    <button onclick="switchTab('quiz')" class="bg-brand hover:bg-blue-600 text-white font-medium py-3 px-8 rounded-xl shadow-lg transition-all w-full md:w-auto">Take the Quiz to Test Yourself</button>
+                </div>
+            </section>
+
+            <!-- STORY SECTION -->
+            <section id="story-content" class="tab-content space-y-6">
+                <h3 class="text-2xl font-bold text-white">Learning Through Story</h3>
+                <p class="text-sm text-gray-400">Notice the bold words. Observe how the plural is formed based on the letter before 'Y'.</p>
+                
+                <div class="bg-surface border border-white/5 rounded-2xl p-6 text-gray-300 leading-relaxed space-y-4 shadow-inner">
+                    <p>Rahul lived in one of the busiest <strong class="text-brand">cities</strong> in India. Like many middle-class <strong class="text-brand">families</strong>, his family loved going out. During holidays, he had many <strong class="text-brand">days</strong> off from work.</p>
+                    
+                    <p>One evening, Rahul was getting ready for several Diwali <strong class="text-brand">parties</strong>. He picked up his <strong class="text-brand">keys</strong> from the table. He needed to buy gifts for his nephews and nieces. He drove his bike past several <strong class="text-brand">bakeries</strong> to reach the toy shop. The shop was full of soft <strong class="text-brand">monkeys</strong>, small cars, and other <strong class="text-brand">toys</strong> for <strong class="text-brand">babies</strong>.</p>
+                    
+                    <p>When he returned home, the <strong class="text-brand">ladies</strong> in his house were busy arranging sweet <strong class="text-brand">trays</strong>. The kids were listening to different <strong class="text-brand">stories</strong> told by their grandfather. Sometimes, managing finances and buying so many gifts created <strong class="text-brand">difficulties</strong>, but seeing the smile on everyone's face made all the <strong class="text-brand">worries</strong> fade away.</p>
+                </div>
+            </section>
+
+            <!-- REAL LIFE USAGE SECTION -->
+            <section id="realLife-content" class="tab-content space-y-6">
+                <div class="flex justify-between items-end mb-4">
+                    <div>
+                        <h3 class="text-2xl font-bold text-white">Daily Life Sentences</h3>
+                        <p class="text-sm text-gray-400 mt-1">Useful contexts for a middle-class Indian household. Try to guess the word before revealing!</p>
+                    </div>
+                </div>
+
+                <div id="scenarios-container" class="space-y-4">
+                    <!-- Populated by JS -->
+                </div>
+
+                <div class="flex justify-between items-center mt-6 border-t border-white/10 pt-4">
+                    <span class="text-xs text-gray-400" id="scenario-counter">Page 1 of 10</span>
+                    <button onclick="nextScenarios()" class="bg-surface hover:bg-white/10 text-white text-sm border border-white/5 py-2 px-6 rounded-xl transition-colors">Shuffle & Next 5</button>
+                </div>
+            </section>
+
+            <!-- QUIZ SECTION -->
+            <section id="quiz-content" class="tab-content">
+                <!-- Quiz Intro -->
+                <div id="quiz-intro" class="text-center py-8">
+                    <h3 class="text-2xl font-bold text-white mb-2">Knowledge Assessment</h3>
+                    <p class="text-gray-400 text-sm mb-8 max-w-md mx-auto">10 random questions will be drawn from a pool of 100 to test your understanding. A mix of MCQs, True/False, and Reasoning.</p>
+                    <button onclick="startQuiz()" class="bg-brand hover:bg-blue-600 text-white font-medium py-3 px-8 rounded-xl shadow-lg transition-transform hover:scale-105">Start Assessment</button>
+                </div>
+
+                <!-- Quiz Engine -->
+                <div id="quiz-engine" class="hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Question <span id="q-current">1</span>/10</span>
+                        <div class="flex-1 max-w-[200px] ml-4 bg-surface rounded-full h-2">
+                            <div id="q-progress" class="bg-brand h-2 rounded-full transition-all duration-300" style="width: 10%"></div>
+                        </div>
+                    </div>
+
+                    <div class="bg-surface/50 border border-white/5 p-6 rounded-2xl mb-6 min-h-[120px] flex items-center">
+                        <h4 id="q-text" class="text-xl text-white font-medium w-full text-center"></h4>
+                    </div>
+
+                    <div id="q-options" class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
+                        <!-- Options injected by JS -->
+                    </div>
+
+                    <!-- Explanation Area (Hidden initially) -->
+                    <div id="q-explanation-box" class="hidden bg-surface border border-white/5 p-5 rounded-xl mb-6">
+                        <p class="text-sm font-bold mb-1" id="q-result-heading">Result</p>
+                        <p class="text-sm text-gray-300" id="q-reasoning"></p>
+                    </div>
+
+                    <div class="text-right">
+                        <button id="q-next-btn" onclick="nextQuestion()" class="hidden bg-brand hover:bg-blue-600 text-white font-medium py-2 px-6 rounded-xl transition-colors">Next Question</button>
+                    </div>
+                </div>
+
+                <!-- Quiz Results -->
+                <div id="quiz-results" class="hidden text-center py-8">
+                    <div class="inline-block p-4 rounded-full bg-surface border border-white/5 mb-4">
+                        <span id="res-emoji" class="text-5xl">🏆</span>
+                    </div>
+                    <h3 class="text-3xl font-bold text-white mb-2">Assessment Complete</h3>
+                    <p class="text-gray-400 mb-6">Here is your performance summary:</p>
+                    
+                    <div class="grid grid-cols-2 gap-4 max-w-md mx-auto mb-8">
+                        <div class="bg-surface border border-white/5 p-4 rounded-2xl">
+                            <p class="text-xs text-gray-400 uppercase tracking-wider mb-1">Score</p>
+                            <p class="text-2xl font-bold text-white"><span id="res-score">0</span>/10</p>
+                        </div>
+                        <div class="bg-surface border border-white/5 p-4 rounded-2xl">
+                            <p class="text-xs text-gray-400 uppercase tracking-wider mb-1">Efficiency</p>
+                            <p class="text-2xl font-bold text-brand" id="res-efficiency">0%</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3 max-w-md mx-auto">
+                        <button onclick="startQuiz()" class="w-full bg-brand hover:bg-blue-600 text-white font-medium py-3 px-8 rounded-xl transition-colors">Practice Again (New Questions)</button>
+                        <button onclick="switchTab('notes')" class="w-full bg-surface hover:bg-white/10 text-gray-300 border border-white/5 font-medium py-3 px-8 rounded-xl transition-colors">Go Back to Notes</button>
+                    </div>
+                </div>
+
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer Navigation -->
+    <footer class="fixed bottom-0 w-full bg-midnight/90 backdrop-blur-md border-t border-white/5 p-4 z-50 no-print">
+        <div class="max-w-4xl mx-auto flex justify-between items-center px-2">
+            <button onclick="goHome()" class="flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-sm font-medium">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                Home
+            </button>
+            <button onclick="goBack()" class="flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-sm font-medium">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Back
+            </button>
+        </div>
+    </footer>
+
+    <!-- Anki Modal Overlay -->
+    <div id="anki-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] hidden flex-col items-center justify-center p-4">
+        <div class="bg-frosted border border-white/10 rounded-2xl p-6 w-full max-w-2xl shadow-2xl flex flex-col max-h-[90vh]">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-white">Anki Flashcards Data</h3>
+                <button onclick="closeAnkiModal()" class="text-gray-400 hover:text-white">&times; Close</button>
+            </div>
+            <p class="text-xs text-gray-400 mb-4">Format strictly respects exactly one comma separator per line between Question and Answer. Copy the code block below or download as CSV.</p>
+            <div class="flex-1 bg-surface rounded-xl border border-white/5 p-4 overflow-y-auto font-mono text-xs text-green-400 w-full whitespace-pre" id="anki-code-block">
+                <!-- Data injected here -->
+            </div>
+            <div class="mt-4 flex gap-3">
+                <button onclick="downloadAnkiCSV()" class="flex-1 bg-brand hover:bg-blue-600 text-white font-medium py-2 rounded-xl transition-colors">Download .CSV File</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Application Logic -->
+    <script>
+        // --- DATA LAYER --- //
+
+        // 50 Real Life Scenarios
+        const scenarios = [
+            { id: 1, eng: "I need to buy some {grocery} from the market today.", ans: "groceries", hint: "grocery ends with consonant 'r' + y. So ies.", hin: "'Grocery' me y se pehle consonant 'r' hai. Hata kar 'ies' lagao." },
+            { id: 2, eng: "My office gives us two {day} off every week.", ans: "days", hint: "day ends with vowel 'a' + y. So s.", hin: "'Day' me y se pehle vowel 'a' hai. Sirf 's' lagao." },
+            { id: 3, eng: "The {lady} in my neighborhood organized a pooja.", ans: "ladies", hint: "lady ends with consonant 'd' + y. So ies.", hin: "'Lady' me y se pehle consonant 'd' hai. Hata kar 'ies' lagao." },
+            { id: 4, eng: "I have to attend three wedding {party} this month.", ans: "parties", hint: "party ends with consonant 't' + y. So ies.", hin: "'Party' me y se pehle consonant 't' hai. 'ies' lagao." },
+            { id: 5, eng: "My nephew loves playing with his new {toy}.", ans: "toys", hint: "toy ends with vowel 'o' + y. So s.", hin: "'Toy' me y se pehle vowel 'o' hai. Sirf 's' lagega." },
+            { id: 6, eng: "We visited three different {city} during our vacation.", ans: "cities", hint: "city -> cities", hin: "'City' -> 't' is consonant -> 'ies'." },
+            { id: 7, eng: "The kids were telling scary {story} at night.", ans: "stories", hint: "story -> stories", hin: "'Story' -> 'r' is consonant -> 'ies'." },
+            { id: 8, eng: "Our maid asked for advance {salary} for two months.", ans: "salaries", hint: "salary -> salaries", hin: "Salary me 'r' consonant hai, ies lagega." },
+            { id: 9, eng: "I bought fresh {berry} for the breakfast smoothie.", ans: "berries", hint: "berry -> berries", hin: "'r' is consonant, replace y with ies." },
+            { id: 10, eng: "The auto rickshaw went through narrow {alley}.", ans: "alleys", hint: "alley -> alleys", hin: "Alley me y se pehle vowel 'e' hai. Sirf 's' lagao." },
+            { id: 11, eng: "We kept the sweets in silver {tray} for guests.", ans: "trays", hint: "tray -> trays", hin: "Tray me y se pehle vowel 'a' hai." },
+            { id: 12, eng: "The mechanic changed both {battery} in the inverter.", ans: "batteries", hint: "battery -> batteries", hin: "Battery me r consonant hai, ies lagao." },
+            { id: 13, eng: "Please make two {copy} of the Aadhar card.", ans: "copies", hint: "copy -> copies", hin: "Copy me p consonant hai." },
+            { id: 14, eng: "I lost my house {key} in the metro.", ans: "keys", hint: "key -> keys", hin: "Key me e vowel hai, sirf s." },
+            { id: 15, eng: "Middle-class {family} focus a lot on education.", ans: "families", hint: "family -> families", hin: "Family me l consonant hai." },
+            { id: 16, eng: "The {boy} were playing cricket in the street.", ans: "boys", hint: "boy -> boys", hin: "Boy me o vowel hai." },
+            { id: 17, eng: "My dad bought two new {diary} for the new year.", ans: "diaries", hint: "diary -> diaries", hin: "Diary me r consonant hai." },
+            { id: 18, eng: "The local baker makes the best {pastry}.", ans: "pastries", hint: "pastry -> pastries", hin: "Pastry me r consonant hai." },
+            { id: 19, eng: "There are many street {monkey} near the temple.", ans: "monkeys", hint: "monkey -> monkeys", hin: "Monkey me e vowel hai, ies mat lagana." },
+            { id: 20, eng: "We saw many beautiful {valley} in Kashmir.", ans: "valleys", hint: "valley -> valleys", hin: "Valley me e vowel hai." },
+            { id: 21, eng: "The software has many {vulnerability} to fix.", ans: "vulnerabilities", hint: "vulnerability -> vulnerabilities", hin: "t is consonant." },
+            { id: 22, eng: "He fulfilled all his {duty} as an elder brother.", ans: "duties", hint: "duty -> duties", hin: "t is consonant." },
+            { id: 23, eng: "Indian {army} conducted joint exercises.", ans: "armies", hint: "army -> armies", hin: "m is consonant." },
+            { id: 24, eng: "The store sells different {variety} of rice.", ans: "varieties", hint: "variety -> varieties", hin: "t is consonant." },
+            { id: 25, eng: "I sent three {reply} to the customer care email.", ans: "replies", hint: "reply -> replies", hin: "l is consonant." },
+            { id: 26, eng: "We saw two {donkey} carrying load on the hill.", ans: "donkeys", hint: "donkey -> donkeys", hin: "e is vowel." },
+            { id: 27, eng: "The {factory} in our area cause pollution.", ans: "factories", hint: "factory -> factories", hin: "r is consonant." },
+            { id: 28, eng: "I packed three {jersey} for the winter trip.", ans: "jerseys", hint: "jersey -> jerseys", hin: "e is vowel." },
+            { id: 29, eng: "Many {company} are hiring freshers this month.", ans: "companies", hint: "company -> companies", hin: "n is consonant." },
+            { id: 30, eng: "We read two {essay} for the exam.", ans: "essays", hint: "essay -> essays", hin: "a is vowel." },
+            { id: 31, eng: "The chef cooked three {turkey} for the feast.", ans: "turkeys", hint: "turkey -> turkeys", hin: "e is vowel." },
+            { id: 32, eng: "Our apartment has many {facility}.", ans: "facilities", hint: "facility -> facilities", hin: "t is consonant." },
+            { id: 33, eng: "He faced many {difficulty} clearing the exam.", ans: "difficulties", hint: "difficulty -> difficulties", hin: "t is consonant." },
+            { id: 34, eng: "There are two {Harry} in my tuition class.", ans: "Harrys", hint: "Harry -> Harrys", hin: "Proper noun (naam) me spelling change nahi hoti, sirf s." },
+            { id: 35, eng: "She has several {hobby} like singing and painting.", ans: "hobbies", hint: "hobby -> hobbies", hin: "b is consonant." },
+            { id: 36, eng: "We need more {delivery} boys for Swiggy.", ans: "deliveries", hint: "delivery -> deliveries", hin: "r is consonant." },
+            { id: 37, eng: "The {baby} were crying in the hospital ward.", ans: "babies", hint: "baby -> babies", hin: "b is consonant." },
+            { id: 38, eng: "The boss gave me two {survey} to fill out.", ans: "surveys", hint: "survey -> surveys", hin: "e is vowel." },
+            { id: 39, eng: "She earned many {trophy} in school sports.", ans: "trophies", hint: "trophy -> trophies", hin: "h is consonant." },
+            { id: 40, eng: "There were five {robbery} in the city last month.", ans: "robberies", hint: "robbery -> robberies", hin: "r is consonant." },
+            { id: 41, eng: "We have two {balcony} in our flat.", ans: "balconies", hint: "balcony -> balconies", hin: "n is consonant." },
+            { id: 42, eng: "The movie had many {comedy} scenes.", ans: "comedies", hint: "comedy -> comedies", hin: "d is consonant." },
+            { id: 43, eng: "I brought three {penny} for the coin collection.", ans: "pennies", hint: "penny -> pennies", hin: "n is consonant." },
+            { id: 44, eng: "Both the {chimney} in the factory emit smoke.", ans: "chimneys", hint: "chimney -> chimneys", hin: "e is vowel." },
+            { id: 45, eng: "The lawyer reviewed the {testimony} of witnesses.", ans: "testimonies", hint: "testimony -> testimonies", hin: "n is consonant." },
+            { id: 46, eng: "We need three {pulley} for the construction work.", ans: "pulleys", hint: "pulley -> pulleys", hin: "e is vowel." },
+            { id: 47, eng: "The author wrote multiple {biography}.", ans: "biographies", hint: "biography -> biographies", hin: "h is consonant." },
+            { id: 48, eng: "I received two {inquiry} for the rented house.", ans: "inquiries", hint: "inquiry -> inquiries", hin: "r is consonant." },
+            { id: 49, eng: "We heard many {theory} about the ghost house.", ans: "theories", hint: "theory -> theories", hin: "r is consonant." },
+            { id: 50, eng: "She has a collection of rare {butterfly}.", ans: "butterflies", hint: "butterfly -> butterflies", hin: "l is consonant." },
+        ];
+
+        // 100 Quiz Questions
+        // Types: mcq, tf (true/false), correct (Correct or Not)
+        const quizBank = [
+            {q: "What is the plural of 'city'?", a: "cities", w: ["citys", "cityes"], r: "Since 't' is a consonant before 'y', we drop 'y' and add 'ies'.", t: "mcq"},
+            {q: "What is the plural of 'boy'?", a: "boys", w: ["boies", "boyes"], r: "Since 'o' is a vowel before 'y', we simply add 's'.", t: "mcq"},
+            {q: "True or False: The plural of 'donkey' is 'donkies'.", a: "False", w: ["True"], r: "'e' is a vowel. So we just add 's' -> donkeys.", t: "tf"},
+            {q: "Is 'families' the correct plural for 'family'?", a: "Correct", w: ["Incorrect"], r: "'l' is a consonant before 'y', so 'y' becomes 'ies'.", t: "correct"},
+            {q: "What is the plural of 'story'?", a: "stories", w: ["storys", "storeis"], r: "'r' is a consonant. Drop 'y', add 'ies'.", t: "mcq"},
+            {q: "Plural of 'toy' is?", a: "toys", w: ["toies", "toyes"], r: "'o' is a vowel before 'y'. Just add 's'.", t: "mcq"},
+            {q: "Identify the correct plural: Monkey", a: "monkeys", w: ["monkeies", "monkies"], r: "'e' is a vowel. Word becomes 'monkeys'.", t: "mcq"},
+            {q: "Identify the correct plural: Baby", a: "babies", w: ["babys", "babyes"], r: "'b' is a consonant. Drop 'y', add 'ies'.", t: "mcq"},
+            {q: "True or False: The plural of 'day' is 'daies'.", a: "False", w: ["True"], r: "'a' is a vowel. The correct plural is 'days'.", t: "tf"},
+            {q: "Is 'partys' correct for multiple parties?", a: "Incorrect", w: ["Correct"], r: "'t' is a consonant. It should be 'parties'.", t: "correct"},
+            {q: "Plural of 'lady'?", a: "ladies", w: ["ladys", "ladyes"], r: "'d' is a consonant -> ladies.", t: "mcq"},
+            {q: "Plural of 'key'?", a: "keys", w: ["keies", "keyes"], r: "'e' is a vowel -> keys.", t: "mcq"},
+            {q: "True or False: The plural of 'valley' is 'valleys'.", a: "True", w: ["False"], r: "'e' is a vowel before 'y', so we just add 's'.", t: "tf"},
+            {q: "What is the correct plural of 'country'?", a: "countries", w: ["countrys", "countreies"], r: "'r' is a consonant -> countries.", t: "mcq"},
+            {q: "Plural of 'guy'?", a: "guys", w: ["guies", "guyes"], r: "'u' is a vowel -> guys.", t: "mcq"},
+            {q: "Is 'journies' the correct plural of 'journey'?", a: "Incorrect", w: ["Correct"], r: "'e' is a vowel before 'y'. It should be 'journeys'.", t: "correct"},
+            {q: "Plural of 'company'?", a: "companies", w: ["companys", "companes"], r: "'n' is a consonant -> companies.", t: "mcq"},
+            {q: "Plural of 'way'?", a: "ways", w: ["waies", "wayes"], r: "'a' is a vowel -> ways.", t: "mcq"},
+            {q: "True or False: The plural of 'salary' is 'salaries'.", a: "True", w: ["False"], r: "'r' is a consonant -> salaries.", t: "tf"},
+            {q: "Plural of 'essay'?", a: "essays", w: ["essaies", "essayes"], r: "'a' is a vowel -> essays.", t: "mcq"},
+            {q: "If there are two girls named 'Mary', what is the plural?", a: "Marys", w: ["Maries", "Maryes"], r: "Proper nouns ending in Y just take 's' to preserve the spelling.", t: "mcq"},
+            {q: "Plural of 'tray'?", a: "trays", w: ["traies", "trayes"], r: "'a' is a vowel -> trays.", t: "mcq"},
+            {q: "Plural of 'factory'?", a: "factories", w: ["factorys", "factores"], r: "'r' is a consonant -> factories.", t: "mcq"},
+            {q: "Is 'turkies' the correct plural of 'turkey'?", a: "Incorrect", w: ["Correct"], r: "'e' is a vowel. The plural is 'turkeys'.", t: "correct"},
+            {q: "True or False: The plural of 'delay' is 'delaies'.", a: "False", w: ["True"], r: "'a' is a vowel. Correct plural is 'delays'.", t: "tf"},
+            {q: "Plural of 'reply'?", a: "replies", w: ["replys", "repleys"], r: "'l' is a consonant -> replies.", t: "mcq"},
+            {q: "Plural of 'chimney'?", a: "chimneys", w: ["chimnies", "chimneies"], r: "'e' is a vowel -> chimneys.", t: "mcq"},
+            {q: "Is 'copys' correct?", a: "Incorrect", w: ["Correct"], r: "'p' is a consonant. It should be 'copies'.", t: "correct"},
+            {q: "Plural of 'battery'?", a: "batteries", w: ["batterys", "battereis"], r: "'r' is a consonant -> batteries.", t: "mcq"},
+            {q: "Plural of 'alley'?", a: "alleys", w: ["allies", "alleies"], r: "'e' is a vowel -> alleys.", t: "mcq"},
+            {q: "True or False: The plural of 'duty' is 'duties'.", a: "True", w: ["False"], r: "'t' is a consonant -> duties.", t: "tf"},
+            {q: "Plural of 'play'?", a: "plays", w: ["plaies", "playes"], r: "'a' is a vowel -> plays.", t: "mcq"},
+            {q: "Is 'berrys' correct?", a: "Incorrect", w: ["Correct"], r: "'r' is a consonant. Plural is 'berries'.", t: "correct"},
+            {q: "Plural of 'hobby'?", a: "hobbies", w: ["hobbys", "hobbeies"], r: "'b' is a consonant -> hobbies.", t: "mcq"},
+            {q: "Plural of 'ray'?", a: "rays", w: ["raies", "rayes"], r: "'a' is a vowel -> rays.", t: "mcq"},
+            {q: "True or False: The plural of 'trolley' is 'trollies'.", a: "False", w: ["True"], r: "'e' is a vowel. It should be 'trolleys'.", t: "tf"},
+            {q: "Plural of 'diary'?", a: "diaries", w: ["diarys", "diareis"], r: "'r' is a consonant -> diaries.", t: "mcq"},
+            {q: "Plural of 'kidney'?", a: "kidneys", w: ["kidnies", "kidneies"], r: "'e' is a vowel -> kidneys.", t: "mcq"},
+            {q: "Is 'memories' the correct plural of 'memory'?", a: "Correct", w: ["Incorrect"], r: "'r' is a consonant -> memories.", t: "correct"},
+            {q: "Plural of 'display'?", a: "displays", w: ["displaies", "displayes"], r: "'a' is a vowel -> displays.", t: "mcq"},
+            {q: "True or False: The plural of 'army' is 'armies'.", a: "True", w: ["False"], r: "'m' is a consonant -> armies.", t: "tf"},
+            {q: "Plural of 'jersey'?", a: "jerseys", w: ["jersies", "jerseies"], r: "'e' is a vowel -> jerseys.", t: "mcq"},
+            {q: "Is 'supply' pluralized as 'supplies'?", a: "Correct", w: ["Incorrect"], r: "'l' is a consonant -> supplies.", t: "correct"},
+            {q: "Plural of 'survey'?", a: "surveys", w: ["survies", "surveies"], r: "'e' is a vowel -> surveys.", t: "mcq"},
+            {q: "Plural of 'enemy'?", a: "enemies", w: ["enemys", "enemeis"], r: "'m' is a consonant -> enemies.", t: "mcq"},
+            {q: "True or False: The plural of 'pulley' is 'pullies'.", a: "False", w: ["True"], r: "'e' is a vowel. It should be 'pulleys'.", t: "tf"},
+            {q: "Plural of 'injury'?", a: "injuries", w: ["injurys", "injureis"], r: "'r' is a consonant -> injuries.", t: "mcq"},
+            {q: "Plural of 'joy'?", a: "joys", w: ["joies", "joyes"], r: "'o' is a vowel -> joys.", t: "mcq"},
+            {q: "Is 'ceremonies' correct for 'ceremony'?", a: "Correct", w: ["Incorrect"], r: "'n' is a consonant -> ceremonies.", t: "correct"},
+            {q: "Plural of 'buy' (noun form)?", a: "buys", w: ["buies", "buyes"], r: "'u' is a vowel -> buys.", t: "mcq"},
+            {q: "True or False: Proper nouns like 'Kennedy' become 'Kennedys'.", a: "True", w: ["False"], r: "Names do not change spelling. We just add 's'.", t: "tf"},
+            {q: "Plural of 'mystery'?", a: "mysteries", w: ["mysterys", "mystereis"], r: "'r' is a consonant -> mysteries.", t: "mcq"},
+            {q: "Plural of 'bay'?", a: "bays", w: ["baies", "bayes"], r: "'a' is a vowel -> bays.", t: "mcq"},
+            {q: "Is 'galaxies' correct for 'galaxy'?", a: "Correct", w: ["Incorrect"], r: "'x' is a consonant -> galaxies.", t: "correct"},
+            {q: "Plural of 'convey' (noun)?", a: "conveys", w: ["convies", "conveies"], r: "'e' is a vowel -> conveys.", t: "mcq"},
+            {q: "True or False: 'Ponies' is plural of 'pony'.", a: "True", w: ["False"], r: "'n' is a consonant -> ponies.", t: "tf"},
+            {q: "Plural of 'attorney'?", a: "attorneys", w: ["attornies", "attorneies"], r: "'e' is a vowel -> attorneys.", t: "mcq"},
+            {q: "Is 'penny' pluralized as 'pennys'?", a: "Incorrect", w: ["Correct"], r: "'n' is a consonant. It should be 'pennies'.", t: "correct"},
+            {q: "Plural of 'boundary'?", a: "boundaries", w: ["boundarys", "boundareis"], r: "'r' is a consonant -> boundaries.", t: "mcq"},
+            {q: "Plural of 'relay'?", a: "relays", w: ["relaies", "delayes"], r: "'a' is a vowel -> relays.", t: "mcq"},
+            {q: "True or False: The plural of 'century' is 'centuries'.", a: "True", w: ["False"], r: "'r' is a consonant -> centuries.", t: "tf"},
+            {q: "Plural of 'journey'?", a: "journeys", w: ["journies", "journeies"], r: "'e' is a vowel -> journeys.", t: "mcq"},
+            {q: "Is 'tragedy' pluralized as 'tragedies'?", a: "Correct", w: ["Incorrect"], r: "'d' is a consonant -> tragedies.", t: "correct"},
+            {q: "Plural of 'decoy'?", a: "decoys", w: ["decoies", "decoyes"], r: "'o' is a vowel -> decoys.", t: "mcq"},
+            {q: "True or False: The plural of 'category' is 'categorys'.", a: "False", w: ["True"], r: "'r' is a consonant. It should be 'categories'.", t: "tf"},
+            {q: "Plural of 'balcony'?", a: "balconies", w: ["balconys", "balconeis"], r: "'n' is a consonant -> balconies.", t: "mcq"},
+            {q: "Plural of 'hockey' (types of)?", a: "hockeys", w: ["hockies", "hockeies"], r: "'e' is a vowel -> hockeys.", t: "mcq"},
+            {q: "Is 'sympathies' correct for 'sympathy'?", a: "Correct", w: ["Incorrect"], r: "'h' is a consonant -> sympathies.", t: "correct"},
+            {q: "Plural of 'spray'?", a: "sprays", w: ["spraies", "sprayes"], r: "'a' is a vowel -> sprays.", t: "mcq"},
+            {q: "True or False: The plural of 'apology' is 'apologies'.", a: "True", w: ["False"], r: "'g' is a consonant -> apologies.", t: "tf"},
+            {q: "Plural of 'volley'?", a: "volleys", w: ["vollies", "volleies"], r: "'e' is a vowel -> volleys.", t: "mcq"},
+            {q: "Is 'strategy' pluralized as 'strategys'?", a: "Incorrect", w: ["Correct"], r: "'g' is a consonant. It should be 'strategies'.", t: "correct"},
+            {q: "Plural of 'penalty'?", a: "penalties", w: ["penaltys", "penalteis"], r: "'t' is a consonant -> penalties.", t: "mcq"},
+            {q: "Plural of 'employ' (uses of)?", a: "employs", w: ["emploies", "employes"], r: "'o' is a vowel -> employs.", t: "mcq"},
+            {q: "True or False: The plural of 'theory' is 'theories'.", a: "True", w: ["False"], r: "'r' is a consonant -> theories.", t: "tf"},
+            {q: "Plural of 'jockey'?", a: "jockeys", w: ["jockies", "jockeies"], r: "'e' is a vowel -> jockeys.", t: "mcq"},
+            {q: "Is 'remedies' correct for 'remedy'?", a: "Correct", w: ["Incorrect"], r: "'d' is a consonant -> remedies.", t: "correct"},
+            {q: "Plural of 'convoy'?", a: "convoys", w: ["convoies", "convoyes"], r: "'o' is a vowel -> convoys.", t: "mcq"},
+            {q: "True or False: The plural of 'faculty' is 'facultys'.", a: "False", w: ["True"], r: "'t' is a consonant. It should be 'facilities' or 'faculties'.", t: "tf"},
+            {q: "Plural of 'biography'?", a: "biographies", w: ["biographys", "biographeis"], r: "'h' is a consonant -> biographies.", t: "mcq"},
+            {q: "Plural of 'abbey'?", a: "abbeys", w: ["abbies", "abbeies"], r: "'e' is a vowel -> abbeys.", t: "mcq"},
+            {q: "Is 'libraries' correct for 'library'?", a: "Correct", w: ["Incorrect"], r: "'r' is a consonant -> libraries.", t: "correct"},
+            {q: "Plural of 'Sunday'?", a: "Sundays", w: ["Sundaies", "Sundayes"], r: "'a' is a vowel -> Sundays.", t: "mcq"},
+            {q: "True or False: The plural of 'discovery' is 'discoveries'.", a: "True", w: ["False"], r: "'r' is a consonant -> discoveries.", t: "tf"},
+            {q: "Plural of 'osprey'?", a: "ospreys", w: ["ospries", "ospreies"], r: "'e' is a vowel -> ospreys.", t: "mcq"},
+            {q: "Is 'butterfly' pluralized as 'butterflys'?", a: "Incorrect", w: ["Correct"], r: "'l' is a consonant. It should be 'butterflies'.", t: "correct"},
+            {q: "Plural of 'curry'?", a: "curries", w: ["currys", "curreis"], r: "'r' is a consonant -> curries.", t: "mcq"},
+            {q: "Plural of 'holiday'?", a: "holidays", w: ["holidaies", "holidayes"], r: "'a' is a vowel -> holidays.", t: "mcq"},
+            {q: "True or False: The plural of 'cemetery' is 'cemeteries'.", a: "True", w: ["False"], r: "'r' is a consonant -> cemeteries.", t: "tf"},
+            {q: "Plural of 'alloy'?", a: "alloys", w: ["alloies", "alloyes"], r: "'o' is a vowel -> alloys.", t: "mcq"},
+            {q: "Is 'tragedies' correct for 'tragedy'?", a: "Correct", w: ["Incorrect"], r: "'d' is a consonant -> tragedies.", t: "correct"},
+            {q: "Plural of 'Thursday'?", a: "Thursdays", w: ["Thursdaies", "Thursdayes"], r: "'a' is a vowel -> Thursdays.", t: "mcq"},
+            {q: "True or False: The plural of 'accessory' is 'accessorys'.", a: "False", w: ["True"], r: "'r' is a consonant. It should be 'accessories'.", t: "tf"},
+            {q: "Plural of 'bakery'?", a: "bakeries", w: ["bakerys", "bakereis"], r: "'r' is a consonant -> bakeries.", t: "mcq"},
+            {q: "Plural of 'runway'?", a: "runways", w: ["runwaies", "runwayes"], r: "'a' is a vowel -> runways.", t: "mcq"},
+            {q: "Is 'vocabularies' correct for 'vocabulary'?", a: "Correct", w: ["Incorrect"], r: "'r' is a consonant -> vocabularies.", t: "correct"},
+            {q: "Plural of 'subway'?", a: "subways", w: ["subwaies", "subwayes"], r: "'a' is a vowel -> subways.", t: "mcq"},
+            {q: "True or False: The plural of 'territory' is 'territories'.", a: "True", w: ["False"], r: "'r' is a consonant -> territories.", t: "tf"},
+            {q: "Plural of 'corduroy'?", a: "corduroys", w: ["corduroies", "corduroyes"], r: "'o' is a vowel -> corduroys.", t: "mcq"},
+            {q: "Is 'agencys' correct for 'agency'?", a: "Incorrect", w: ["Correct"], r: "'c' is a consonant. It should be 'agencies'.", t: "correct"}
+        ];
+
+        // --- GLOBAL STATE --- //
+        let currentTab = 'notes';
+        let timerSeconds = 0;
+        let timerInterval = null;
+
+        // Scenarios State
+        let scIndex = 0;
+        const scPerPage = 5;
+        let shuffledScenarios = [];
+
+        // Quiz State
+        let activeQuizPool = [];
+        let qIndex = 0;
+        let qScore = 0;
+        let isAnswered = false;
+
+        // --- INITIALIZATION --- //
+        window.onload = function() {
+            startGlobalTimer();
+            initScenarios();
+        };
+
+        // --- GLOBAL TIMER --- //
+        function startGlobalTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timerSeconds++;
+                const mins = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
+                const secs = String(timerSeconds % 60).padStart(2, '0');
+                document.getElementById('global-timer').innerText = `${mins}:${secs}`;
+            }, 1000);
+        }
+
+        // --- NAVIGATION --- //
+        function switchTab(tabId) {
+            // Update buttons
+            document.querySelectorAll('nav button').forEach(btn => {
+                btn.className = "flex-1 min-w-[100px] text-sm py-2 px-3 rounded-xl transition-colors text-gray-400 hover:text-white hover:bg-surface/50";
+            });
+            const activeBtn = document.getElementById(`tab-${tabId}`);
+            activeBtn.className = "flex-1 min-w-[100px] text-sm py-2 px-3 rounded-xl transition-colors bg-surface border border-white/10 text-white font-medium";
+
+            // Update content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(`${tabId}-content`).classList.add('active');
+            currentTab = tabId;
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function goHome() {
+            // Simulated home action
+            switchTab('notes');
+        }
+
+        function goBack() {
+            // Simulated back action
+            const tabs = ['notes', 'story', 'realLife', 'quiz'];
+            const idx = tabs.indexOf(currentTab);
+            if (idx > 0) switchTab(tabs[idx - 1]);
+        }
+
+        // --- REAL LIFE SCENARIOS ENGINE --- //
+        function shuffleArray(array) {
+            let arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function initScenarios() {
+            shuffledScenarios = shuffleArray(scenarios);
+            scIndex = 0;
+            renderScenarios();
+        }
+
+        function nextScenarios() {
+            scIndex += scPerPage;
+            if (scIndex >= shuffledScenarios.length) scIndex = 0;
+            renderScenarios();
+        }
+
+        function renderScenarios() {
+            const container = document.getElementById('scenarios-container');
+            container.innerHTML = '';
+            
+            const slice = shuffledScenarios.slice(scIndex, scIndex + scPerPage);
+            
+            slice.forEach((sc) => {
+                const sentenceHtml = sc.eng.replace(/\{([^}]+)\}/g, `<span class="bg-white/10 px-2 py-0.5 rounded text-gray-300 border border-dashed border-white/30">$1</span>`);
+                
+                const html = `
+                    <div class="bg-surface border border-white/5 p-4 rounded-xl relative group">
+                        <p class="text-white font-medium mb-3 pr-10 leading-relaxed">${sentenceHtml}</p>
+                        
+                        <div id="ans-box-${sc.id}" class="hidden bg-[#111A2C] border border-brand/30 p-3 rounded-lg mt-2 transition-all">
+                            <p class="text-brand font-bold mb-1">Answer: ${sc.ans}</p>
+                            <p class="text-xs text-gray-300">💡 Logic: ${sc.hin}</p>
+                        </div>
+                        
+                        <button onclick="toggleScenarioAnswer(${sc.id})" class="absolute top-4 right-4 p-2 text-gray-400 hover:text-white bg-white/5 rounded-lg transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                        </button>
+                    </div>
+                `;
+                container.innerHTML += html;
+            });
+            
+            const totalPages = Math.ceil(shuffledScenarios.length / scPerPage);
+            const currPage = Math.floor(scIndex / scPerPage) + 1;
+            document.getElementById('scenario-counter').innerText = `Page ${currPage} of ${totalPages}`;
+        }
+
+        function toggleScenarioAnswer(id) {
+            const el = document.getElementById(`ans-box-${id}`);
+            el.classList.toggle('hidden');
+        }
+
+        // --- QUIZ ENGINE --- //
+        function startQuiz() {
+            document.getElementById('quiz-intro').classList.add('hidden');
+            document.getElementById('quiz-results').classList.add('hidden');
+            document.getElementById('quiz-engine').classList.remove('hidden');
+            
+            // Pick 10 random questions
+            activeQuizPool = shuffleArray(quizBank).slice(0, 10);
+            qIndex = 0;
+            qScore = 0;
+            isAnswered = false;
+            
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            isAnswered = false;
+            const q = activeQuizPool[qIndex];
+            
+            // Update Header
+            document.getElementById('q-current').innerText = qIndex + 1;
+            document.getElementById('q-progress').style.width = `${((qIndex) / 10) * 100}%`;
+            
+            // Set Text
+            document.getElementById('q-text').innerText = q.q;
+            
+            // Hide Explanations & Next Button
+            document.getElementById('q-explanation-box').classList.add('hidden');
+            document.getElementById('q-next-btn').classList.add('hidden');
+            
+            // Setup Options
+            const optsContainer = document.getElementById('q-options');
+            optsContainer.innerHTML = '';
+            
+            let options = [...q.w, q.a];
+            if (q.t !== 'tf' && q.t !== 'correct') {
+                options = shuffleArray(options); // Only shuffle MCQs completely
+            } else {
+                // Keep True/False Order consistent if possible, or just shuffle
+                options = shuffleArray(options);
+            }
+            
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = "q-opt-btn w-full bg-surface border border-white/5 hover:bg-white/10 text-white font-medium py-4 px-6 rounded-xl transition-all text-left";
+                btn.innerText = opt;
+                btn.onclick = () => answerQuestion(opt, btn, q);
+                optsContainer.appendChild(btn);
+            });
+        }
+
+        function answerQuestion(selectedStr, btnElement, qObj) {
+            if (isAnswered) return;
+            isAnswered = true;
+            
+            const isCorrect = selectedStr === qObj.a;
+            if (isCorrect) qScore++;
+            
+            // Style buttons
+            document.querySelectorAll('.q-opt-btn').forEach(btn => {
+                btn.disabled = true;
+                btn.classList.remove('hover:bg-white/10');
+                if (btn.innerText === qObj.a) {
+                    btn.classList.replace('bg-surface', 'bg-green-600/20');
+                    btn.classList.replace('border-white/5', 'border-green-500');
+                    btn.classList.add('text-green-400');
+                } else if (btn === btnElement && !isCorrect) {
+                    btn.classList.replace('bg-surface', 'bg-red-600/20');
+                    btn.classList.replace('border-white/5', 'border-red-500');
+                    btn.classList.add('text-red-400');
+                } else {
+                    btn.classList.add('opacity-50');
+                }
+            });
+            
+            // Show Explanation
+            const expBox = document.getElementById('q-explanation-box');
+            const head = document.getElementById('q-result-heading');
+            const reason = document.getElementById('q-reasoning');
+            
+            expBox.classList.remove('hidden');
+            reason.innerText = qObj.r;
+            
+            if (isCorrect) {
+                head.innerText = "✅ Correct!";
+                head.className = "text-sm font-bold mb-1 text-green-400";
+                expBox.className = "bg-green-900/10 border border-green-500/30 p-5 rounded-xl mb-6 block";
+            } else {
+                head.innerText = "❌ Incorrect!";
+                head.className = "text-sm font-bold mb-1 text-red-400";
+                expBox.className = "bg-red-900/10 border border-red-500/30 p-5 rounded-xl mb-6 block";
+            }
+            
+            document.getElementById('q-next-btn').classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            qIndex++;
+            if (qIndex < 10) {
+                renderQuestion();
+            } else {
+                showQuizResults();
+            }
+        }
+
+        function showQuizResults() {
+            document.getElementById('quiz-engine').classList.add('hidden');
+            document.getElementById('quiz-results').classList.remove('hidden');
+            
+            document.getElementById('res-score').innerText = qScore;
+            document.getElementById('q-progress').style.width = `100%`;
+            
+            // Efficiency calculation (Score / Time factor)
+            // Just a fun metric: if score is high and time is reasonable
+            const minExpectedSecs = 30; // 3 secs per question
+            const timeTaken = timerSeconds; // Total time spent on page
+            let eff = (qScore / 10) * 100;
+            if (qScore === 10) eff = 100;
+            
+            document.getElementById('res-efficiency').innerText = `${Math.round(eff)}%`;
+            
+            const emoji = document.getElementById('res-emoji');
+            if (qScore >= 8) emoji.innerText = '🏆';
+            else if (qScore >= 5) emoji.innerText = '👍';
+            else emoji.innerText = '📚';
+        }
+
+        // --- PRINT & EXPORT --- //
+        function printPage() {
+            window.print();
+        }
+
+        function openAnkiModal() {
+            const modal = document.getElementById('anki-modal');
+            const codeBlock = document.getElementById('anki-code-block');
+            
+            // Generate CSV exactly as requested: Question,Answer
+            // Removing any accidental commas inside text
+            let csvStr = "";
+            quizBank.forEach(q => {
+                const safeQ = q.q.replace(/,/g, '');
+                const safeA = q.a.replace(/,/g, '');
+                csvStr += `${safeQ},${safeA}\n`;
+            });
+            
+            codeBlock.innerText = csvStr;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeAnkiModal() {
+            const modal = document.getElementById('anki-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function downloadAnkiCSV() {
+            const csvData = document.getElementById('anki-code-block').innerText;
+            const blob = new Blob([csvData], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('hidden', '');
+            a.setAttribute('href', url);
+            a.setAttribute('download', 'Fluency_Y_to_IES_Flashcards.csv');
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    </script>
+</body>
+</html>
