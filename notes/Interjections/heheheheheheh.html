@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fluency - Interjections</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:ital,wght@1,600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-midnight: #060B19;
+            --bg-card: #111A2C;
+            --bg-input: #080D1A;
+            --accent-blue: #2563EB;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-midnight);
+            color: white;
+            overflow-x: hidden;
+        }
+        .serif-italic {
+            font-family: 'Playfair Display', serif;
+        }
+        /* Custom Scrollbar for inner cards */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-midnight); }
+        ::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #374151; }
+
+        /* Print Styles to maintain theme */
+        @media print {
+            @page { margin: 0; }
+            body { 
+                -webkit-print-color-adjust: exact !important; 
+                print-color-adjust: exact !important;
+                background-color: var(--bg-midnight) !important;
+                color: white !important;
+            }
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            #notes-section { display: block !important; }
+            .card-style {
+                break-inside: avoid;
+                border: 1px solid rgba(255,255,255,0.1);
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col relative pb-24 text-base antialiased">
+    <!-- Subtle Radial Blur Background -->
+    <div class="fixed inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#131E3A]/40 to-transparent blur-3xl z-0"></div>
+
+    <!-- Header -->
+    <header class="relative z-10 p-6 flex justify-between items-center no-print">
+        <div class="flex flex-col">
+            <span class="tracking-[0.3em] text-[10px] text-gray-300 uppercase font-bold">F L U E N C Y</span>
+            <span class="text-white text-4xl italic serif-italic leading-none mt-1">bridge</span>
+        </div>
+        <div class="text-right">
+            <div class="text-[10px] tracking-widest text-gray-400 uppercase mb-1">Session Time</div>
+            <div id="global-timer" class="text-xl font-bold text-white tracking-widest">00:00</div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="relative z-10 flex-grow w-full max-w-4xl mx-auto px-4 sm:px-6">
+        
+        <!-- ================= NOTES SECTION ================= -->
+        <section id="notes-section" class="space-y-6">
+            <div class="bg-[#111A2C] border-t border-white/5 rounded-3xl shadow-2xl p-6 sm:p-8 card-style">
+                <div class="flex justify-between items-start mb-6 border-b border-white/10 pb-4">
+                    <h1 class="text-3xl font-bold text-white tracking-tight">Interjections</h1>
+                    <div class="flex gap-3 no-print">
+                        <button onclick="downloadAnki()" class="bg-[#080D1A] hover:bg-white/10 border border-white/5 text-xs text-white rounded-xl px-4 py-2 transition-colors">Download Anki CSV</button>
+                        <button onclick="window.print()" class="bg-[#080D1A] hover:bg-white/10 border border-white/5 text-xs text-white rounded-xl px-4 py-2 transition-colors">Print Notes</button>
+                    </div>
+                </div>
+
+                <!-- Table of Contents -->
+                <div class="bg-[#080D1A] rounded-xl p-5 mb-8 border border-white/5 no-print">
+                    <h3 class="text-sm tracking-widest text-gray-400 uppercase mb-3">Table of Contents</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#what-is" class="text-blue-400 hover:text-blue-300">1. What is an Interjection? (Meaning in Hinglish)</a></li>
+                        <li><a href="#why-independent" class="text-blue-400 hover:text-blue-300">2. Why are they their own part of speech?</a></li>
+                        <li><a href="#common-words" class="text-blue-400 hover:text-blue-300">3. Uses of Ah Cool Aha Damn Oh mmm Ooh Ouch Uh Wow Yippee Yuck</a></li>
+                        <li><a href="#top-mistakes" class="text-blue-400 hover:text-blue-300">4. Top Mistakes People Make</a></li>
+                    </ul>
+                </div>
+
+                <!-- Prerequisites -->
+                <div class="mb-8 p-4 rounded-xl bg-[#2563EB]/10 border border-[#2563EB]/20">
+                    <h3 class="text-sm font-bold text-[#2563EB] uppercase tracking-wider mb-2">Prerequisites</h3>
+                    <p class="text-sm text-gray-300">Is topic ko samajhne se pehle, in concepts ka basic idea hona zaroori hai. Click to Google search:</p>
+                    <div class="flex gap-3 mt-3 flex-wrap">
+                        <a href="https://www.google.com/search?q=What+are+Parts+of+Speech+in+English+grammar" target="_blank" class="px-3 py-1 bg-white/5 rounded-lg text-xs hover:bg-white/10 border border-white/10">Parts of Speech</a>
+                        <a href="https://www.google.com/search?q=What+is+sentence+structure+in+English" target="_blank" class="px-3 py-1 bg-white/5 rounded-lg text-xs hover:bg-white/10 border border-white/10">Sentence Structure</a>
+                    </div>
+                </div>
+
+                <!-- Content Body -->
+                <div class="space-y-8 text-gray-300">
+                    <div id="what-is">
+                        <h2 class="text-2xl font-bold text-white mb-3">1. What is an Interjection?</h2>
+                        <p class="mb-3">Interjection grammar ka sabse chhota hissa (part of speech) hai. Yeh aisi aawazein ya chhote words hote hain jo achanak aayi hui feelings (emotions) ko express karte hain—jaise khushi surprise dukh ya gussa.</p>
+                        <ul class="list-disc pl-5 space-y-2 text-sm">
+                            <li>Yeh words sentence ka main hissa nahi hote.</li>
+                            <li>Inhe hata dene se bhi sentence ke meaning par grammatical farq nahi padta sirf emotion kam ho jata hai.</li>
+                            <li>Example: <strong>Wow</strong> that car is fast! (Agar 'Wow' hata dein toh bhi "that car is fast" ek poora sentence hai).</li>
+                        </ul>
+                    </div>
+
+                    <div id="why-independent">
+                        <h2 class="text-2xl font-bold text-white mb-3">2. Why are they their own part of speech?</h2>
+                        <p class="mb-3">Aap soch sakte hain ki in chote words ko alag part of speech kyun maante hain? Iske 2 main reasons hain:</p>
+                        <ul class="list-disc pl-5 space-y-2 text-sm">
+                            <li><strong>Rule-breakers:</strong> Yeh English grammar ke placement aur sentence structure rules ko bilkul disregard (ignore) karte hain. Subject verb ya object se inka koi direct connection nahi hota.</li>
+                            <li><strong>Starting Position:</strong> Yeh almost hamesha sentence ki starting mein aate hain kyuki emotion pehle nikalta hai uske baad hum logic ya baat bolte hain.</li>
+                        </ul>
+                        <div class="mt-4 p-4 bg-[#080D1A] rounded-xl border border-white/5 text-sm">
+                            <span class="text-white font-bold">Logical Example:</span> "Ouch my foot hurts." Yahan 'Ouch' bas pain dikha raha hai. Iska 'my foot' (subject) ya 'hurts' (verb) se koi grammatical relation nahi hai. Isliye isey independent part of speech maana jata hai.
+                        </div>
+                    </div>
+
+                    <div id="common-words">
+                        <h2 class="text-2xl font-bold text-white mb-4">3. Deep Dive into Common Interjections</h2>
+                        <div class="space-y-4">
+                            <!-- Items -->
+                            <div class="bg-white/5 p-4 rounded-xl">
+                                <h4 class="text-xl font-bold text-white mb-1">Ah</h4>
+                                <p class="text-sm mb-2">Use: Relief realization ya samajh aane ka expression.</p>
+                                <p class="text-sm text-gray-400"><em>Ah ab mujhe samajh aaya ki machine kaise chalti hai.</em></p>
+                            </div>
+                            <div class="bg-white/5 p-4 rounded-xl">
+                                <h4 class="text-xl font-bold text-white mb-1">Cool</h4>
+                                <p class="text-sm mb-2">Use: Agreement ya approval dikhane ke liye (often informal).</p>
+                                <p class="text-sm text-gray-400"><em>Cool main kal wahan pahunch jaunga.</em></p>
+                            </div>
+                            <div class="bg-white/5 p-4 rounded-xl">
+                                <h4 class="text-xl font-bold text-white mb-1">Aha</h4>
+                                <p class="text-sm mb-2">Use: Sudden discovery ya kisi ki chori pakadne par.</p>
+                                <p class="text-sm text-gray-400"><em>Aha toh tumne khaya tha mera pizza!</em></p>
+                            </div>
+                            <div class="bg-white/5 p-4 rounded-xl">
+                                <h4 class="text-xl font-bold text-white mb-1">Damn</h4>
+                                <p class="text-sm mb-2">Use: Frustration shock ya kabhi-kabhi extreme impress hone par.</p>
+                                <p class="text-sm text-gray-400"><em>Damn traffic kitna zyada hai aaj!</em></p>
+                            </div>
+                            <div class="bg-white/5 p-4 rounded-xl">
+                                <h4 class="text-xl font-bold text-white mb-1">Oh</h4>
+                                <p class="text-sm mb-2">Use: Surprise realization ya just a filler word.</p>
+                                <p class="text-sm text-gray-400"><em>Oh mujhe nahi pata tha tum aa rahe ho.</em></p>
+                            </div>
+                            <div class="bg-white/5 p-4 rounded-xl">
+                                <h4 class="text-xl font-bold text-white mb-1">mmm / Ooh</h4>
+                                <p class="text-sm mb-2">Use: 'mmm' sochne ya taste ke liye. 'Ooh' fascination ya interest ke liye.</p>
+                                <p class="text-sm text-gray-400"><em>mmm yeh biryani bahut achhi hai. Ooh nayi gadi!</em></p>
+                            </div>
+                            <div class="bg-white/5 p-4 rounded-xl">
+                                <h4 class="text-xl font-bold text-white mb-1">Ouch</h4>
+                                <p class="text-sm mb-2">Use: Sudden physical ya emotional pain.</p>
+                                <p class="text-sm text-gray-400"><em>Ouch mera pair table se takra gaya!</em></p>
+                            </div>
+                            <div class="bg-white/5 p-4 rounded-xl">
+                                <h4 class="text-xl font-bold text-white mb-1">Uh</h4>
+                                <p class="text-sm mb-2">Use: Hesitation bolne se pehle atakna ya confuse hona.</p>
+                                <p class="text-sm text-gray-400"><em>Uh mujhe lagta hai hum rasta bhatak gaye hain.</em></p>
+                            </div>
+                            <div class="bg-white/5 p-4 rounded-xl">
+                                <h4 class="text-xl font-bold text-white mb-1">Wow / Yippee / Yuck</h4>
+                                <p class="text-sm mb-2">Wow: Amazement. Yippee: Extreme joy. Yuck: Disgust (ghinn aana).</p>
+                                <p class="text-sm text-gray-400"><em>Yuck is sabzi mein bahut namak hai!</em></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="top-mistakes">
+                        <h2 class="text-2xl font-bold text-white mb-3">4. Top Mistakes People Make</h2>
+                        <div class="space-y-3">
+                            <div class="p-4 bg-red-900/20 border border-red-500/20 rounded-xl">
+                                <h4 class="text-red-400 font-bold mb-1">Mistake 1: Punctuation error</h4>
+                                <p class="text-sm">Log aksar strong interjection ke baad full stop laga dete hain. <strong>Wrong:</strong> Ouch. It hurts. <strong>Right:</strong> Ouch! It hurts. ya Ouch it hurts.</p>
+                            </div>
+                            <div class="p-4 bg-red-900/20 border border-red-500/20 rounded-xl">
+                                <h4 class="text-red-400 font-bold mb-1">Mistake 2: Overusing in formal writing</h4>
+                                <p class="text-sm">Emails ya formal essays mein 'Uh' 'Wow' ya 'Damn' use karna unprofessional lagta hai. Inhe sirf spoken English ya casual chats mein rakhein.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-10 flex justify-center no-print">
+                    <button onclick="switchTab('quiz')" class="bg-[#2563EB] hover:bg-blue-600 text-white font-bold rounded-xl px-8 py-4 transition-colors shadow-lg">Take the Quiz Now</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= STORY SECTION ================= -->
+        <section id="story-section" class="hidden space-y-6">
+            <div class="bg-[#111A2C] border-t border-white/5 rounded-3xl shadow-2xl p-6 sm:p-8 card-style">
+                <h1 class="text-3xl font-bold text-white tracking-tight mb-6">A Morning of Interjections</h1>
+                <div class="text-gray-300 space-y-4 text-lg leading-relaxed bg-[#080D1A] p-6 rounded-2xl border border-white/5">
+                    <p><span class="text-blue-400 font-bold">Ah</span> the sun is finally up. I stretched my arms feeling the warmth through the window. <span class="text-blue-400 font-bold">Ooh</span> the coffee smells amazing today I thought as I walked into the kitchen.</p>
+                    <p>Suddenly my brother walked in carrying a weird looking green smoothie. "<span class="text-blue-400 font-bold">Yuck</span> what is that?" I asked backing away.</p>
+                    <p>"It is kale and ginger" he said. "<span class="text-blue-400 font-bold">Cool</span>" I replied sarcastically "keep it away from me."</p>
+                    <p>Just then my phone buzzed. I looked at the text and gasped. "<span class="text-blue-400 font-bold">Damn</span> the train is cancelled!" I yelled. "<span class="text-blue-400 font-bold">Oh</span> no how will you get to college?" my brother asked looking worried.</p>
+                    <p>"<span class="text-blue-400 font-bold">Uh</span> I guess I will have to take the bus." I rushed to grab my bag but stubbed my toe on the table. "<span class="text-blue-400 font-bold">Ouch</span>!" I hopped on one foot. "<span class="text-blue-400 font-bold">Aha</span>" my brother smirked "that is karma for insulting my smoothie."</p>
+                    <p>I glared at him and rushed out. I made it to the bus stop right as the bus arrived. "<span class="text-blue-400 font-bold">Wow</span> that was lucky!" I panted. Finding an empty seat I sat down heavily. "<span class="text-blue-400 font-bold">mmm</span>" I hummed "at least the day is getting better."</p>
+                    <p>Then I saw my friend waving from the back of the bus. "<span class="text-blue-400 font-bold">Yippee</span>" she mouthed happily. I smiled back. Maybe today would not be so bad after all.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= QUIZ SECTION ================= -->
+        <section id="quiz-section" class="hidden space-y-6">
+            <div id="quiz-container" class="bg-[#111A2C] border-t border-white/5 rounded-3xl shadow-2xl p-6 sm:p-8 card-style">
+                <!-- Quiz Header -->
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">Assessment</h2>
+                        <p class="text-sm text-gray-400">Question <span id="q-current">1</span> of <span id="q-total">10</span></p>
+                    </div>
+                    <div class="bg-[#080D1A] px-4 py-2 rounded-xl border border-white/5">
+                        <span class="text-sm text-gray-400 uppercase tracking-wider">Score</span>
+                        <span id="quiz-score" class="text-xl font-bold text-white ml-2">0</span>
+                    </div>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="w-full bg-white/10 rounded-full h-2 mb-8">
+                    <div id="quiz-progress" class="bg-[#2563EB] h-2 rounded-full transition-all duration-300" style="width: 10%"></div>
+                </div>
+
+                <!-- Question Area -->
+                <div id="question-area">
+                    <h3 id="question-text" class="text-xl sm:text-2xl font-bold text-white mb-6">Question goes here?</h3>
+                    <div id="options-area" class="space-y-3">
+                        <!-- Options injected via JS -->
+                    </div>
+                </div>
+
+                <!-- Explanation / Feedback (Hidden initially) -->
+                <div id="feedback-area" class="hidden mt-6 p-5 rounded-xl border">
+                    <h4 id="feedback-title" class="font-bold text-lg mb-2"></h4>
+                    <p id="feedback-text" class="text-gray-300 text-sm"></p>
+                    <button onclick="nextQuestion()" class="mt-4 bg-[#2563EB] hover:bg-blue-600 text-white font-bold rounded-xl px-6 py-2 transition-colors w-full sm:w-auto">Next Question</button>
+                </div>
+            </div>
+
+            <!-- Summary Area -->
+            <div id="quiz-summary" class="hidden bg-[#111A2C] border-t border-white/5 rounded-3xl shadow-2xl p-6 sm:p-8 text-center card-style">
+                <h2 class="text-3xl font-bold text-white mb-2">Quiz Complete!</h2>
+                <p class="text-gray-400 mb-8">Here is how you performed.</p>
+                
+                <div class="grid grid-cols-3 gap-4 mb-8">
+                    <div class="bg-[#080D1A] border border-white/5 p-4 rounded-2xl">
+                        <div class="text-gray-400 text-xs uppercase tracking-widest mb-1">Final Score</div>
+                        <div id="summary-score" class="text-3xl font-bold text-white">0/10</div>
+                    </div>
+                    <div class="bg-[#080D1A] border border-white/5 p-4 rounded-2xl">
+                        <div class="text-gray-400 text-xs uppercase tracking-widest mb-1">Accuracy</div>
+                        <div id="summary-accuracy" class="text-3xl font-bold text-[#2563EB]">0%</div>
+                    </div>
+                    <div class="bg-[#080D1A] border border-white/5 p-4 rounded-2xl">
+                        <div class="text-gray-400 text-xs uppercase tracking-widest mb-1">Time Taken</div>
+                        <div id="summary-time" class="text-3xl font-bold text-white">00:00</div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row justify-center gap-4">
+                    <button onclick="startQuiz()" class="bg-[#2563EB] hover:bg-blue-600 text-white font-bold rounded-xl px-8 py-3 transition-colors">Practice Another 10</button>
+                    <button onclick="switchTab('notes')" class="bg-[#080D1A] hover:bg-white/10 border border-white/5 text-white font-bold rounded-xl px-8 py-3 transition-colors">Revise Notes</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= IRL USAGE SECTION ================= -->
+        <section id="irl-section" class="hidden space-y-6">
+            <div class="bg-[#111A2C] border-t border-white/5 rounded-3xl shadow-2xl p-6 sm:p-8 card-style">
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-3xl font-bold text-white tracking-tight">Real Life Scenarios</h1>
+                    <span class="text-sm text-gray-400">Page <span id="irl-page">1</span>/10</span>
+                </div>
+                <p class="text-gray-400 text-sm mb-6">Common middle-class Indian scenarios. Guess the interjection before revealing!</p>
+
+                <div id="irl-container" class="space-y-4">
+                    <!-- Cards injected via JS -->
+                </div>
+
+                <div class="mt-8 flex justify-between">
+                    <button onclick="prevIrl()" class="bg-[#080D1A] hover:bg-white/10 border border-white/5 text-white rounded-xl px-4 py-2 transition-colors">Previous 5</button>
+                    <button onclick="nextIrl()" class="bg-[#2563EB] hover:bg-blue-600 text-white rounded-xl px-4 py-2 transition-colors">Next 5</button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer Navigation -->
+    <footer class="fixed bottom-0 w-full bg-[#060B19]/90 backdrop-blur-md border-t border-white/5 z-50 no-print">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
+            <button onclick="goBack()" class="text-gray-400 hover:text-white text-sm font-medium transition-colors flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Back
+            </button>
+            <nav class="flex gap-4 sm:gap-8 overflow-x-auto">
+                <button onclick="switchTab('notes')" id="nav-notes" class="nav-btn text-white font-bold text-sm tracking-wider uppercase">Notes</button>
+                <button onclick="switchTab('story')" id="nav-story" class="nav-btn text-gray-400 hover:text-white text-sm tracking-wider uppercase transition-colors">Story</button>
+                <button onclick="switchTab('quiz')" id="nav-quiz" class="nav-btn text-gray-400 hover:text-white text-sm tracking-wider uppercase transition-colors">Quiz</button>
+                <button onclick="switchTab('irl')" id="nav-irl" class="nav-btn text-gray-400 hover:text-white text-sm tracking-wider uppercase transition-colors">IRL Usage</button>
+            </nav>
+            <button onclick="switchTab('notes')" class="text-gray-400 hover:text-white text-sm font-medium transition-colors flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                <span class="hidden sm:inline">Home</span>
+            </button>
+        </div>
+    </footer>
+
+    <!-- Inline Application Script -->
+    <script>
+        // Global Timer
+        let globalSeconds = 0;
+        let quizStartTime = 0;
+        setInterval(() => {
+            globalSeconds++;
+            const mins = String(Math.floor(globalSeconds / 60)).padStart(2, '0');
+            const secs = String(globalSeconds % 60).padStart(2, '0');
+            document.getElementById('global-timer').innerText = `${mins}:${secs}`;
+        }, 1000);
+
+        // Navigation Logic
+        const tabs = ['notes', 'story', 'quiz', 'irl'];
+        let historyStack = ['notes'];
+
+        function switchTab(tabId) {
+            tabs.forEach(t => {
+                document.getElementById(`${t}-section`).classList.add('hidden');
+                document.getElementById(`nav-${t}`).classList.remove('text-white', 'font-bold');
+                document.getElementById(`nav-${t}`).classList.add('text-gray-400');
+            });
+            document.getElementById(`${tabId}-section`).classList.remove('hidden');
+            document.getElementById(`nav-${tabId}`).classList.remove('text-gray-400');
+            document.getElementById(`nav-${tabId}`).classList.add('text-white', 'font-bold');
+            
+            if(historyStack[historyStack.length - 1] !== tabId) {
+                historyStack.push(tabId);
+            }
+
+            if(tabId === 'quiz' && document.getElementById('quiz-summary').classList.contains('hidden') === false) {
+                // Keep summary open if quiz is done
+            } else if (tabId === 'quiz' && currentQuestions.length === 0) {
+                startQuiz();
+            }
+            window.scrollTo(0, 0);
+        }
+
+        function goBack() {
+            if(historyStack.length > 1) {
+                historyStack.pop(); // remove current
+                const prev = historyStack.pop(); // get previous
+                switchTab(prev);
+            }
+        }
+
+        // ================= DATA ARRAYS =================
+
+        // 100 Strictly Formatted Questions (No commas inside Q or A)
+        // Format: Question,Answer,Type,Options (separated by |),Hinglish Reasoning
+        const masterQuizBank = [
+            "Which interjection shows sudden realization or relief?,Ah,mcq,Ah|Ouch|Yuck|Damn,Ah ka use tab hota hai jab achanak kuch samajh aaye ya sukoon mile.",
+            "If you stub your toe what interjection naturally comes out?,Ouch,mcq,Wow|Ah|Ouch|Cool,Ouch direct physical ya emotional pain dikhata hai.",
+            "True or False: Interjections must always be placed at the end of a sentence.,False,tf,True|False,Interjections usually sentence ke starting mein aate hain kyunki emotion pehle nikalta hai.",
+            "You find a missing Rs 500 note in your jeans pocket. What will you say?,Yippee,mcq,Yippee|Yuck|Ouch|Uh,Yippee extreme khushi ya joy express karta hai.",
+            "Is the sentence 'Wow she runs fast.' grammatically correct without the interjection?,Correct,correctnot,Correct|Not Correct,Wow hatane ke baad bhi 'she runs fast' ek complete sentence hai isliye ye rule-breakers hain.",
+            "You taste spoiled milk. Which word fits best?,Yuck,mcq,Mmm|Yuck|Aha|Cool,Yuck ka matlab disgust ya ghinn aana hota hai.",
+            "Which word shows you caught someone doing something sneaky?,Aha,mcq,Aha|Uh|Oh|Cool,Aha use hota hai sudden discovery par ya kisi ko range hath pakadne par.",
+            "Does 'mmm' show hesitation or thinking about a tasty food?,Both,mcq,Hesitation|Tasty food|Both|Neither,mmm sochne ke waqt aur tasty khana dekh kar dono time use hota hai.",
+            "What emotion does 'Damn' mostly represent in casual English?,Frustration or shock,mcq,Joy|Frustration or shock|Relief|Agreement,Damn gussa ya extreme shock dikhata hai.",
+            "True or False: 'Uh' is used when someone is confident and speaking fast.,False,tf,True|False,Uh tab use hota hai jab bolne wala atak raha ho ya confuse ho (hesitation).",
+            "Which word means agreement in informal English?,Cool,mcq,Cool|Yuck|Ouch|Aha,Cool ka informal use 'thik hai' ya 'manzoor hai' ke liye hota hai.",
+            "True or False: Interjections change the grammatical tense of the sentence.,False,tf,True|False,Inka sentence ke tense ya structure se koi relation nahi hota.",
+            "You see a beautiful shooting star. What is the natural reaction?,Wow,mcq,Wow|Uh|Ouch|Damn,Wow amazement aur wonder dikhata hai.",
+            "If a friend says they are coming to your house and you did not know what do you say?,Oh,mcq,Oh|Yuck|Mmm|Yippee,Oh surprise ya nayi information milne par use hota hai.",
+            "Is it correct to use 'Damn' in a formal job application letter?,Not Correct,correctnot,Correct|Not Correct,Damn ek casual/slang word hai isey formal writing mein use karna galat hai.",
+            "What punctuation usually follows a strong interjection?,Exclamation mark,mcq,Question mark|Exclamation mark|Full stop|Hyphen,Strong emotion dikhane ke liye hamesha exclamation mark (!) lagta hai.",
+            "Which part of speech disregards the placement rules of grammar?,Interjection,mcq,Noun|Verb|Interjection|Adjective,Ye independent hote hain inpe subject-verb rules lagoo nahi hote.",
+            "Is 'Ooh' used for physical pain?,False,tf,True|False,Ooh fascination ya interest dikhata hai pain ke liye Ouch use hota hai.",
+            "You forgot where you kept your keys and are trying to remember. What sound do you make?,Uh,mcq,Wow|Uh|Yippee|Aha,Uh dimaag par zor daalte waqt hesitation dikhata hai.",
+            "Can a sentence exist perfectly without an interjection?,Yes,tf,Yes|No,Inke bina sentence ka meaning grammatical rehta hai bas emotion kam hota hai.",
+            "Which word fits: '___ I finally finished my heavy homework.',Ah,mcq,Ah|Yuck|Uh|Aha,Ah yahan sukoon (relief) dikha raha hai.",
+            "Which word fits: '___ I dropped my phone in the water!',Damn,mcq,Damn|Cool|Mmm|Yippee,Damn yahan frustration aur gussa dikha raha hai.",
+            "True or False: Interjections connect two nouns together.,False,tf,True|False,Do nouns ko connect karne ka kaam Conjunctions karte hain Interjections nahi.",
+            "You see a very dirty public toilet. Reaction?,Yuck,mcq,Yuck|Wow|Ah|Cool,Yuck hamesha disgust ke liye aata hai.",
+            "You find the thief who stole your pen. Reaction?,Aha,mcq,Aha|Uh|Ouch|Mmm,Aha kisi discovery ya pakde jaane par use hota hai.",
+            "Is 'Cool I will see you tomorrow' a grammatically correct casual use?,Correct,correctnot,Correct|Not Correct,Cool yahan agreement dikha raha hai jo casual English mein sahi hai.",
+            "Does 'Oh' always mean you are sad?,False,tf,True|False,Oh surprise realization ya sirf ek filler word ki tarah bhi use hota hai.",
+            "Are interjections considered the largest part of speech?,False,tf,True|False,Yeh sabse chhota aur independent part of speech maana jata hai.",
+            "Which interjection implies you are enjoying the smell of food?,Mmm,mcq,Mmm|Ouch|Uh|Damn,Mmm taste ya smell ke pleasure ko dikhata hai.",
+            "Which word fits: '___ look at that expensive car!',Ooh,mcq,Ooh|Yuck|Uh|Ouch,Ooh interest aur fascination express karta hai.",
+            "Does an interjection act as the subject of a sentence?,False,tf,True|False,Nahi subject hamesha Noun ya Pronoun hota hai.",
+            "If someone steps on your foot what do you yell?,Ouch,mcq,Ouch|Wow|Cool|Ah,Ouch directly sudden pain ka expression hai.",
+            "Is 'Wow' an interjection?,Yes,tf,Yes|No,Wow ek classic interjection hai jo amazement dikhata hai.",
+            "True or False: Interjections usually occur at the end of a thought.,False,tf,True|False,Emotion pehle aata hai isliye yeh sentence ki shuruwat mein hote hain.",
+            "Which word fits: '___ that is a huge spider.',Damn,mcq,Damn|Yippee|Mmm|Ah,Damn yahan sudden shock ya darr dikha raha hai.",
+            "Can interjections be multiple words like 'Oh my God'?,Yes,tf,Yes|No,Haan interjection phrases bhi hote hain jo same independent rule follow karte hain.",
+            "Does 'Yippee' show sadness?,False,tf,True|False,Yippee extreme khushi ka word hai.",
+            "Is it correct to write 'Uh! The king died' in a formal history book?,Not Correct,correctnot,Correct|Not Correct,Formal books mein hesitation dikhane wale words use nahi hote.",
+            "Which word fits: '___ I did not know you were Indian.',Oh,mcq,Oh|Yuck|Ouch|Cool,Oh nayi realization ya surprise dikhata hai.",
+            "Which word implies you caught a mistake in an exam paper?,Aha,mcq,Aha|Mmm|Ouch|Cool,Aha discovery ya galti pakadne ko darshata hai.",
+            "If your boss says you can leave early what do you think?,Yippee,mcq,Yippee|Yuck|Damn|Uh,Khushi ka mauka hai isliye Yippee.",
+            "True or False: Interjections modify verbs like adverbs do.,False,tf,True|False,Yeh kisi ko modify nahi karte sentence mein akele stand karte hain.",
+            "Which word fits: '___ this tea is too hot.',Ouch,mcq,Ouch|Cool|Wow|Ah,Hot tea se pain hota hai isliye Ouch.",
+            "Are interjections necessary for a sentence to make logical sense?,False,tf,True|False,Inke bina bhi sentence poora aur logical rehta hai.",
+            "Which word fits: '___ that movie was terrible.',Ugh,mcq,Ugh|Yippee|Wow|Aha,Ugh ya Yuck dono disgust ya kharab experience dikhate hain.",
+            "Is 'Ah' only used for pain?,False,tf,True|False,Ah relief ya realization ke liye hota hai pain ke liye nahi.",
+            "Which word fits: '___ I guess we can go now.',Uh,mcq,Uh|Wow|Yippee|Ouch,Uh dikhata hai ki speaker sure nahi hai ya hesitate kar raha hai.",
+            "Can 'Cool' be used as an adjective and an interjection?,Yes,tf,Yes|No,Jaise 'cool breeze' (adjective) aur 'Cool I will come' (interjection).",
+            "Which word shows pure amazement?,Wow,mcq,Wow|Ah|Uh|Mmm,Wow kisi cheez ko dekh kar dang reh jaane par bolte hain.",
+            "True or False: 'Damn' should be used in front of teachers.,False,tf,True|False,Yeh slang hai aur formal settings mein rude mana jata hai.",
+            "Which interjection would you use if someone gives you a gift?,Oh,mcq,Oh|Yuck|Ouch|Uh,Oh yahan pleasant surprise dikhata hai 'Oh thank you!'.",
+            "Are interjections completely dependent on the object of the sentence?,False,tf,True|False,Yeh bilkul independent hote hain.",
+            "Which word fits: '___ I see what you mean now.',Ah,mcq,Ah|Yuck|Ouch|Damn,Ah samajh aane (realization) ko darshata hai.",
+            "Which interjection implies you are examining a beautiful piece of art?,Ooh,mcq,Ooh|Uh|Yuck|Ouch,Ooh fascination aur gehra interest dikhata hai.",
+            "Is it grammatically correct to say 'Yuck this food.' as a full sentence?,Not Correct,correctnot,Correct|Not Correct,Yuck interjection hai par 'this food' incomplete thought hai verb nahi hai.",
+            "Which word shows you are trying to find an excuse?,Uh,mcq,Uh|Wow|Ah|Yippee,Uh bolne mein deri (hesitation) dikhata hai.",
+            "Which interjection fits: '___ we won the match!',Yippee,mcq,Yippee|Oh|Mmm|Ouch,Jeetne par khushi manane ke liye Yippee.",
+            "True or False: Placing a comma after a mild interjection is correct.,True,tf,True|False,Mild emotion ke liye comma aur strong ke liye exclamation mark lagta hai (Oh I see).",
+            "Which word fits: '___ I dropped the glass again.',Damn,mcq,Damn|Cool|Wow|Yippee,Damn frustration dikha raha hai.",
+            "Is 'Mmm' used when you hate the taste of something?,False,tf,True|False,Mmm achhe taste ke liye hota hai hate ke liye Yuck.",
+            "Which interjection implies you are agreeing to a plan casually?,Cool,mcq,Cool|Ouch|Yuck|Uh,Cool informal agreement ka sabse common word hai.",
+            "Can an interjection be a complete sentence by itself in dialogue?,Yes,tf,Yes|No,Conversation mein sirf 'Ouch!' bolna ek poora emotional message deta hai.",
+            "Which word fits: '___ is that your new phone?',Ooh,mcq,Ooh|Yuck|Uh|Ah,Ooh yahan interest dikha raha hai.",
+            "Which word fits: '___ I feel so relaxed after the spa.',Ah,mcq,Ah|Damn|Yuck|Uh,Ah sukoon aur relief ka word hai.",
+            "True or False: Interjections always have a subject.,False,tf,True|False,Inka koi subject nahi hota yeh bas sounds ya words hote hain.",
+            "Which word implies you found a hidden trick in a video game?,Aha,mcq,Aha|Uh|Oh|Mmm,Aha nayi discovery dikhata hai.",
+            "Is it correct to use 'Wow' to show disappointment?,Not Correct,correctnot,Correct|Not Correct,Wow positive amazement ke liye hota hai disappointment ke liye Oh ya Damn.",
+            "Which word fits: '___ my head hurts.',Ouch,mcq,Ouch|Wow|Yippee|Cool,Ouch directly pain dikhata hai.",
+            "True or False: 'Oh' can be used as a filler word when thinking.,True,tf,True|False,'Oh' ya 'Uh' dono conversation mein pause lene ke liye use hote hain.",
+            "Which interjection fits: '___ look at the size of that dog!',Wow,mcq,Wow|Yuck|Mmm|Ah,Wow size dekh kar amaze hone ko dikhata hai.",
+            "Can interjections show both positive and negative emotions?,Yes,tf,Yes|No,Jaise Wow positive hai aur Yuck negative hai.",
+            "Which word fits: '___ I stepped in mud.',Yuck,mcq,Yuck|Cool|Ah|Yippee,Keeychad (mud) mein pair rakhne par disgust (Yuck) aati hai.",
+            "Is 'Ah' a preposition?,False,tf,True|False,Preposition relation dikhate hain (in on at) Ah ek interjection hai.",
+            "Which word fits: '___ let me think about it.',Uh,mcq,Uh|Ouch|Wow|Aha,Uh pause lene aur sochne ka expression hai.",
+            "Which word implies extreme informal frustration?,Damn,mcq,Damn|Cool|Oh|Ah,Damn slang hai jo frustration dikhata hai.",
+            "True or False: All interjections are exactly three letters long.,False,tf,True|False,Ah do letter ka hai Yippee six letters ka hai.",
+            "Which word fits: '___ I love this song.',Ooh,mcq,Ooh|Yuck|Uh|Ouch,Ooh interest aur pasand aane ko dikhata hai.",
+            "Is it correct to put an interjection in the middle of a verb phrase?,Not Correct,correctnot,Correct|Not Correct,Inhe sentence ke shuru mein ya alag se likhna chahiye sentence todna galat hai.",
+            "Which word fits: '___ I found my lost ring!',Aha,mcq,Aha|Uh|Mmm|Ouch,Aha discovery ki khushi dikhata hai.",
+            "Which interjection shows you are casually accepting an apology?,Cool,mcq,Cool|Yuck|Ouch|Damn,Cool yahan 'koi baat nahi' ka sense de raha hai.",
+            "True or False: Interjections are often used in academic research papers.,False,tf,True|False,Academic papers formal hote hain inme emotions nahi facts hote hain.",
+            "Which word fits: '___ that hurts!',Ouch,mcq,Ouch|Wow|Cool|Ah,Dard ke liye sirf Ouch.",
+            "Which word implies you are enjoying a warm bath?,Ah,mcq,Ah|Yuck|Damn|Uh,Ah relief aur comfort dikhata hai.",
+            "Is 'Yippee' an old-fashioned way of showing sadness?,False,tf,True|False,Yeh khushi dikhata hai sadness nahi.",
+            "Which word fits: '___ I did not expect to see you here.',Oh,mcq,Oh|Yuck|Mmm|Ouch,Oh surprise dikhata hai.",
+            "Which interjection shows pure disgust at a bad smell?,Yuck,mcq,Yuck|Wow|Ah|Cool,Yuck specifically kharab smell ya taste ke liye hai.",
+            "True or False: 'Mmm' is completely meaningless in grammar.,False,tf,True|False,Iski grammatical value nahi hai par meaning (pleasure/thinking) zaroor hai.",
+            "Which word fits: '___ I forgot my wallet at home.',Damn,mcq,Damn|Yippee|Cool|Ah,Wallet bhoolne par frustration (Damn) aata hai.",
+            "Can interjections be followed by a comma?,Yes,tf,Yes|No,Mild interjections ke baad comma lagta hai jaise 'Oh I see.'",
+            "Which word implies you are trying to remember someone name?,Uh,mcq,Uh|Wow|Yuck|Ah,Uh yaad karne mein hesitation dikhata hai.",
+            "Is 'Wow' used only for beautiful things?,False,tf,True|False,Wow badi ya ajeeb cheezon ke liye bhi (amazement) use ho sakta hai.",
+            "Which word fits: '___ we finally reached the top of the mountain.',Ah,mcq,Ah|Yuck|Uh|Damn,Ah mehnat ke baad ka sukoon (relief) dikhata hai.",
+            "Which interjection shows you are caught in a lie?,Oh,mcq,Oh|Yippee|Cool|Mmm,Pakde jane par sharam ya surprise wala 'Oh' nikalta hai.",
+            "True or False: Interjections give the main verb its action.,False,tf,True|False,Verb ki action subject se aati hai interjection se nahi.",
+            "Which word fits: '___ I hate broccoli.',Yuck,mcq,Yuck|Wow|Cool|Ah,Broccoli na pasand hone par Yuck.",
+            "Which interjection implies you solved a hard puzzle?,Aha,mcq,Aha|Uh|Ouch|Mmm,Aha logic solve hone ki khushi hai.",
+            "Is it correct to use 'Ouch' when someone else gets hurt?,Correct,correctnot,Correct|Not Correct,Sahi hai hum empathy (doosre ka dard mehsoos karke) mein bhi Ouch bolte hain.",
+            "Which word fits: '___ that dress looks amazing on you.',Ooh,mcq,Ooh|Yuck|Uh|Ouch,Ooh compliment aur fascination ke liye hai.",
+            "Which word shows you are casually dismissing a minor problem?,Cool,mcq,Cool|Damn|Ouch|Aha,Cool ka matlab yahan 'chill hai' hota hai.",
+            "True or False: An interjection is the most important part of a sentence.,False,tf,True|False,Sentence ka main part Subject aur Verb hote hain interjection extra emotion hai."
+        ];
+
+        // 50 IRL Scenarios
+        const irlData = [
+            { s: "Electricity goes off right during the IPL final over.", ans: "Damn not right now!", exp: "Damn shows sudden frustration typical for power cuts." },
+            { s: "Tasting extremely spicy street pani puri.", ans: "Ouch my tongue is burning!", exp: "Ouch shows physical pain from the spice." },
+            { s: "Mom finally finds the Tupperware box you hid.", ans: "Aha I knew you had it!", exp: "Aha shows discovery of a hidden object." },
+            { s: "Getting a surprise holiday announcement at work.", ans: "Yippee long weekend!", exp: "Yippee shows extreme joy for holidays." },
+            { s: "Seeing someone spit gutkha on a clean wall.", ans: "Yuck have some sense.", exp: "Yuck is used for deep disgust." },
+            { s: "When the AC finally turns on after sweating outside.", ans: "Ah that feels so good.", exp: "Ah represents the relief of cool air." },
+            { s: "Your friend says they will pay for the momos.", ans: "Cool order two plates then.", exp: "Cool shows casual agreement." },
+            { s: "Realizing you left your charger at hometown.", ans: "Oh no my battery is at 10%.", exp: "Oh shows sudden bad realization." },
+            { s: "When autowala asks for 300 Rs for 2 kilometers.", ans: "Wow that is a robbery.", exp: "Wow shows sarcastic amazement at the price." },
+            { s: "Trying to remember an actor's name in a movie.", ans: "Uh I think it was Shahrukh.", exp: "Uh shows hesitation while thinking." },
+            { s: "Eating hot jalebi on a winter morning.", ans: "Mmm this is perfect.", exp: "Mmm shows pleasure from taste." },
+            { s: "Seeing a brand new sports car in your gali.", ans: "Ooh whose car is that?", exp: "Ooh shows fascination and interest." },
+            { s: "Sticking your hand in wet paint by mistake.", ans: "Yuck my hands are sticky.", exp: "Yuck shows physical disgust." },
+            { s: "Traffic is stuck at Silk Board junction forever.", ans: "Damn we will be late.", exp: "Damn shows immense frustration." },
+            { s: "You finally solve a bug in your code after 3 hours.", ans: "Aha so that was the error!", exp: "Aha is the developer's discovery joy." },
+            { s: "Biting into an elaichi inside the biryani.", ans: "Yuck my mood is ruined.", exp: "Yuck shows taste disgust." },
+            { s: "Sitting on a sofa after a 9-hour shift.", ans: "Ah my back needed this.", exp: "Ah is pure physical relief." },
+            { s: "When the boss says the meeting is cancelled.", ans: "Cool I will leave early.", exp: "Cool is a laid-back positive reaction." },
+            { s: "Dropping your phone face-down on the tiles.", ans: "Ouch please do not be broken.", exp: "Ouch shows emotional pain for the phone." },
+            { s: "Teacher asks a question you did not prepare for.", ans: "Uh I think the answer is...", exp: "Uh buys you time to think." },
+            { s: "Getting 50% discount on Myntra.", ans: "Wow I should buy two.", exp: "Wow shows happy surprise." },
+            { s: "Finding a 100 Rs note in old winter jacket.", ans: "Ooh free money!", exp: "Ooh shows pleasant surprise." },
+            { s: "When relative asks about your marriage plans.", ans: "Oh we are not thinking about it yet.", exp: "Oh acts as a polite filler word." },
+            { s: "Accidentally drinking salt water instead of plain.", ans: "Yuck who kept this here?", exp: "Yuck is immediate rejection of taste." },
+            { s: "Watching India win a cricket match by 1 run.", ans: "Yippee what a match!", exp: "Yippee is celebratory joy." },
+            { s: "When someone steps on your new white sneakers.", ans: "Damn watch where you walk.", exp: "Damn is anger at disrespect." },
+            { s: "Smelling fresh filter coffee in the morning.", ans: "Mmm I needed this.", exp: "Mmm is aroma appreciation." },
+            { s: "When you finally understand a math concept.", ans: "Ah now the formula makes sense.", exp: "Ah is mental clarity." },
+            { s: "Catching your sibling wearing your clothes.", ans: "Aha take that shirt off right now.", exp: "Aha is catching someone red-handed." },
+            { s: "Friend says they are running 10 mins late.", ans: "Cool I am waiting.", exp: "Cool is casual acceptance." },
+            { s: "Looking at a huge electricity bill in summer.", ans: "Wow they increased the rates again.", exp: "Wow is negative shock." },
+            { s: "When the dentist touches the sensitive tooth.", ans: "Ouch that is the spot.", exp: "Ouch is direct physical pain." },
+            { s: "Trying to explain a lie to your parents.", ans: "Uh I was at the library.", exp: "Uh is nervous hesitation." },
+            { s: "Realizing tomorrow is Sunday not Monday.", ans: "Oh thank god.", exp: "Oh is a sudden wave of relief." },
+            { s: "Seeing your salary credited message.", ans: "Yippee time to order food.", exp: "Yippee is financial joy." },
+            { s: "When the maid does not come for 3 days.", ans: "Damn the dishes are piling up.", exp: "Damn is domestic frustration." },
+            { s: "Tasting mom's special paneer butter masala.", ans: "Mmm this is restaurant quality.", exp: "Mmm is high food praise." },
+            { s: "When the tailor stitches the dress perfectly.", ans: "Ooh the fitting is great.", exp: "Ooh is visual appreciation." },
+            { s: "Seeing someone pick their nose in public.", ans: "Yuck that is gross.", exp: "Yuck is social disgust." },
+            { s: "Finally sitting in the train after running.", ans: "Ah we made it.", exp: "Ah is post-stress relief." },
+            { s: "Catching a mosquito that was biting you.", ans: "Aha got you!", exp: "Aha is triumph over an enemy." },
+            { s: "Friend suggests skipping the boring lecture.", ans: "Cool let us go to the canteen.", exp: "Cool is peer agreement." },
+            { s: "Getting a paper cut from an envelope.", ans: "Ouch that stings.", exp: "Ouch is sharp minor pain." },
+            { s: "Looking at the crowd in dadar station.", ans: "Wow how will we get in?", exp: "Wow is overwhelming scale." },
+            { s: "Trying to pronounce a tough English word.", ans: "Uh is it pronounced like this?", exp: "Uh is linguistic hesitation." },
+            { s: "When your bike runs out of petrol halfway.", ans: "Damn I should have filled it.", exp: "Damn is regretful frustration." },
+            { s: "Seeing a very cute street puppy.", ans: "Ooh look at his little paws.", exp: "Ooh is endearing affection." },
+            { s: "Finding out your favorite show got cancelled.", ans: "Oh I really liked that one.", exp: "Oh is mild disappointment." },
+            { s: "Eating a beautifully baked chocolate cake.", ans: "Mmm the texture is so soft.", exp: "Mmm is sensory enjoyment." },
+            { s: "When the internet comes back after an hour.", ans: "Ah finally I can work.", exp: "Ah is restoration of order." }
+        ];
+
+        // ================= QUIZ LOGIC =================
+        let currentQuestions = [];
+        let currentQIndex = 0;
+        let score = 0;
+        let userAnswers = [];
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function startQuiz() {
+            document.getElementById('quiz-summary').classList.add('hidden');
+            document.getElementById('quiz-container').classList.remove('hidden');
+            
+            // Pick 10 random questions
+            let tempBank = [...masterQuizBank];
+            shuffleArray(tempBank);
+            currentQuestions = tempBank.slice(0, 10).map(qStr => {
+                const parts = qStr.split(',');
+                return {
+                    question: parts[0],
+                    answer: parts[1],
+                    type: parts[2],
+                    options: parts[3].split('|'),
+                    reasoning: parts[4]
+                };
+            });
+            
+            currentQIndex = 0;
+            score = 0;
+            userAnswers = [];
+            quizStartTime = globalSeconds;
+            updateScoreDisplay();
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const q = currentQuestions[currentQIndex];
+            document.getElementById('q-current').innerText = currentQIndex + 1;
+            document.getElementById('quiz-progress').style.width = `${((currentQIndex) / 10) * 100}%`;
+            document.getElementById('question-text').innerText = q.question;
+            document.getElementById('feedback-area').classList.add('hidden');
+            
+            const optionsArea = document.getElementById('options-area');
+            optionsArea.innerHTML = '';
+            
+            let displayOptions = [...q.options];
+            if(q.type === 'mcq') shuffleArray(displayOptions); // only shuffle MCQs
+
+            displayOptions.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'w-full text-left bg-[#080D1A] border border-white/5 rounded-xl p-4 hover:bg-white/10 transition-colors text-white';
+                btn.innerText = opt;
+                btn.onclick = () => checkAnswer(opt, btn);
+                optionsArea.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selectedOpt, btnElement) {
+            // Disable all buttons
+            const btns = document.getElementById('options-area').querySelectorAll('button');
+            btns.forEach(b => {
+                b.onclick = null;
+                b.classList.remove('hover:bg-white/10');
+            });
+
+            const q = currentQuestions[currentQIndex];
+            const isCorrect = selectedOpt === q.answer;
+            
+            if(isCorrect) {
+                btnElement.classList.remove('bg-[#080D1A]', 'border-white/5');
+                btnElement.classList.add('bg-green-600/20', 'border-green-500', 'text-green-400');
+                score++;
+                updateScoreDisplay();
+            } else {
+                btnElement.classList.remove('bg-[#080D1A]', 'border-white/5');
+                btnElement.classList.add('bg-red-600/20', 'border-red-500', 'text-red-400');
+                // Highlight correct
+                btns.forEach(b => {
+                    if(b.innerText === q.answer) {
+                        b.classList.remove('bg-[#080D1A]', 'border-white/5');
+                        b.classList.add('bg-green-600/20', 'border-green-500', 'text-green-400');
+                    }
+                });
+            }
+
+            // Show feedback
+            const feedbackArea = document.getElementById('feedback-area');
+            feedbackArea.classList.remove('hidden');
+            feedbackArea.classList.remove('bg-green-900/20', 'border-green-500/20', 'bg-red-900/20', 'border-red-500/20');
+            
+            if(isCorrect) {
+                feedbackArea.classList.add('bg-green-900/20', 'border-green-500/20');
+                document.getElementById('feedback-title').innerText = "Correct!";
+                document.getElementById('feedback-title').className = "font-bold text-lg mb-2 text-green-400";
+            } else {
+                feedbackArea.classList.add('bg-red-900/20', 'border-red-500/20');
+                document.getElementById('feedback-title').innerText = "Incorrect";
+                document.getElementById('feedback-title').className = "font-bold text-lg mb-2 text-red-400";
+            }
+            document.getElementById('feedback-text').innerText = q.reasoning;
+        }
+
+        function nextQuestion() {
+            currentQIndex++;
+            if(currentQIndex < 10) {
+                loadQuestion();
+            } else {
+                endQuiz();
+            }
+        }
+
+        function updateScoreDisplay() {
+            document.getElementById('quiz-score').innerText = `${score}`;
+        }
+
+        function endQuiz() {
+            document.getElementById('quiz-container').classList.add('hidden');
+            document.getElementById('quiz-summary').classList.remove('hidden');
+            
+            document.getElementById('summary-score').innerText = `${score}/10`;
+            document.getElementById('summary-accuracy').innerText = `${(score/10)*100}%`;
+            
+            const timeTaken = globalSeconds - quizStartTime;
+            const mins = String(Math.floor(timeTaken / 60)).padStart(2, '0');
+            const secs = String(timeTaken % 60).padStart(2, '0');
+            document.getElementById('summary-time').innerText = `${mins}:${secs}`;
+        }
+
+        // ================= IRL LOGIC =================
+        let irlIndex = 0;
+        
+        function renderIrlCards() {
+            const container = document.getElementById('irl-container');
+            container.innerHTML = '';
+            
+            const currentBatch = irlData.slice(irlIndex, irlIndex + 5);
+            document.getElementById('irl-page').innerText = Math.floor(irlIndex/5) + 1;
+
+            currentBatch.forEach((item, idx) => {
+                const card = document.createElement('div');
+                card.className = 'bg-[#080D1A] p-5 rounded-xl border border-white/5 relative';
+                
+                card.innerHTML = `
+                    <p class="text-gray-300 font-medium mb-3 pr-10">${item.s}</p>
+                    <div class="hidden-answer hidden mt-4 pt-4 border-t border-white/10">
+                        <p class="text-white font-bold text-lg italic serif-italic mb-2">"${item.ans}"</p>
+                        <p class="text-sm text-[#2563EB]">${item.exp}</p>
+                    </div>
+                    <button onclick="toggleIrlAnswer(this)" class="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                    </button>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function toggleIrlAnswer(btn) {
+            const answerDiv = btn.parentElement.querySelector('.hidden-answer');
+            if(answerDiv.classList.contains('hidden')) {
+                answerDiv.classList.remove('hidden');
+                btn.classList.add('text-[#2563EB]');
+            } else {
+                answerDiv.classList.add('hidden');
+                btn.classList.remove('text-[#2563EB]');
+            }
+        }
+
+        function nextIrl() {
+            if(irlIndex + 5 < irlData.length) {
+                irlIndex += 5;
+                renderIrlCards();
+            }
+        }
+
+        function prevIrl() {
+            if(irlIndex - 5 >= 0) {
+                irlIndex -= 5;
+                renderIrlCards();
+            }
+        }
+
+        // ================= EXPORT LOGIC =================
+        function downloadAnki() {
+            let csvContent = "";
+            masterQuizBank.forEach(q => {
+                const parts = q.split(',');
+                // strictly Question,Answer
+                csvContent += `${parts[0]},${parts[1]}\n`;
+            });
+            
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", "interjections_anki_deck.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Init
+        shuffleArray(irlData);
+        renderIrlCards();
+    </script>
+</body>
+</html>
