@@ -1,3 +1,4 @@
+```
 Fluency Bridge Workspace Compiler v2.0
 
 Official Syntax Master Guide
@@ -162,3 +163,4 @@ Check: Did you use pipes | to separate the 5 main chunks of the MCQ question? Di
 Check: Did you remember to add the pipe | inside the [English Text] brackets? (e.g., [Part 1 | Part 2]).
 
 Follow these rules rigidly, and the Fluency Bridge Compiler will generate flawless, interactive applications every single time.
+```
