@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fluency Bridge | The Science of Heritability: Hair Color and IQ</title>
+    <script>
+        window.tailwind = { config: { theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'], serif: ['Playfair Display', 'serif'] }, colors: { brand: { bg: '#060B19', card: '#111A2C', input: '#080D1A', primary: '#2563EB' } } } } } };
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@1,600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #060B19; color: #ffffff; }
+        .serif-italic { font-family: 'Playfair Display', serif; font-style: italic; }
+        .phrase-underline { border-bottom: 2px dotted #4b5563; transition: all 0.2s ease; cursor: pointer; }
+        .phrase-underline:hover { border-bottom-color: #ffffff; background-color: rgba(255, 255, 255, 0.05); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col relative overflow-x-hidden">
+    <div class="fixed inset-0 z-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#131E3A] via-[#060B19] to-transparent opacity-80 pointer-events-none"></div>
+    <header class="sticky top-0 z-40 bg-[#060B19]/80 backdrop-blur-md border-b border-white/5">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center gap-4">
+            <a href="https://fluencybridgeedu.online" class="flex flex-col items-start group">
+                <span class="tracking-[0.3em] text-[10px] text-gray-300 font-semibold uppercase">F L U E N C Y</span>
+                <span class="serif-italic text-white text-4xl mt-[-4px]">bridge</span>
+            </a>
+            <nav class="flex space-x-1 sm:space-x-3 bg-[#111A2C] p-1 rounded-2xl border-t border-white/5 overflow-x-auto no-scrollbar">
+                <button onclick="switchTab('read')" id="nav-read" class="px-4 py-2 rounded-xl text-sm font-medium transition-all text-white bg-[#2563EB]">Read</button>
+                <button onclick="switchTab('vocab')" id="nav-vocab" class="px-4 py-2 rounded-xl text-sm font-medium text-gray-400">Vocab</button>
+                <button onclick="switchTab('grammar')" id="nav-grammar" class="px-4 py-2 rounded-xl text-sm font-medium text-gray-400">Grammar</button>
+                <button onclick="switchTab('quiz')" id="nav-quiz" class="px-4 py-2 rounded-xl text-sm font-medium text-gray-400">Quiz</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="flex-grow relative z-10 max-w-4xl mx-auto w-full p-4 sm:p-6 pb-24">
+        <section id="section-read" class="block">
+            <div class="bg-brand-card rounded-3xl p-6 sm:p-8 border-t border-white/5 shadow-2xl">
+                <h1 class="text-2xl font-bold mb-6 text-white border-b border-white/10 pb-4">The Science of Heritability: Hair Color and IQ</h1>
+                <div id="article-container" class="space-y-6 text-lg leading-relaxed text-gray-200"></div>
+            </div>
+        </section>
+        <section id="section-vocab" class="hidden space-y-6"><div class="bg-brand-card rounded-3xl p-6 border-t border-white/5 shadow-2xl"><h2 class="text-xl font-bold mb-4 text-white">Main Vocabulary</h2><div id="vocab-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div></div></section>
+        <section id="section-grammar" class="hidden space-y-6"><div class="bg-brand-card rounded-3xl p-6 border-t border-white/5 shadow-2xl"><h2 class="text-xl font-bold mb-4 text-white">Grammar Structures</h2><div id="grammar-list" class="space-y-4"></div></div></section>
+        <section id="section-quiz" class="hidden space-y-6"><div class="bg-brand-card rounded-3xl p-6 border-t border-white/5 shadow-2xl min-h-[400px] flex flex-col"><div class="flex justify-between items-center mb-6 pb-4 border-b border-white/10"><h2 class="text-xl font-bold text-white">Assessment</h2><span id="quiz-progress-text" class="text-sm font-medium text-gray-400"></span></div><div class="w-full bg-white/10 rounded-full h-2 mb-8"><div id="quiz-progress-bar" class="bg-brand-primary h-2 rounded-full transition-all duration-300"></div></div><div id="quiz-container" class="flex-grow flex flex-col justify-center"></div></div></section>
+    </main>
+
+    <footer class="fixed bottom-0 left-0 right-0 z-40 bg-[#060B19]/90 backdrop-blur-md border-t border-white/5"><div class="max-w-4xl mx-auto px-6 py-3 flex justify-between items-center"><button onclick="goBack()" class="text-gray-400 text-sm font-medium hover:text-white">Back</button><a href="https://fluencybridgeedu.online" class="text-gray-400 text-sm font-medium">Home</a></div></footer>
+
+    <div id="phrase-popup" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-brand-card w-full sm:max-w-xl rounded-t-3xl sm:rounded-3xl p-6 border-t border-white/5 transform translate-y-full transition-transform duration-300 max-h-[85vh] flex flex-col" id="popup-content">
+            <div class="flex justify-between items-start mb-4"><h3 id="popup-sentence-header" class="text-lg font-bold text-white pr-8"></h3><button onclick="closePopup()" class="text-gray-400 bg-white/5 p-1 rounded-full"><i data-lucide="x" class="w-5 h-5"></i></button></div>
+            <p id="popup-sentence-meaning" class="text-sm text-brand-primary font-medium mb-6 italic border-l-2 border-brand-primary pl-3"></p>
+            <div class="flex space-x-2 border-b border-white/10 mb-4 overflow-x-auto no-scrollbar pb-2"><button onclick="switchPopupTab('vocab')" id="popup-tab-vocab" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-brand-primary text-white">Vocabulary</button><button onclick="switchPopupTab('grammar')" id="popup-tab-grammar" class="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-400">Grammar</button></div>
+            <div class="overflow-y-auto flex-grow pr-2 pb-4"><div id="popup-content-vocab" class="space-y-3 block"><div id="popup-words-container" class="flex flex-wrap gap-2"></div><div id="word-detail-box" class="mt-4 bg-brand-input border border-white/5 rounded-xl p-4 hidden"><div class="flex items-center gap-2 mb-2"><span id="wd-word" class="font-bold text-white text-lg"></span><span id="wd-pos" class="text-xs px-2 py-0.5 rounded-full bg-white/10 text-gray-300"></span></div><p id="wd-meaning" class="text-brand-primary font-medium text-sm mb-1"></p><p id="wd-detail" class="text-gray-400 text-sm"></p></div></div><div id="popup-content-grammar" class="space-y-4 hidden"><p id="popup-grammar-text" class="text-sm text-gray-300 leading-relaxed"></p></div></div>
+            <button onclick="closePopup()" class="w-full mt-4 bg-white/5 text-white font-medium py-3 rounded-xl border border-white/5">Close</button>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        const articleData = [{"id":"p1","sentences":[{"id":"s0","text":"How heritable is hair color?","meaning":"Baalon ka rang kitna anuvanshik hota hai?","grammar":"Simple Present tense ka use ek sawal puchne ke liye kiya gaya hai.","phrases":[{"id":"ph0_0","text":"How heritable is hair color?","words":[{"w":"Heritable","m":"Anuvanshik","pos":"Adjective","d":"Jo genes ke zariye mata-pita se milta ho"},{"w":"Hair color","m":"Baalon ka rang","pos":"Noun","d":"Baalon ki natural rangat"}]}]},{"id":"s1","text":"Well, if you’re a redhead  and you have an identical twin,","meaning":"Khair, agar aapke baal lal hain aur aapka ek jaisa dikhne wala judwa bhai ya behen hai,","grammar":"Zero Conditional ka use factual sachai batane ke liye hua hai.","phrases":[{"id":"ph1_0","text":"Well, if you’re a redhead","words":[{"w":"Redhead","m":"Lal baalon wala","pos":"Noun","d":"Woh vyakti jiske baal natural taur par lal hon"},{"w":"Identical twin","m":"Ek jaisa judwa","pos":"Noun","d":"Judwa jo ek hi egg se develop hote hain aur bilkul ek jaise dikhte hain"}]},{"id":"ph1_1","text":"and you have an identical twin,","words":[{"w":"Redhead","m":"Lal baalon wala","pos":"Noun","d":"Woh vyakti jiske baal natural taur par lal hon"},{"w":"Identical twin","m":"Ek jaisa judwa","pos":"Noun","d":"Judwa jo ek hi egg se develop hote hain aur bilkul ek jaise dikhte hain"}]}]},{"id":"s2","text":"they will definitely  also be a redhead.","meaning":"toh woh bhi nishchit roop se lal baalon wale honge.","grammar":"Future Simple 'will' ka use 100% certainty dikhane ke liye kiya gaya hai.","phrases":[{"id":"ph2_0","text":"they will definitely","words":[{"w":"Definitely","m":"Nishchit roop se","pos":"Adverb","d":"Bina kisi shak ke"},{"w":"Also","m":"Bhi","pos":"Adverb","d":"Addition dikhane ke liye"}]},{"id":"ph2_1","text":"also be a redhead.","words":[{"w":"Definitely","m":"Nishchit roop se","pos":"Adverb","d":"Bina kisi shak ke"},{"w":"Also","m":"Bhi","pos":"Adverb","d":"Addition dikhane ke liye"}]}]},{"id":"s4","text":"And there’s some randomness  in where melanocytes end up  on your skull  when you’re an embryo.","meaning":"Aur isme kuch anishchit-ta hoti hai ki jab aap ek bhrun hote hain, toh melanocytes aapki khopdi par kahan rukte hain.","grammar":"Subordinating conjunction 'when' ka use time frame batane ke liye hua hai.","phrases":[{"id":"ph4_0","text":"And there’s some randomness","words":[{"w":"Randomness","m":"Anishchit-ta","pos":"Noun","d":"Bina kisi pattern ya plan ke hona"},{"w":"Embryo","m":"Bhrun","pos":"Noun","d":"Vikas ki shuruati stage wala jeev"},{"w":"Skull","m":"Khopdi","pos":"Noun","d":"Sir ki haddi ka dhancha"}]},{"id":"ph4_1","text":"in where melanocytes end up","words":[{"w":"Randomness","m":"Anishchit-ta","pos":"Noun","d":"Bina kisi pattern ya plan ke hona"},{"w":"Embryo","m":"Bhrun","pos":"Noun","d":"Vikas ki shuruati stage wala jeev"},{"w":"Skull","m":"Khopdi","pos":"Noun","d":"Sir ki haddi ka dhancha"}]},{"id":"ph4_2","text":"on your skull","words":[{"w":"Randomness","m":"Anishchit-ta","pos":"Noun","d":"Bina kisi pattern ya plan ke hona"},{"w":"Embryo","m":"Bhrun","pos":"Noun","d":"Vikas ki shuruati stage wala jeev"},{"w":"Skull","m":"Khopdi","pos":"Noun","d":"Sir ki haddi ka dhancha"}]},{"id":"ph4_3","text":"when you’re an embryo.","words":[{"w":"Randomness","m":"Anishchit-ta","pos":"Noun","d":"Bina kisi pattern ya plan ke hona"},{"w":"Embryo","m":"Bhrun","pos":"Noun","d":"Vikas ki shuruati stage wala jeev"},{"w":"Skull","m":"Khopdi","pos":"Noun","d":"Sir ki haddi ka dhancha"}]}]},{"id":"s5","text":"So the correct answer is,  some large number,  but less than 100%.","meaning":"Toh sahi jawab hai, ek badi sankhya, lekin 100% se kam.","grammar":"Coordinating conjunction 'but' ka use contrast dikhane ke liye hua hai.","phrases":[{"id":"ph5_0","text":"So the correct answer is,","words":[{"w":"Correct","m":"Sahi","pos":"Adjective","d":"Jo galat na ho"},{"w":"Less than","m":"Se kam","pos":"Prepositional Phrase","d":"Comparison ke liye"}]},{"id":"ph5_1","text":"some large number,","words":[{"w":"Correct","m":"Sahi","pos":"Adjective","d":"Jo galat na ho"},{"w":"Less than","m":"Se kam","pos":"Prepositional Phrase","d":"Comparison ke liye"}]},{"id":"ph5_2","text":"but less than 100%.","words":[{"w":"Correct","m":"Sahi","pos":"Adjective","d":"Jo galat na ho"},{"w":"Less than","m":"Se kam","pos":"Prepositional Phrase","d":"Comparison ke liye"}]}]},{"id":"s6","text":"Say I redefine “hair color”  to mean “hair color except  ignoring epigenetic and embryonic stuff”.","meaning":"Maano ki main \"hair color\" ko fir se paribhashit karta hoon, epigenetic aur bhrun se judi baaton ko nazarandaz karte huye.","grammar":"Infinitive 'to mean' ka use 'redefine' ka maqsad batane ke liye hua hai.","phrases":[{"id":"ph6_0","text":"Say I redefine “hair color”","words":[{"w":"Redefine","m":"Fir se paribhashit karna","pos":"Verb","d":"Kisi cheez ka naya matlab nikalna"},{"w":"Ignoring","m":"Nazarandaz karna","pos":"Verb (Gerund)","d":"Dhyaan na dena"},{"w":"Stuff","m":"Baatein / Saaman","pos":"Noun","d":"Aam taur par cheezon ke liye use hota hai"}]},{"id":"ph6_1","text":"to mean “hair color except","words":[{"w":"Redefine","m":"Fir se paribhashit karna","pos":"Verb","d":"Kisi cheez ka naya matlab nikalna"},{"w":"Ignoring","m":"Nazarandaz karna","pos":"Verb (Gerund)","d":"Dhyaan na dena"},{"w":"Stuff","m":"Baatein / Saaman","pos":"Noun","d":"Aam taur par cheezon ke liye use hota hai"}]},{"id":"ph6_2","text":"ignoring epigenetic and embryonic stuff”.","words":[{"w":"Redefine","m":"Fir se paribhashit karna","pos":"Verb","d":"Kisi cheez ka naya matlab nikalna"},{"w":"Ignoring","m":"Nazarandaz karna","pos":"Verb (Gerund)","d":"Dhyaan na dena"},{"w":"Stuff","m":"Baatein / Saaman","pos":"Noun","d":"Aam taur par cheezon ke liye use hota hai"}]}]},{"id":"s7","text":"The wise man answers,  “Some number between 0% or 100%”.","meaning":"Samajhdar vyakti jawab deta hai, \"0% aur 100% ke beech koi sankhya\".","grammar":"Reporting verb 'answers' Simple Present mein hai.","phrases":[{"id":"ph7_0","text":"The wise man answers,","words":[{"w":"Wise","m":"Samajhdar","pos":"Adjective","d":"Jiske paas gyan aur anubhav ho"},{"w":"Between","m":"Ke beech","pos":"Preposition","d":"Do points ke darmiyan"}]},{"id":"ph7_1","text":"“Some number between 0% or 100%”.","words":[{"w":"Wise","m":"Samajhdar","pos":"Adjective","d":"Jiske paas gyan aur anubhav ho"},{"w":"Between","m":"Ke beech","pos":"Preposition","d":"Do points ke darmiyan"}]}]},{"id":"s8","text":"In our branch of the multiverse,  some kids get private tutors  and organic food.","meaning":"Hamaare multiverse ki is shakha mein, kuch baccho ko private tutors aur organic khana milta hai.","grammar":"Prepositional phrase context set kar raha hai.","phrases":[{"id":"ph8_0","text":"In our branch of the multiverse,","words":[{"w":"Multiverse","m":"Bahu-brahmand","pos":"Noun","d":"Ek hypothetical concept jahan kai brahmand hote hain"},{"w":"Organic","m":"Jaivik","pos":"Adjective","d":"Bina chemicals ke ugaya gaya"}]},{"id":"ph8_1","text":"some kids get private tutors","words":[{"w":"Multiverse","m":"Bahu-brahmand","pos":"Noun","d":"Ek hypothetical concept jahan kai brahmand hote hain"},{"w":"Organic","m":"Jaivik","pos":"Adjective","d":"Bina chemicals ke ugaya gaya"}]},{"id":"ph8_2","text":"and organic food.","words":[{"w":"Multiverse","m":"Bahu-brahmand","pos":"Noun","d":"Ek hypothetical concept jahan kai brahmand hote hain"},{"w":"Organic","m":"Jaivik","pos":"Adjective","d":"Bina chemicals ke ugaya gaya"}]}]},{"id":"s9","text":"These things surely have  at least some impact on IQ.","meaning":"In cheezon ka IQ par nishchit roop se kam se kam kuch asar toh padta hi hai.","grammar":"Adverb 'surely' emphasis dene ke liye use hua hai.","phrases":[{"id":"ph9_0","text":"These things surely have","words":[{"w":"Surely","m":"Nishchit roop se","pos":"Adverb","d":"Pakke taur par"},{"w":"Impact","m":"Asar","pos":"Noun","d":"Prabhav"}]},{"id":"ph9_1","text":"at least some impact on IQ.","words":[{"w":"Surely","m":"Nishchit roop se","pos":"Adverb","d":"Pakke taur par"},{"w":"Impact","m":"Asar","pos":"Noun","d":"Prabhav"}]}]}]}];
+        const mainVocab = [{"word":"Heritable","meaning":"Anuvanshik","context":"Inherited characteristics through genes","example":"Eye color is a highly heritable trait."},{"word":"Identical","meaning":"Ek jaisa","context":"Exactly the same in every detail","example":"They are identical twins and hard to tell apart."},{"word":"Vary","meaning":"Badalna","context":"To be different in size amount or degree","example":"The prices of vegetables vary from shop to shop."},{"word":"Embryo","meaning":"Bhrun","context":"An unborn offspring in the process of development","example":"The embryo begins to develop specialized cells early on."},{"word":"Redefine","meaning":"Fir se paribhashit karna","context":"To give a new meaning to something","example":"We need to redefine our strategy to win the match."},{"word":"Randomness","meaning":"Anishchit-ta","context":"The quality of lacking any predictable plan","example":"The randomness of the lottery makes it fair for everyone."},{"word":"Epigenetic","meaning":"Epigenetic","context":"Relating to changes in organisms caused by gene expression","example":"Epigenetic factors can be influenced by our environment."},{"word":"Dysfunctional","meaning":"Jo theek se kaam na kare","context":"Not operating normally or properly","example":"Growing up in a dysfunctional family can be very difficult."}];
+        const mainGrammar = [{"title":"Zero Conditional","rule":"If + Simple Present | Simple Present","explanation":"General truths aur scientific facts batane ke liye","textExample":"'If you are a redhead... they are a redhead'","otherExample":"If you heat ice | it melts."},{"title":"Future Simple","rule":"Subject + will + Verb (Base form)","explanation":"Future ke predictions ya certainty batane ke liye","textExample":"'they will definitely be a redhead'","otherExample":"It will rain tomorrow."},{"title":"Relative Clause (at which)","rule":"Noun + at which + Subject + Verb","explanation":"Kisi specific point or time ko refer karne ke liye","textExample":"'the age at which twins go gray'","otherExample":"This is the point at which we start."},{"title":"Prepositional Phrase","rule":"Preposition + Noun/Pronoun","explanation":"Sentence mein direction | time | ya location ka context dene ke liye","textExample":"'In our branch of the multiverse'","otherExample":"The book is on the table."},{"title":"Adverb of Certainty","rule":"Subject + Adverb + Verb","explanation":"Kisi action ki surety dikhane ke liye","textExample":"'These things surely have some impact'","otherExample":"I will definitely come to your party."}];
+        const quizQuestions = [{"type":"mcq","q":"According to the text, if one identical twin is a redhead, the other will...","options":["Also be a redhead","Have a different color","Go gray immediately","Dye their hair"],"ans":0,"explanation":"The text states they will definitely also be a redhead."},{"type":"tf","q":"The age at which twins go gray is exactly the same regardless of lifestyle.","options":["True","False"],"ans":1,"explanation":"The text says the age seems to vary a bit based on lifestyle."},{"type":"mcq","q":"What does the author say about IQ in our society?","options":["It is 100% heritable","It depends on factors like tutors and food","It is only based on genes","It never changes"],"ans":1,"explanation":"The text mentions that things like private tutors and organic food have an impact on IQ."},{"type":"flashcard","q":"What are 'melanocytes'?","ans":"Cells responsible for skin/hair pigment","explanation":"They end up on your skull when you are an embryo and affect hair color."},{"type":"tf","q":"Redefining \"hair color\" to ignore lifestyle and environment makes it 100% heritable.","options":["True","False"],"ans":0,"explanation":"The author suggests that if we ignore all external factors, it becomes 100% heritable."}];
+        let currentQuizIndex = 0, quizScore = 0;
+
+        function switchTab(tabId) {
+            ['read', 'vocab', 'grammar', 'quiz'].forEach(id => {
+                document.getElementById('section-'+id).classList.add('hidden');
+                document.getElementById('nav-'+id).className = "px-4 py-2 rounded-xl text-sm font-medium transition-all text-gray-400";
+            });
+            document.getElementById('section-'+tabId).classList.remove('hidden');
+            document.getElementById('nav-'+tabId).className = "px-4 py-2 rounded-xl text-sm font-medium transition-all text-white bg-[#2563EB]";
+        }
+
+        function renderArticle() {
+            const container = document.getElementById('article-container');
+            container.innerHTML = articleData.map(p => '<p class="mb-4">' + p.sentences.map(s => '<span class="inline leading-loose mr-1">' + s.phrases.map(ph => '<span class="phrase-underline text-white" onclick="openPopup(\''+s.id+'\', \''+ph.id+'\')">'+ph.text+'</span>').join(' ') + '</span>').join(' ') + '</p>').join('');
+        }
+
+        function openPopup(sId, phId) {
+            let sentence;
+            articleData.forEach(p => p.sentences.forEach(s => { if(s.id === sId) sentence = s; }));
+            if(!sentence) return;
+            document.getElementById('popup-sentence-header').innerText = sentence.text;
+            document.getElementById('popup-sentence-meaning').innerText = sentence.meaning;
+            document.getElementById('popup-grammar-text').innerText = sentence.grammar;
+            const wordsContainer = document.getElementById('popup-words-container');
+            wordsContainer.innerHTML = '';
+            document.getElementById('word-detail-box').classList.add('hidden');
+            sentence.phrases[0].words.forEach(w => {
+                const b = document.createElement('button');
+                b.className = "bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-gray-200 hover:bg-white/10";
+                b.innerText = w.w;
+                b.onclick = () => { document.getElementById('wd-word').innerText = w.w; document.getElementById('wd-pos').innerText = w.pos; document.getElementById('wd-meaning').innerText = w.m; document.getElementById('wd-detail').innerText = w.d; document.getElementById('word-detail-box').classList.remove('hidden'); };
+                wordsContainer.appendChild(b);
+            });
+            const popup = document.getElementById('phrase-popup');
+            const content = document.getElementById('popup-content');
+            popup.classList.remove('hidden'); void popup.offsetWidth;
+            popup.classList.remove('opacity-0'); content.classList.remove('translate-y-full');
+            document.body.style.overflow = 'hidden';
+            switchPopupTab('vocab');
+        }
+
+        function closePopup() { document.getElementById('phrase-popup').classList.add('opacity-0'); document.getElementById('popup-content').classList.add('translate-y-full'); setTimeout(() => { document.getElementById('phrase-popup').classList.add('hidden'); document.body.style.overflow = ''; }, 300); }
+        function switchPopupTab(t) {
+            const vB = document.getElementById('popup-tab-vocab'), gB = document.getElementById('popup-tab-grammar');
+            const vC = document.getElementById('popup-content-vocab'), gC = document.getElementById('popup-content-grammar');
+            if(t === 'vocab') { vB.className = "px-3 py-1.5 rounded-lg text-sm font-medium bg-brand-primary text-white"; gB.className = "px-3 py-1.5 rounded-lg text-sm font-medium text-gray-400"; vC.classList.remove('hidden'); gC.classList.add('hidden'); }
+            else { gB.className = "px-3 py-1.5 rounded-lg text-sm font-medium bg-brand-primary text-white"; vB.className = "px-3 py-1.5 rounded-lg text-sm font-medium text-gray-400"; gC.classList.remove('hidden'); vC.classList.add('hidden'); }
+        }
+
+        function renderVocab() { document.getElementById('vocab-list').innerHTML = mainVocab.map(v => '<div class="bg-brand-input border border-white/5 p-4 rounded-2xl"><h3 class="text-lg font-bold text-brand-primary">'+v.word+'</h3><p class="text-white font-medium text-sm mb-2">'+v.meaning+'</p><p class="text-gray-400 text-xs mb-3 border-l-2 border-gray-600 pl-2">Context: '+v.context+'</p><div class="bg-[#060B19] p-2 rounded-lg"><p class="text-sm text-gray-300 italic">"'+v.example+'"</p></div></div>').join(''); }
+        function renderGrammar() { document.getElementById('grammar-list').innerHTML = mainGrammar.map((g,i) => '<div class="bg-brand-input border border-white/5 rounded-2xl overflow-hidden"><button class="w-full text-left p-4 flex justify-between items-center" onclick="document.getElementById(\'g-acc-'+i+'\').classList.toggle(\'hidden\')"><span class="font-bold text-white">'+g.title+'</span><i data-lucide="chevron-down" class="w-5 h-5 text-gray-400"></i></button><div id="g-acc-'+i+'" class="hidden px-4 pb-4 pt-3 border-t border-white/5"><div class="inline-block bg-[#2563EB]/20 text-blue-300 text-xs px-2 py-1 rounded mb-3">'+g.rule+'</div><p class="text-sm text-gray-300 mb-4">'+g.explanation+'</p><div class="bg-[#060B19] p-3 rounded-xl mb-2"><p class="text-sm text-brand-primary italic">'+g.textExample+'</p></div><div class="bg-[#060B19] p-3 rounded-xl"><p class="text-sm text-gray-300">'+g.otherExample+'</p></div></div></div>').join(''); }
+
+        function renderQuiz() {
+            const container = document.getElementById('quiz-container');
+            if(currentQuizIndex >= quizQuestions.length) { container.innerHTML = '<div class="text-center py-8"><h3 class="text-2xl font-bold text-white mb-2">Quiz Completed!</h3><p class="text-gray-400 mb-6">You scored '+quizScore+' / '+quizQuestions.length+'</p><button onclick="currentQuizIndex=0;quizScore=0;renderQuiz()" class="bg-brand-primary text-white font-medium px-8 py-3 rounded-xl">Retake</button></div>'; return; }
+            const q = quizQuestions[currentQuizIndex];
+            document.getElementById('quiz-progress-text').innerText = 'Question '+(currentQuizIndex+1)+'/'+quizQuestions.length;
+            document.getElementById('quiz-progress-bar').style.width = ((currentQuizIndex+1)/quizQuestions.length*100)+'%';
+            let html = '<div class="mb-8"><h3 class="text-xl text-white font-medium">'+q.q+'</h3></div>';
+            if(q.type !== 'flashcard') {
+                html += '<div class="space-y-3">' + q.options.map((o,i) => '<button onclick="submitAnswer('+i+')" class="w-full text-left bg-brand-input border border-white/5 p-4 rounded-xl text-gray-200">'+o+'</button>').join('') + '</div>';
+            } else {
+                html += '<div class="text-center"><button onclick="document.getElementById(\'f-ans\').classList.remove(\'hidden\');this.classList.add(\'hidden\')" class="bg-brand-input border border-white/5 py-6 rounded-xl w-full block">Tap to reveal</button><div id="f-ans" class="hidden bg-white/5 border border-brand-primary/30 p-6 rounded-xl mt-4"><p class="text-brand-primary font-bold text-lg">'+q.ans+'</p><p class="text-sm text-gray-400 mt-2">'+q.explanation+'</p><button onclick="submitAnswer(true)" class="mt-6 bg-brand-primary text-white font-medium px-6 py-2 rounded-lg w-full">Next</button></div></div>';
+            }
+            container.innerHTML = html; lucide.createIcons();
+        }
+
+        function submitAnswer(idx) {
+            const q = quizQuestions[currentQuizIndex];
+            if(q.type !== 'flashcard') {
+                if(idx === q.ans) quizScore++;
+                const container = document.getElementById('quiz-container');
+                container.innerHTML += '<div class="mt-6 bg-blue-900/20 border border-blue-500/30 p-4 rounded-xl"><p class="text-sm text-gray-300"><b>Explanation:</b> '+q.explanation+'</p><button onclick="currentQuizIndex++;renderQuiz()" class="mt-4 bg-brand-primary text-white font-medium px-6 py-2 rounded-lg w-full">Next</button></div>';
+            } else { quizScore++; currentQuizIndex++; renderQuiz(); }
+        }
+        renderArticle(); renderVocab(); renderGrammar(); renderQuiz();
+    </script>
+</body>
+</html>
