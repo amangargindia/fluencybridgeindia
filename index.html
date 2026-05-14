@@ -100,6 +100,7 @@
         <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
             <div class="flex items-center gap-4 sm:gap-6 overflow-x-auto no-scrollbar">
                 <button onclick="setTab('Notes')" id="tab-Notes" class="tab-btn text-brand-400 font-bold transition-colors whitespace-nowrap">Notes</button>
+                <button onclick="setTab('Reader')" id="tab-Reader" class="tab-btn text-slate-400 hover:text-slate-200 transition-colors whitespace-nowrap">Reader</button>
                 <button onclick="setTab('Tools')" id="tab-Tools" class="tab-btn text-slate-400 hover:text-slate-200 transition-colors whitespace-nowrap">Tools</button>
                 <button onclick="setTab('Mistakes')" id="tab-Mistakes" class="tab-btn text-slate-400 hover:text-slate-200 transition-colors whitespace-nowrap">Mistakes</button>
             </div>
@@ -250,6 +251,7 @@
             if (lc.includes("tools")) return "wrench";
             if (lc.includes("test")) return "check-square";
             if (lc.includes("mistake")) return "alert-circle";
+            if (lc.includes("reader")) return "book-open";
             return "folder";
         }
 
