@@ -294,6 +294,13 @@
     "rootGroup": "Notes"
   },
   {
+    "title": "Workspace Compiler",
+    "slug": "ReaderAdminPortal",
+    "folder": "tools",
+    "category": "Tools",
+    "rootGroup": "Tools"
+  },
+  {
     "title": "Class Notes Creator",
     "slug": "docxtopdf",
     "folder": "tools",
