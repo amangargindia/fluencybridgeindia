@@ -1,6 +1,13 @@
 [
   {
     "title": "Article Reader",
+    "slug": "Iran-Negotiations",
+    "folder": "Reader",
+    "category": "Reader",
+    "rootGroup": "Reader"
+  },
+  {
+    "title": "Article Reader",
     "slug": "TEST-2",
     "folder": "Reader",
     "category": "Reader",
