@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fluency Bridge | Article Reader</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #060B19;
+            color: #ffffff;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .font-serif { font-family: 'Playfair Display', serif; }
+        
+        /* Custom Scrollbar for dark theme */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #060B19; }
+        ::-webkit-scrollbar-thumb { background: #111A2C; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #2563EB; }
+
+        /* Background Gradient */
+        .bg-radial-gradient {
+            background: radial-gradient(circle at top center, #131E3A 0%, #060B19 60%, #060B19 100%);
+        }
+
+        /* Dotted underline for phrases */
+        .phrase-highlight {
+            border-bottom: 1px dashed rgba(255,255,255,0.3);
+            transition: all 0.2s ease;
+            cursor: pointer;
+            padding-bottom: 2px;
+            line-height: 2.2;
+        }
+        .phrase-highlight:hover {
+            border-bottom-color: #2563EB;
+            color: #93C5FD;
+            background-color: rgba(255,255,255,0.02);
+            border-radius: 4px;
+        }
+
+        /* Native button styling for words to ensure 100% clickability */
+        .word-interactive {
+            cursor: pointer;
+            transition: all 0.2s;
+            padding: 2px 4px;
+            margin: -2px 0;
+            border-radius: 6px;
+            border: none;
+            background: transparent;
+            font-family: inherit;
+            font-size: inherit;
+            touch-action: manipulation; /* Improves touch responsiveness on mobile */
+            outline: none;
+            color: inherit;
+        }
+        .word-interactive:hover, .word-active {
+            background-color: rgba(37, 99, 235, 0.2);
+            color: #60A5FA !important;
+        }
+
+        /* Animation utilities */
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-radial-gradient min-h-screen flex flex-col relative pb-20">
+
+    <!-- Top Navigation & Header -->
+    <header class="p-4 md:p-6 sticky top-0 z-40 bg-[#060B19]/80 backdrop-blur-xl border-b border-white/5">
+        <div class="flex flex-col items-center cursor-pointer" onclick="window.location.href='http://fluencybridgeedu.online'">
+            <span class="tracking-[0.3em] text-[10px] text-gray-300 uppercase">F L U E N C Y</span>
+            <span class="text-white text-4xl italic font-serif leading-tight">bridge</span>
+        </div>
+        
+        <nav class="flex justify-center gap-6 mt-6 text-sm font-medium">
+            <button onclick="switchTab('read')" id="tab-read" class="nav-tab text-white pb-1 border-b-2 border-[#2563EB] transition-colors">Read</button>
+            <button onclick="switchTab('vocab')" id="tab-vocab" class="nav-tab text-gray-400 pb-1 border-b-2 border-transparent hover:text-white transition-colors">Vocab</button>
+            <button onclick="switchTab('grammar')" id="tab-grammar" class="nav-tab text-gray-400 pb-1 border-b-2 border-transparent hover:text-white transition-colors">Grammar</button>
+            <button onclick="switchTab('quiz')" id="tab-quiz" class="nav-tab text-gray-400 pb-1 border-b-2 border-transparent hover:text-white transition-colors">Quiz</button>
+        </nav>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow w-full max-w-3xl mx-auto p-4 md:p-6 relative z-10">
+        
+        <!-- SECTION: READ ARTICLE -->
+        <section id="sec-read" class="fade-in space-y-6">
+            <div class="bg-[#111A2C] border-t border-white/5 shadow-2xl rounded-2xl md:rounded-3xl p-6 md:p-8">
+                <h1 class="text-2xl font-bold text-white mb-6">Article: Google's Storage Policy Shift</h1>
+                <div id="article-container" class="text-lg text-gray-300 space-y-4 font-medium tracking-wide">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+            <p class="text-sm text-gray-500 text-center mt-4">Tap on any dotted phrase to understand its meaning and grammar.</p>
+        </section>
+
+        <!-- SECTION: MAIN VOCAB -->
+        <section id="sec-vocab" class="fade-in hidden space-y-4">
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold text-white">Main Vocabulary</h2>
+                <p class="text-sm text-gray-400 mt-2">Words you might not know from the text, explained in easy Hinglish.</p>
+            </div>
+            <div id="main-vocab-container" class="space-y-4">
+                <!-- Populated by JS -->
+            </div>
+        </section>
+
+        <!-- SECTION: MAIN GRAMMAR STRUCTURE -->
+        <section id="sec-grammar" class="fade-in hidden space-y-4">
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold text-white">Grammar Structures</h2>
+                <p class="text-sm text-gray-400 mt-2">Key grammatical rules used in the article, explained practically.</p>
+            </div>
+            <div id="main-grammar-container" class="space-y-4">
+                <!-- Populated by JS -->
+            </div>
+        </section>
+
+        <!-- SECTION: QUIZ -->
+        <section id="sec-quiz" class="fade-in hidden space-y-6">
+            <div class="bg-[#111A2C] border-t border-white/5 shadow-2xl rounded-2xl md:rounded-3xl p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-bold text-white">Assessment</h2>
+                    <span id="quiz-progress" class="text-xs text-gray-400 font-semibold bg-[#080D1A] px-3 py-1 rounded-full border border-white/5">0 / 15</span>
+                </div>
+                
+                <!-- Progress Bar -->
+                <div class="w-full bg-white/10 rounded-full h-2 mb-8">
+                    <div id="quiz-progress-bar" class="bg-[#2563EB] h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+
+                <div id="quiz-container" class="min-h-[250px]">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Interactive Phrase Modal -->
+    <div id="phrase-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeModal()"></div>
+        
+        <div class="absolute bottom-0 left-0 right-0 md:top-1/2 md:left-1/2 md:right-auto md:bottom-auto md:-translate-x-1/2 md:-translate-y-1/2 bg-[#111A2C] w-full md:w-[600px] max-h-[85vh] md:max-h-[80vh] rounded-t-3xl md:rounded-3xl border-t md:border border-white/5 shadow-2xl flex flex-col overflow-hidden transition-transform transform translate-y-full md:translate-y-0 duration-300" id="modal-content-box">
+            
+            <!-- Drag Handle (Mobile) -->
+            <div class="w-full flex justify-center pt-3 pb-1 md:hidden" onclick="closeModal()">
+                <div class="w-12 h-1.5 bg-white/20 rounded-full"></div>
+            </div>
+
+            <div class="p-5 md:p-6 overflow-y-auto custom-scrollbar flex-grow space-y-6">
+                <!-- Header: The Phrase -->
+                <div>
+                    <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Phrase Focus</h3>
+                    <p class="text-[11px] text-[#60A5FA] mb-2 font-medium">Tap any word below for its meaning</p>
+                    <div id="modal-interactive-words" class="text-xl font-medium text-white leading-relaxed flex flex-wrap gap-x-1 gap-y-2">
+                        <!-- Interactive Words go here, acting as the header -->
+                    </div>
+                </div>
+
+                <!-- Action: Translate Entire Sentence -->
+                <div class="bg-[#080D1A] border border-white/5 rounded-xl p-4">
+                    <button onclick="toggleSentenceMeaning()" class="w-full flex justify-between items-center text-sm font-semibold text-[#2563EB]">
+                        <span>Translate Entire Sentence</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <p id="modal-sentence-meaning" class="hidden mt-3 text-sm text-gray-300 border-t border-white/10 pt-3 leading-relaxed"></p>
+                </div>
+
+                <!-- Sub-Tabs: Vocab & Grammar -->
+                <div class="flex gap-2 bg-[#080D1A] p-1 rounded-xl border border-white/5">
+                    <button onclick="switchModalTab('vocab')" id="modal-tab-vocab" class="flex-1 py-2 text-sm font-medium rounded-lg bg-white/10 text-white transition">Vocabulary</button>
+                    <button onclick="switchModalTab('grammar')" id="modal-tab-grammar" class="flex-1 py-2 text-sm font-medium rounded-lg text-gray-400 hover:text-white transition">Grammar</button>
+                </div>
+
+                <!-- Modal Vocab Content -->
+                <div id="modal-vocab-content" class="space-y-4">
+                    <!-- Word Detail Box -->
+                    <div id="word-detail-box" class="hidden bg-[#2563EB]/10 border border-[#2563EB]/30 rounded-xl p-4 fade-in">
+                        <div class="flex items-end gap-3 mb-2">
+                            <span id="detail-word" class="text-xl font-bold text-white"></span>
+                            <span id="detail-pos" class="text-xs text-[#93C5FD] uppercase tracking-wider font-semibold mb-1"></span>
+                        </div>
+                        <p id="detail-meaning" class="text-sm text-white mb-2 font-medium"></p>
+                        <p id="detail-context" class="text-xs text-gray-400 leading-relaxed"></p>
+                    </div>
+                </div>
+
+                <!-- Modal Grammar Content -->
+                <div id="modal-grammar-content" class="hidden space-y-4">
+                    <div class="bg-[#080D1A] border border-white/5 rounded-xl p-5">
+                        <h4 class="text-sm font-bold text-white mb-3">Grammar Breakdown</h4>
+                        <p id="modal-grammar-text" class="text-sm text-gray-300 leading-relaxed"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Close Button (Desktop) -->
+            <button onclick="closeModal()" class="hidden md:block absolute top-4 right-4 text-gray-400 hover:text-white bg-[#080D1A] rounded-full p-2 border border-white/5">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Fixed Bottom Footer -->
+    <footer class="fixed bottom-0 left-0 w-full bg-[#060B19]/90 backdrop-blur-lg border-t border-white/5 z-40 p-3 md:p-4">
+        <div class="max-w-3xl mx-auto flex justify-between items-center">
+            <button onclick="goBack()" class="flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-sm font-medium">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                Back
+            </button>
+            <button onclick="window.location.href='http://fluencybridgeedu.online'" class="flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-sm font-medium">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                Home
+            </button>
+        </div>
+    </footer>
+
+    <!-- Inline Application Data and Logic -->
+    <script>
+        // --- DATA LAYER --- //
+
+        // Article Data - Deep mapping of sentences, phrases, and every single word.
+        const articleData = [
+            {
+                sId: 1,
+                fullSentence: "Google is testing out a change to Gmail that might make the service a little bit less useful for newcomers.",
+                translation: "Google Gmail mein ek badlaav test kar raha hai jo shayad naye users ke liye is service ko thoda kam useful (kaam ka) bana de.",
+                phrases: [
+                    {
+                        pId: "p1_1",
+                        text: "Google is testing out a change to Gmail",
+                        grammar: "Yahan 'is testing' Present Continuous tense hai, matlab kaam abhi chal raha hai. 'out' ek adverb hai jo 'test' ke sath lag kar phrasal verb 'test out' banata hai jiska matlab azmaana hota hai.",
+                        words: [
+                            { w: "Google", m: "Ek tech company", pos: "Noun", c: "Sentence ka subject." },
+                            { w: "is", m: "hai", pos: "Helping Verb", c: "Present tense dikhata hai." },
+                            { w: "testing", m: "jaanch raha", pos: "Verb", c: "'test' ka continuous (v1+ing) form." },
+                            { w: "out", m: "azma kar dekhna", pos: "Adverb", c: "'test out' milkar ek phrasal verb banta hai." },
+                            { w: "a", m: "ek", pos: "Article", c: "Singular noun 'change' ke liye aaya hai." },
+                            { w: "change", m: "badlaav", pos: "Noun", c: "Object 1: Kya test kar rahe hain - ek badlaav." },
+                            { w: "to", m: "mein/par", pos: "Preposition", c: "Direction dikhata hai ki badlaav kis par ho raha hai." },
+                            { w: "Gmail", m: "Email service", pos: "Noun", c: "Object 2." }
+                        ]
+                    },
+                    {
+                        pId: "p1_2",
+                        text: "that might make the service",
+                        grammar: "'that' yahan relative pronoun hai jo pichle phrase ke 'change' ko point kar raha hai. 'might make' Modal Verb of possibility hai, matlab aisa ho 'sakta' hai, pakka nahi hai.",
+                        words: [
+                            { w: "that", m: "jo", pos: "Relative Pronoun", c: "Pichle word 'change' ke baare mein aur bata raha hai." },
+                            { w: "might", m: "shayad / sakta hai", pos: "Modal Verb", c: "Possibility (sambhavna) dikhata hai." },
+                            { w: "make", m: "bana de", pos: "Verb", c: "Base form verb." },
+                            { w: "the", m: "us (specific)", pos: "Article", c: "Specific 'service' ki baat ho rahi hai." },
+                            { w: "service", m: "sewa (yahan Gmail)", pos: "Noun", c: "Object." }
+                        ]
+                    },
+                    {
+                        pId: "p1_3",
+                        text: "a little bit less useful for newcomers.",
+                        grammar: "Yahan adjectives ka comparison ho raha hai. 'less useful' comparative form hai (jaise 'more useful' ka ulta). 'a little bit' us comparative degree ko modify/describe kar raha hai ki kitna less? Thoda sa less.",
+                        words: [
+                            { w: "a", m: "ek", pos: "Article", c: "phrase 'a little bit' ka hissa." },
+                            { w: "little", m: "thoda", pos: "Adjective", c: "Quantity dikhata hai." },
+                            { w: "bit", m: "hissa / zara sa", pos: "Noun", c: "'a little bit' milkar thodi matra (small amount) batate hain." },
+                            { w: "less", m: "kam", pos: "Adverb", c: "Degree kam karta hai." },
+                            { w: "useful", m: "kaam ka / upyogi", pos: "Adjective", c: "Service ki quality bata raha hai." },
+                            { w: "for", m: "ke liye", pos: "Preposition", c: "Target audience dikhata hai." },
+                            { w: "newcomers.", m: "naye aane wale log", pos: "Noun", c: "Plural noun. Jo naye accounts banayenge." }
+                        ]
+                    }
+                ]
+            },
+            {
+                sId: 2,
+                fullSentence: "The company confirmed to Android Authority that it is testing a policy shift that would see new Gmail accounts get a mere 5GB of free cloud storage, down from the 15GB that's been guaranteed to Gmail accounts for years.",
+                translation: "Company ne Android Authority ko confirm kiya ki wo ek policy change test kar rahi hai jisme naye Gmail accounts ko sirf 5GB free storage milegi, jo ki pichle kai saalon se milne wale 15GB se kam hai.",
+                phrases: [
+                    {
+                        pId: "p2_1",
+                        text: "The company confirmed to Android Authority",
+                        grammar: "Simple Past Tense ('confirmed'). Subject (The company) ne object (Android Authority) ko past mein kuch bataya.",
+                        words: [
+                            { w: "The", m: "Wo (specific)", pos: "Article", c: "Google ki baat ho rahi hai." },
+                            { w: "company", m: "company", pos: "Noun", c: "Subject." },
+                            { w: "confirmed", m: "pakka kiya / pushti ki", pos: "Verb", c: "Past tense form." },
+                            { w: "to", m: "ko", pos: "Preposition", c: "Kisko bataya wo dikhata hai." },
+                            { w: "Android", m: "Android", pos: "Noun", c: "Proper noun, ek website ka naam." },
+                            { w: "Authority", m: "Authority", pos: "Noun", c: "Website ke naam ka hissa." }
+                        ]
+                    },
+                    {
+                        pId: "p2_2",
+                        text: "that it is testing a policy shift",
+                        grammar: "Reported speech mein clause jud raha hai 'that' se. Fir se Present Continuous ('is testing') use hua hai, aur 'policy shift' compound noun hai.",
+                        words: [
+                            { w: "that", m: "ki", pos: "Conjunction", c: "Do sentences ko jod raha hai." },
+                            { w: "it", m: "yah (Google)", pos: "Pronoun", c: "Company ke liye use hua hai." },
+                            { w: "is", m: "hai", pos: "Helping Verb", c: "Present continuous." },
+                            { w: "testing", m: "jaanch rahi", pos: "Verb", c: "Action verb." },
+                            { w: "a", m: "ek", pos: "Article", c: "Ek shift (badlaav) ke liye." },
+                            { w: "policy", m: "niyam / yojana", pos: "Noun", c: "Rules ka set." },
+                            { w: "shift", m: "badlaav", pos: "Noun", c: "Policy mein hone wala change." }
+                        ]
+                    },
+                    {
+                        pId: "p2_3",
+                        text: "that would see new Gmail accounts get a mere 5GB of free cloud storage,",
+                        grammar: "'would see' yahan conditional/future in the past ki tarah use hua hai. Yeh ek result bata raha hai ki is policy shift se kya hoga.",
+                        words: [
+                            { w: "that", m: "jo", pos: "Relative Pronoun", c: "Policy shift ke baare mein bata raha hai." },
+                            { w: "would", m: "karega / hoga", pos: "Modal Verb", c: "Future ka ek possible result batata hai." },
+                            { w: "see", m: "dekhega (yahan: anubhav karega)", pos: "Verb", c: "Is context mein iska matlab 'kisi cheez ka hona' hai." },
+                            { w: "new", m: "naye", pos: "Adjective", c: "Accounts ki quality." },
+                            { w: "Gmail", m: "Gmail", pos: "Noun", c: "Brand name." },
+                            { w: "accounts", m: "khaate", pos: "Noun", c: "Plural subject." },
+                            { w: "get", m: "milna", pos: "Verb", c: "Receive karna." },
+                            { w: "a", m: "ek", pos: "Article", c: "Quantity batane ke liye." },
+                            { w: "mere", m: "matra / kewal", pos: "Adjective", c: "Dikhane ke liye ki amount bahut chota hai." },
+                            { w: "5GB", m: "5 gigabytes", pos: "Noun", c: "Storage size." },
+                            { w: "of", m: "ka / ki", pos: "Preposition", c: "Relation batata hai." },
+                            { w: "free", m: "muft", pos: "Adjective", c: "Bina paise ke." },
+                            { w: "cloud", m: "cloud (internet storage)", pos: "Noun", c: "Type of storage." },
+                            { w: "storage,", m: "jagah (data save karne ki)", pos: "Noun", c: "Object." }
+                        ]
+                    },
+                    {
+                        pId: "p2_4",
+                        text: "down from the 15GB",
+                        grammar: "Ek prepositional phrase jo comparison bata raha hai ki pehle kitna tha aur ab kitna niche gir gaya hai.",
+                        words: [
+                            { w: "down", m: "niche / kam", pos: "Adverb", c: "Dikhata hai ki amount ghat gaya hai." },
+                            { w: "from", m: "se", pos: "Preposition", c: "Starting point batata hai (kahan se gira)." },
+                            { w: "the", m: "wo (specific)", pos: "Article", c: "Specific purani storage ki baat." },
+                            { w: "15GB", m: "15 gigabytes", pos: "Noun", c: "Purana storage amount." }
+                        ]
+                    },
+                    {
+                        pId: "p2_5",
+                        text: "that's been guaranteed to Gmail accounts for years.",
+                        grammar: "'that's been' = 'that has been'. Yeh Present Perfect Passive tense hai. Kyunki guarantee company ne di thi (action kisi aur ne kiya), isliye passive voice use hua hai. 'for years' duration batata hai.",
+                        words: [
+                            { w: "that's", m: "jo ki hai (that has)", pos: "Pronoun + Verb", c: "Contraction of that + has." },
+                            { w: "been", m: "raha hai / gaya hai", pos: "Verb", c: "Perfect tense passive form." },
+                            { w: "guaranteed", m: "pakka diya gaya / wada kiya gaya", pos: "Verb", c: "Past participle (v3) in passive voice." },
+                            { w: "to", m: "ko", pos: "Preposition", c: "Kisko diya gaya." },
+                            { w: "Gmail", m: "Gmail", pos: "Noun", c: "Service name." },
+                            { w: "accounts", m: "accounts", pos: "Noun", c: "Receiver." },
+                            { w: "for", m: "se / ke liye", pos: "Preposition", c: "Time duration ke liye 'for' lagta hai." },
+                            { w: "years.", m: "saalon", pos: "Noun", c: "Lambe samay se." }
+                        ]
+                    }
+                ]
+            },
+            {
+                sId: 3,
+                fullSentence: "This change wouldn't affect existing accounts that already have 15GB of free storage, but anyone who wants to make a new account would be limited, at least as long as they live in one of the regions where this is being tested.",
+                translation: "Yeh badlaav un purane accounts par asar nahi dalega jinke paas pehle se 15GB free storage hai, lekin koi bhi naya jo account banana chahta hai wo limited rahega, kam se kam tab tak jab tak wo us region (jagah) me rehte hain jahan ise test kiya jaa raha hai.",
+                phrases: [
+                    {
+                        pId: "p3_1",
+                        text: "This change wouldn't affect existing accounts",
+                        grammar: "'wouldn't' = would not. Yeh conditional statement hai (Negative form). Yeh bata raha hai ki future me iska asar kin logo par NAHI padega.",
+                        words: [
+                            { w: "This", m: "Yeh", pos: "Demonstrative Pronoun", c: "Paas ki specific cheez ko point kar raha hai." },
+                            { w: "change", m: "badlaav", pos: "Noun", c: "Subject." },
+                            { w: "wouldn't", m: "nahi karega (would not)", pos: "Modal Verb", c: "Negative future condition." },
+                            { w: "affect", m: "asar dalna", pos: "Verb", c: "Prabhav dalna." },
+                            { w: "existing", m: "maujooda / pehle se bane hue", pos: "Adjective", c: "Accounts ki state bata raha hai." },
+                            { w: "accounts", m: "accounts", pos: "Noun", c: "Object." }
+                        ]
+                    },
+                    {
+                        pId: "p3_2",
+                        text: "that already have 15GB of free storage,",
+                        grammar: "'that' relative pronoun hai jo existing accounts ke baare me detail add kar raha hai. Simple Present tense ('have' - possession dikhane ke liye).",
+                        words: [
+                            { w: "that", m: "jinke paas", pos: "Relative Pronoun", c: "Purane accounts ke baare mein bata raha hai." },
+                            { w: "already", m: "pehle se hi", pos: "Adverb", c: "Time batata hai." },
+                            { w: "have", m: "hai (possession)", pos: "Verb", c: "Dikhata hai ki unke paas wo cheez hai." },
+                            { w: "15GB", m: "15 gigabytes", pos: "Noun", c: "Storage amount." },
+                            { w: "of", m: "ka", pos: "Preposition", c: "Relation batata hai." },
+                            { w: "free", m: "muft", pos: "Adjective", c: "Quality of storage." },
+                            { w: "storage,", m: "jagah", pos: "Noun", c: "Object." }
+                        ]
+                    },
+                    {
+                        pId: "p3_3",
+                        text: "but anyone who wants to make a new account would be limited,",
+                        grammar: "Compound sentence jo 'but' se juda hai. 'who wants to make' ek relative clause hai. 'would be limited' Passive voice (Future conditional) hai.",
+                        words: [
+                            { w: "but", m: "lekin", pos: "Conjunction", c: "Do opposite ideas ko jod raha hai." },
+                            { w: "anyone", m: "koi bhi", pos: "Pronoun", c: "Koyi bhi insaan." },
+                            { w: "who", m: "jo", pos: "Relative Pronoun", c: "'anyone' ke baare mein batata hai." },
+                            { w: "wants", m: "chahta hai", pos: "Verb", c: "Simple present tense (singular)." },
+                            { w: "to", m: "ko / ke liye", pos: "Preposition", c: "Infinitive 'to make' banane ke liye." },
+                            { w: "make", m: "banana", pos: "Verb", c: "Base verb." },
+                            { w: "a", m: "ek", pos: "Article", c: "Singular." },
+                            { w: "new", m: "naya", pos: "Adjective", c: "Account ki quality." },
+                            { w: "account", m: "khata", pos: "Noun", c: "Object." },
+                            { w: "would", m: "hoga", pos: "Modal Verb", c: "Condition." },
+                            { w: "be", m: "rahega / hoga", pos: "Verb", c: "State of being." },
+                            { w: "limited,", m: "seemit (restricted)", pos: "Adjective/Past Participle", c: "State dikha raha hai ki unpar limit lag jayegi." }
+                        ]
+                    },
+                    {
+                        pId: "p3_4",
+                        text: "at least as long as they live in one of the regions",
+                        grammar: "'as long as' ek subordinating conjunction (condition batane ke liye). Matlab 'sirf tab tak jab tak'.",
+                        words: [
+                            { w: "at", m: "par", pos: "Preposition", c: "'at least' ka hissa." },
+                            { w: "least", m: "kam se kam", pos: "Adverb", c: "Minimum condition." },
+                            { w: "as", m: "jitna / jab", pos: "Conjunction", c: "'as long as' phrase ka hissa." },
+                            { w: "long", m: "lamba / tak", pos: "Adverb", c: "Duration batata hai." },
+                            { w: "as", m: "tak", pos: "Conjunction", c: "Condition complete karta hai." },
+                            { w: "they", m: "ve (wo log)", pos: "Pronoun", c: "Naye users ke liye." },
+                            { w: "live", m: "rehte hain", pos: "Verb", c: "Present tense." },
+                            { w: "in", m: "mein", pos: "Preposition", c: "Location." },
+                            { w: "one", m: "ek", pos: "Pronoun", c: "Unme se ek." },
+                            { w: "of", m: "me se", pos: "Preposition", c: "Selection dikhata hai." },
+                            { w: "the", m: "wo", pos: "Article", c: "Specific regions." },
+                            { w: "regions", m: "ilake / jagah", pos: "Noun", c: "Geographical areas." }
+                        ]
+                    },
+                    {
+                        pId: "p3_5",
+                        text: "where this is being tested.",
+                        grammar: "Present Continuous Passive voice ('is being tested'). Test kaun kar raha hai (Google) wo chupa hua hai, important ye hai ki 'kya' test ho raha hai (policy).",
+                        words: [
+                            { w: "where", m: "jahan", pos: "Relative Adverb", c: "Jagah ke baare mein bata raha hai." },
+                            { w: "this", m: "yeh (policy)", pos: "Pronoun", c: "Policy shift ki baat ho rahi hai." },
+                            { w: "is", m: "hai", pos: "Helping Verb", c: "Present tense." },
+                            { w: "being", m: "ja raha", pos: "Verb", c: "Passive voice continuous form me zaruri hota hai." },
+                            { w: "tested.", m: "jaancha (test kiya)", pos: "Verb", c: "Past participle in passive voice." }
+                        ]
+                    }
+                ]
+            }
+        ];
+
+        const mainVocab = [
+            { word: "Policy shift", meaning: "Rules ya tareeke mein ek bada badlaav (A change in policy).", context: "Google apne rules badal raha hai ki naye accounts ko kitni storage milegi.", examples: ["The school announced a policy shift regarding homework."] },
+            { word: "Newcomers", meaning: "Naye aane wale log (People who are new).", context: "Article mein iska matlab un logo se hai jo naye Gmail accounts banayenge.", examples: ["We should welcome the newcomers to our class."] },
+            { word: "Mere", meaning: "Kewal / Matra (Only / As small as).", context: "Ye shabd dikhata hai ki 5GB bahut chota amount hai (sirf 5GB).", examples: ["It costs a mere 50 rupees.", "She was a mere child when it happened."] },
+            { word: "Guaranteed", meaning: "Pakka kiya hua / Wada kiya hua (Promised with certainty).", context: "Pehle 15GB storage har account ke liye pakka hota tha.", examples: ["This phone comes with a guaranteed 1-year warranty."] },
+            { word: "Limited", meaning: "Seemit (Restricted in size or amount).", context: "Naye accounts sirf 5GB tak hi seemit rahenge.", examples: ["We have limited time to finish this test."] },
+            { word: "Regions", meaning: "Ilake / Kshetra (Areas or parts of a country/world).", context: "Yeh testing duniya ke kuch khass ilakon mein hi ho rahi hai abhi.", examples: ["Many regions in India experience heavy rainfall."] }
+        ];
+
+        const grammarTopics = [
+            { 
+                topic: "Present Continuous Tense (is testing)", 
+                rule: "Structure: Subject + is/am/are + Verb(ing). Yeh tense tab use hota hai jab koi kaam abhi chal raha ho.",
+                context: "'Google is testing out a change' - Google abhi is badlaav ko azma raha hai, kaam progress mein hai.",
+                examples: ["She is reading a book.", "They are playing football outside."]
+            },
+            { 
+                topic: "Modal Verbs for Possibility (might / would)", 
+                rule: "Aise verbs jo batate hain ki kisi cheez ke hone ke kya chances hain. 'Might' matlab shayad. 'Would' future in the past ya imagined situations ke liye.",
+                context: "'that might make the service' - shayad ye service ko kam useful bana de (pakka nahi hai). 'would see new accounts get' - naye accounts ko milega (future result condition).",
+                examples: ["It might rain today (shayad barish ho).", "If I had money, I would buy a car (agar paise hote toh kharidta)."]
+            },
+            { 
+                topic: "Relative Clauses (that / who / where)", 
+                rule: "Yeh clauses noun ke baare mein extra information dete hain bina naya sentence shuru kiye.",
+                context: "'accounts that already have' (wo accounts jinke paas pehle se hai). 'anyone who wants' (koi bhi jo chahta hai).",
+                examples: ["The boy who is wearing a red shirt is my brother.", "This is the city where I was born."]
+            },
+            {
+                topic: "Passive Voice (is being tested / been guaranteed)",
+                rule: "Jab kaam karne wale (subject) se zyada kaam jish par ho raha hai (object) wo important ho, tab passive voice use hota hai.",
+                context: "'where this is being tested' (jahan ise test kiya ja raha hai - Google ka naam nahi liya, test hona important hai).",
+                examples: ["The house is being cleaned.", "The letters were sent yesterday."]
+            }
+        ];
+
+        const quizQuestions = [
+            { type: 'mcq', question: "What major change is Google testing for Gmail?", options: ["Removing free storage completely", "Giving 15GB to all new users", "Reducing free storage to 5GB for new accounts", "Charging money for email sending"], answer: 2 },
+            { type: 'tf', question: "True or False: If you already have a Gmail account, your 15GB free storage will be reduced to 5GB.", answer: false },
+            { type: 'flashcard', question: "What does the phrase 'policy shift' mean in the text?", answer: "Niyam ya rules mein ek bada badlaav (A major change in policy)." },
+            { type: 'mcq', question: "Who will this new policy affect?", options: ["Existing accounts", "Only Android Authority users", "Newcomers (people making new accounts)", "Nobody"], answer: 2 },
+            { type: 'mcq', question: "Which tense is used in the phrase 'Google is testing out a change'?", options: ["Simple Past", "Present Continuous", "Future Perfect", "Simple Present"], answer: 1 },
+            { type: 'tf', question: "True or False: This 5GB rule is immediately applied everywhere in the world right now.", answer: false },
+            { type: 'flashcard', question: "Translate 'mere' in this context: 'a mere 5GB'.", answer: "Kewal / Matra (It emphasizes that 5GB is a very small amount compared to 15GB)." },
+            { type: 'mcq', question: "In the sentence 'that might make the service less useful', what is the role of 'might'?", options: ["It shows a 100% guarantee", "It shows a possibility (shayad)", "It shows a command/order", "It shows past habit"], answer: 1 },
+            { type: 'mcq', question: "What is the meaning of 'guaranteed' in '15GB that's been guaranteed'?", options: ["Hidden", "Stolen", "Promised / Pakka kiya hua", "Tested"], answer: 2 },
+            { type: 'flashcard', question: "What grammar structure is used in 'where this is being tested'?", answer: "Present Continuous Passive Voice. (Kaam abhi ho raha hai, aur kis par ho raha hai wo important hai)." },
+            { type: 'mcq', question: "What does the relative pronoun 'who' refer to in 'anyone who wants to make a new account'?", options: ["Google", "Android Authority", "The existing accounts", "Anyone (koyi bhi insaan)"], answer: 3 },
+            { type: 'tf', question: "True or False: 'Less useful' is a comparative adjective structure.", answer: true },
+            { type: 'mcq', question: "Which preposition is used to show a decrease from a previous amount in the text?", options: ["up to", "down from", "in between", "out of"], answer: 1 },
+            { type: 'flashcard', question: "What does 'at least as long as' mean?", answer: "Kam se kam tab tak jab tak (It sets a minimum time condition)." },
+            { type: 'mcq', question: "Overall, why might this change make Gmail 'less useful' for newcomers?", options: ["They get less space to store emails and files for free", "The email app will become slower", "They won't be able to send emails", "They have to use Android Authority"], answer: 0 }
+        ];
+
+        // --- UI & LOGIC --- //
+
+        let currentSection = 'read';
+        let activePhraseData = null;
+        let quizState = { current: 0, score: 0, showAnswer: false };
+
+        // Initialization
+        window.onload = () => {
+            renderArticle();
+            renderMainVocab();
+            renderMainGrammar();
+            renderQuiz();
+        };
+
+        // Navigation
+        function switchTab(tabId) {
+            // Hide all sections
+            ['read', 'vocab', 'grammar', 'quiz'].forEach(id => {
+                document.getElementById(`sec-${id}`).classList.add('hidden');
+                document.getElementById(`tab-${id}`).classList.remove('text-white', 'border-[#2563EB]');
+                document.getElementById(`tab-${id}`).classList.add('text-gray-400', 'border-transparent');
+            });
+
+            // Show active section
+            document.getElementById(`sec-${tabId}`).classList.remove('hidden');
+            document.getElementById(`tab-${tabId}`).classList.add('text-white', 'border-[#2563EB]');
+            document.getElementById(`tab-${tabId}`).classList.remove('text-gray-400', 'border-transparent');
+            currentSection = tabId;
+        }
+
+        function goBack() {
+            if (currentSection !== 'read') {
+                switchTab('read');
+            } else {
+                window.location.href = 'http://fluencybridgeedu.online';
+            }
+        }
+
+        // Render Article
+        function renderArticle() {
+            const container = document.getElementById('article-container');
+            container.innerHTML = '';
+
+            articleData.forEach(sentence => {
+                const p = document.createElement('p');
+                
+                sentence.phrases.forEach((phrase, index) => {
+                    const span = document.createElement('span');
+                    span.className = 'phrase-highlight mr-1 inline-block';
+                    span.textContent = phrase.text + (index === sentence.phrases.length - 1 ? '' : ' ');
+                    span.onclick = () => openModal(phrase.pId, sentence.translation);
+                    p.appendChild(span);
+                });
+                container.appendChild(p);
+            });
+        }
+
+        // Modal Logic
+        function openModal(phraseId, fullSentenceTranslation) {
+            // Find phrase data
+            let foundPhrase = null;
+            for (const s of articleData) {
+                const found = s.phrases.find(p => p.pId === phraseId);
+                if (found) { foundPhrase = found; break; }
+            }
+            if (!foundPhrase) return;
+
+            activePhraseData = foundPhrase;
+
+            // Setup Modal Content
+            document.getElementById('modal-sentence-meaning').textContent = fullSentenceTranslation;
+            document.getElementById('modal-sentence-meaning').classList.add('hidden');
+            
+            document.getElementById('modal-grammar-text').textContent = foundPhrase.grammar;
+
+            // Render interactive words
+            const wordsContainer = document.getElementById('modal-interactive-words');
+            wordsContainer.innerHTML = '';
+            
+            // Loop through words and use actual HTML buttons for robust click events
+            foundPhrase.words.forEach((w) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'word-interactive';
+                btn.textContent = w.w;
+                btn.onclick = (e) => {
+                    e.stopPropagation(); // Prevent the click from bubbling and accidentally closing the modal
+                    e.preventDefault();
+                    
+                    // Switch to vocab tab automatically if they click a word while on the grammar tab
+                    if (document.getElementById('modal-vocab-content').classList.contains('hidden')) {
+                        switchModalTab('vocab');
+                    }
+                    
+                    // Remove active class from all buttons
+                    document.querySelectorAll('.word-interactive').forEach(el => el.classList.remove('word-active'));
+                    
+                    // Add active state to clicked button
+                    btn.classList.add('word-active');
+                    showWordDetail(w);
+                };
+                wordsContainer.appendChild(btn);
+            });
+
+            // Reset tabs & detail box
+            switchModalTab('vocab');
+            document.getElementById('word-detail-box').classList.add('hidden');
+
+            // Show Modal
+            const modal = document.getElementById('phrase-modal');
+            const modalBox = document.getElementById('modal-content-box');
+            modal.classList.remove('hidden');
+            
+            // Animation for modal box
+            setTimeout(() => {
+                modalBox.classList.remove('translate-y-full');
+            }, 10);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('phrase-modal');
+            const modalBox = document.getElementById('modal-content-box');
+            
+            modalBox.classList.add('translate-y-full');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300); // match transition duration
+        }
+
+        function toggleSentenceMeaning() {
+            const el = document.getElementById('modal-sentence-meaning');
+            el.classList.toggle('hidden');
+        }
+
+        function switchModalTab(tab) {
+            const vocabContent = document.getElementById('modal-vocab-content');
+            const grammarContent = document.getElementById('modal-grammar-content');
+            const tabVocab = document.getElementById('modal-tab-vocab');
+            const tabGrammar = document.getElementById('modal-tab-grammar');
+
+            if (tab === 'vocab') {
+                vocabContent.classList.remove('hidden');
+                grammarContent.classList.add('hidden');
+                tabVocab.classList.replace('bg-transparent', 'bg-white/10');
+                tabVocab.classList.replace('text-gray-400', 'text-white');
+                tabGrammar.classList.replace('bg-white/10', 'bg-transparent');
+                tabGrammar.classList.replace('text-white', 'text-gray-400');
+            } else {
+                vocabContent.classList.add('hidden');
+                grammarContent.classList.remove('hidden');
+                tabGrammar.classList.replace('bg-transparent', 'bg-white/10');
+                tabGrammar.classList.replace('text-gray-400', 'text-white');
+                tabVocab.classList.replace('bg-white/10', 'bg-transparent');
+                tabVocab.classList.replace('text-white', 'text-gray-400');
+            }
+        }
+
+        function showWordDetail(wordObj) {
+            const detailBox = document.getElementById('word-detail-box');
+            detailBox.classList.remove('hidden');
+            
+            // Re-trigger animation
+            detailBox.classList.remove('fade-in');
+            void detailBox.offsetWidth; // trigger reflow
+            detailBox.classList.add('fade-in');
+
+            document.getElementById('detail-word').textContent = wordObj.w;
+            document.getElementById('detail-pos').textContent = wordObj.pos;
+            document.getElementById('detail-meaning').textContent = wordObj.m;
+            document.getElementById('detail-context').textContent = wordObj.c;
+        }
+
+        // Render Vocab Section
+        function renderMainVocab() {
+            const container = document.getElementById('main-vocab-container');
+            mainVocab.forEach(item => {
+                const html = `
+                    <div class="bg-[#080D1A] border border-white/5 rounded-xl p-5 hover:bg-white/5 transition duration-300 group">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-3">
+                            <h3 class="text-lg font-bold text-white group-hover:text-[#60A5FA] transition">${item.word}</h3>
+                            <span class="text-sm font-semibold text-[#2563EB] bg-[#2563EB]/10 px-3 py-1 rounded-lg self-start md:self-auto">${item.meaning}</span>
+                        </div>
+                        <p class="text-sm text-gray-300 mb-3 leading-relaxed"><strong>Context:</strong> ${item.context}</p>
+                        <div class="bg-[#111A2C] p-3 rounded-lg border border-white/5">
+                            <p class="text-xs text-gray-400 italic">" ${item.examples[0]} "</p>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += html;
+            });
+        }
+
+        // Render Grammar Section
+        function renderMainGrammar() {
+            const container = document.getElementById('main-grammar-container');
+            grammarTopics.forEach((item, index) => {
+                const html = `
+                    <div class="bg-[#080D1A] border border-white/5 rounded-xl overflow-hidden transition duration-300">
+                        <button class="w-full text-left p-5 flex justify-between items-center hover:bg-white/5 focus:outline-none" onclick="toggleAccordion('grammar-acc-${index}')">
+                            <h3 class="text-md font-bold text-white">${item.topic}</h3>
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                        <div id="grammar-acc-${index}" class="hidden px-5 pb-5 space-y-3">
+                            <p class="text-sm text-[#93C5FD] font-medium leading-relaxed">${item.rule}</p>
+                            <p class="text-sm text-gray-300 leading-relaxed border-l-2 border-white/20 pl-3"><strong>In Text:</strong> ${item.context}</p>
+                            <div class="pt-2">
+                                <span class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Examples</span>
+                                <ul class="list-disc list-inside text-sm text-gray-400 mt-1">
+                                    ${item.examples.map(ex => `<li>${ex}</li>`).join('')}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += html;
+            });
+        }
+
+        function toggleAccordion(id) {
+            const el = document.getElementById(id);
+            el.classList.toggle('hidden');
+        }
+
+        // Quiz Logic
+        function renderQuiz() {
+            const container = document.getElementById('quiz-container');
+            const progress = document.getElementById('quiz-progress');
+            const progressBar = document.getElementById('quiz-progress-bar');
+            
+            if (quizState.current >= quizQuestions.length) {
+                // End of quiz
+                container.innerHTML = `
+                    <div class="text-center fade-in py-10">
+                        <h3 class="text-3xl font-bold text-white mb-2">Quiz Completed!</h3>
+                        <p class="text-gray-400 mb-6">You successfully reviewed all ${quizQuestions.length} concepts.</p>
+                        <button onclick="resetQuiz()" class="bg-[#2563EB] hover:bg-blue-600 text-white font-bold py-3 px-8 rounded-xl transition duration-300 shadow-lg shadow-blue-500/30">Restart Quiz</button>
+                    </div>
+                `;
+                progress.textContent = `${quizQuestions.length} / ${quizQuestions.length}`;
+                progressBar.style.width = `100%`;
+                return;
+            }
+
+            const q = quizQuestions[quizState.current];
+            progress.textContent = `${quizState.current + 1} / ${quizQuestions.length}`;
+            progressBar.style.width = `${((quizState.current) / quizQuestions.length) * 100}%`;
+
+            let html = `<div class="fade-in">
+                <span class="text-xs font-semibold text-[#60A5FA] uppercase tracking-wider mb-2 block">${q.type === 'mcq' ? 'Multiple Choice' : q.type === 'tf' ? 'True / False' : 'Flashcard'}</span>
+                <h3 class="text-xl font-bold text-white mb-6 leading-relaxed">${q.question}</h3>
+            `;
+
+            if (q.type === 'mcq') {
+                html += `<div class="space-y-3">`;
+                q.options.forEach((opt, idx) => {
+                    html += `
+                        <button onclick="handleQuizAnswer(${idx})" class="quiz-option w-full text-left p-4 rounded-xl bg-[#080D1A] border border-white/5 text-gray-300 hover:bg-white/10 transition font-medium focus:outline-none" id="opt-${idx}">
+                            ${opt}
+                        </button>
+                    `;
+                });
+                html += `</div>`;
+            } 
+            else if (q.type === 'tf') {
+                html += `
+                    <div class="flex gap-4">
+                        <button onclick="handleQuizAnswer(true)" class="quiz-option flex-1 p-4 rounded-xl bg-[#080D1A] border border-white/5 text-gray-300 hover:bg-white/10 transition font-medium text-center focus:outline-none" id="opt-true">True</button>
+                        <button onclick="handleQuizAnswer(false)" class="quiz-option flex-1 p-4 rounded-xl bg-[#080D1A] border border-white/5 text-gray-300 hover:bg-white/10 transition font-medium text-center focus:outline-none" id="opt-false">False</button>
+                    </div>
+                `;
+            }
+            else if (q.type === 'flashcard') {
+                html += `
+                    <div id="flashcard-answer" class="hidden bg-[#080D1A] border border-[#2563EB]/30 p-6 rounded-xl mt-4 fade-in">
+                        <span class="text-xs text-gray-500 uppercase tracking-wider block mb-2">Answer</span>
+                        <p class="text-lg text-white font-medium">${q.answer}</p>
+                    </div>
+                    <button onclick="revealFlashcard()" id="btn-reveal" class="w-full bg-[#080D1A] border border-white/10 hover:border-white/30 text-white font-bold py-4 px-6 rounded-xl transition duration-300 mt-4 focus:outline-none">Reveal Answer</button>
+                    <button onclick="nextQuestion()" id="btn-next-flash" class="hidden w-full bg-[#2563EB] hover:bg-blue-600 text-white font-bold py-4 px-6 rounded-xl transition duration-300 mt-4 shadow-lg shadow-blue-500/30 focus:outline-none">Next Question</button>
+                `;
+            }
+
+            // Next button for MCQ/TF (hidden initially)
+            if (q.type !== 'flashcard') {
+                 html += `
+                 <div id="feedback-area" class="mt-4 hidden p-4 rounded-xl font-medium"></div>
+                 <button onclick="nextQuestion()" id="btn-next" class="hidden w-full bg-[#2563EB] hover:bg-blue-600 text-white font-bold py-4 px-6 rounded-xl transition duration-300 mt-4 shadow-lg shadow-blue-500/30 focus:outline-none">Next Question</button>
+                 `;
+            }
+
+            html += `</div>`;
+            container.innerHTML = html;
+        }
+
+        function handleQuizAnswer(selected) {
+            if (quizState.showAnswer) return; // Prevent multiple clicks
+            quizState.showAnswer = true;
+            
+            const q = quizQuestions[quizState.current];
+            const isCorrect = selected === q.answer;
+            
+            // Disable all options
+            document.querySelectorAll('.quiz-option').forEach(btn => {
+                btn.classList.add('opacity-50', 'cursor-not-allowed');
+                btn.onclick = null;
+            });
+
+            const feedback = document.getElementById('feedback-area');
+            feedback.classList.remove('hidden');
+            feedback.classList.add('fade-in');
+
+            if (isCorrect) {
+                quizState.score++;
+                feedback.classList.add('bg-green-900/30', 'text-green-400', 'border', 'border-green-500/30');
+                feedback.textContent = "Correct! Well done.";
+                // Highlight selected as correct
+                let btnId = q.type === 'mcq' ? `opt-${selected}` : `opt-${selected}`;
+                document.getElementById(btnId).classList.replace('bg-[#080D1A]', 'bg-green-900/50');
+                document.getElementById(btnId).classList.replace('border-white/5', 'border-green-500');
+            } else {
+                feedback.classList.add('bg-red-900/30', 'text-red-400', 'border', 'border-red-500/30');
+                feedback.textContent = "Incorrect.";
+                // Highlight selected as wrong
+                let wrongBtnId = q.type === 'mcq' ? `opt-${selected}` : `opt-${selected}`;
+                document.getElementById(wrongBtnId).classList.replace('bg-[#080D1A]', 'bg-red-900/50');
+                document.getElementById(wrongBtnId).classList.replace('border-white/5', 'border-red-500');
+                
+                // Highlight correct answer
+                if (q.type === 'mcq') {
+                    let correctBtn = document.getElementById(`opt-${q.answer}`);
+                    correctBtn.classList.replace('bg-[#080D1A]', 'bg-green-900/50');
+                    correctBtn.classList.replace('border-white/5', 'border-green-500');
+                    correctBtn.classList.remove('opacity-50'); // Make it visible
+                } else if (q.type === 'tf') {
+                     let correctBtn = document.getElementById(`opt-${q.answer}`);
+                     correctBtn.classList.replace('bg-[#080D1A]', 'bg-green-900/50');
+                     correctBtn.classList.replace('border-white/5', 'border-green-500');
+                     correctBtn.classList.remove('opacity-50');
+                }
+            }
+
+            document.getElementById('btn-next').classList.remove('hidden');
+        }
+
+        function revealFlashcard() {
+            document.getElementById('flashcard-answer').classList.remove('hidden');
+            document.getElementById('btn-reveal').classList.add('hidden');
+            document.getElementById('btn-next-flash').classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            quizState.current++;
+            quizState.showAnswer = false;
+            renderQuiz();
+        }
+
+        function resetQuiz() {
+            quizState.current = 0;
+            quizState.score = 0;
+            quizState.showAnswer = false;
+            renderQuiz();
+        }
+    </script>
+</body>
+</html>
