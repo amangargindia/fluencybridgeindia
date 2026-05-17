@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fluency Bridge - Article Reader</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@1,600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #060B19;
+            color: #ffffff;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .playfair { font-family: 'Playfair Display', serif; }
+        
+        /* Custom scrollbar for a clean look */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #060B19; }
+        ::-webkit-scrollbar-thumb { background: #111A2C; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #2563EB; }
+
+        .phrase {
+            border-bottom: 2px dotted #4B5563;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-block;
+            margin-right: 4px;
+            margin-bottom: 4px;
+            padding-bottom: 2px;
+        }
+        .phrase:hover { border-bottom-color: #2563EB; color: #E5E7EB; }
+        
+        .clickable-word {
+            display: inline-block;
+            cursor: pointer;
+            padding: 2px 4px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+        .clickable-word:hover, .clickable-word.active {
+            background: rgba(37, 99, 235, 0.3);
+            color: #60A5FA;
+        }
+
+        .hide { display: none !important; }
+        .glass-panel {
+            background: rgba(17, 26, 44, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        
+        /* Flashcard Animation */
+        .perspective { perspective: 1000px; }
+        .preserve-3d { transform-style: preserve-3d; transition: transform 0.6s; }
+        .backface-hidden { backface-visibility: hidden; }
+        .rotate-y-180 { transform: rotateY(180deg); }
+    </style>
+</head>
+<body class="relative min-h-screen flex flex-col antialiased selection:bg-[#2563EB] selection:text-white pb-20">
+    
+    <!-- Background Gradient -->
+    <div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
+        <div class="absolute top-[-10%] left-[-10%] w-[120%] h-[120%] bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#131E3A]/40 via-[#060B19]/0 to-transparent blur-[100px]"></div>
+    </div>
+
+    <!-- Header / Navigation -->
+    <header class="sticky top-0 z-40 glass-panel border-b border-white/5 p-4 sm:p-6 flex flex-col gap-4">
+        <!-- Logo -->
+        <a href="https://fluencybridgeedu.online" class="flex flex-col items-center justify-center text-center cursor-pointer w-max mx-auto">
+            <span class="tracking-[0.3em] text-[10px] text-gray-300 uppercase font-semibold">F L U E N C Y</span>
+            <span class="text-white text-4xl italic playfair leading-none mt-1">bridge</span>
+        </a>
+        
+        <!-- Top Nav -->
+        <nav class="flex overflow-x-auto space-x-2 pb-2 scrollbar-hide">
+            <button onclick="nav('read')" id="nav-read" class="nav-btn whitespace-nowrap px-4 py-2 rounded-xl bg-[#2563EB] text-white text-sm font-medium transition">Read Article</button>
+            <button onclick="nav('vocab')" id="nav-vocab" class="nav-btn whitespace-nowrap px-4 py-2 rounded-xl bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 text-sm font-medium transition border border-white/5">Main Vocab</button>
+            <button onclick="nav('grammar')" id="nav-grammar" class="nav-btn whitespace-nowrap px-4 py-2 rounded-xl bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 text-sm font-medium transition border border-white/5">Main Grammar</button>
+            <button onclick="nav('quiz')" id="nav-quiz" class="nav-btn whitespace-nowrap px-4 py-2 rounded-xl bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 text-sm font-medium transition border border-white/5">Quiz</button>
+        </nav>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-grow p-4 sm:p-6 max-w-3xl mx-auto w-full">
+        
+        <!-- SECTION: READ ARTICLE -->
+        <section id="sec-read" class="section block">
+            <div class="bg-[#111A2C] rounded-3xl p-6 border-t border-white/5 shadow-2xl mb-6">
+                <h2 class="text-xl font-bold text-white mb-4">Article Study</h2>
+                <p class="text-sm text-gray-400 mb-6">Read the text below. Each sentence is broken into chunks. Tap on the <span class="border-b-2 border-dotted border-gray-500">dotted phrases</span> to explore vocabulary and grammar.</p>
+                
+                <div id="article-container" class="space-y-6 text-lg leading-relaxed text-gray-200">
+                    <!-- Article generated by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION: MAIN VOCAB -->
+        <section id="sec-vocab" class="section hide">
+            <div class="bg-[#111A2C] rounded-3xl p-6 border-t border-white/5 shadow-2xl">
+                <h2 class="text-xl font-bold text-white mb-2">Key Vocabulary</h2>
+                <p class="text-sm text-gray-400 mb-6">Important words for Lower-Intermediate students from this article.</p>
+                <div id="main-vocab-list" class="space-y-4">
+                    <!-- Vocab generated by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION: MAIN GRAMMAR -->
+        <section id="sec-grammar" class="section hide">
+            <div class="bg-[#111A2C] rounded-3xl p-6 border-t border-white/5 shadow-2xl">
+                <h2 class="text-xl font-bold text-white mb-2">Grammar Structures</h2>
+                <p class="text-sm text-gray-400 mb-6">Core grammar concepts used in this article explained in Hinglish.</p>
+                <div id="main-grammar-list" class="space-y-4">
+                    <!-- Grammar generated by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION: QUIZ -->
+        <section id="sec-quiz" class="section hide">
+            <div class="bg-[#111A2C] rounded-3xl p-6 border-t border-white/5 shadow-2xl min-h-[400px] flex flex-col">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-bold text-white">Knowledge Check</h2>
+                    <span id="quiz-progress" class="text-sm text-[#60A5FA] font-medium">1 / 15</span>
+                </div>
+                
+                <!-- Progress Bar -->
+                <div class="w-full bg-white/10 h-2 rounded-full mb-8">
+                    <div id="quiz-bar" class="bg-[#2563EB] h-2 rounded-full transition-all duration-300 w-[6%]"></div>
+                </div>
+
+                <div id="quiz-content" class="flex-grow flex flex-col justify-center">
+                    <!-- Quiz dynamically rendered here -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="fixed bottom-0 left-0 w-full glass-panel border-t border-white/5 p-4 z-40 flex justify-between items-center px-6">
+        <button onclick="goBack()" class="flex items-center gap-2 text-gray-400 hover:text-white transition text-sm font-medium">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+            Back
+        </button>
+        <button onclick="nav('read')" class="flex items-center gap-2 text-gray-400 hover:text-white transition text-sm font-medium">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+            Home
+        </button>
+    </footer>
+
+    <!-- INTERACTIVE MODAL FOR PHRASES -->
+    <div id="phrase-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex justify-center items-end sm:items-center p-0 sm:p-4 hide transition-opacity">
+        <div class="bg-[#111A2C] w-full sm:w-11/12 sm:max-w-md rounded-t-3xl sm:rounded-3xl border-t border-white/10 shadow-[0_-10px_40px_rgba(0,0,0,0.5)] flex flex-col max-h-[85vh]">
+            
+            <!-- Modal Header -->
+            <div class="p-5 border-b border-white/5 relative">
+                <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white p-2 bg-white/5 rounded-full">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+                <p class="text-xs text-[#60A5FA] uppercase tracking-wider font-semibold mb-2" id="modal-sentence-idx">Sentence Context</p>
+                <!-- Phrase Words injected here -->
+                <h3 id="modal-phrase-text" class="text-xl font-medium text-white leading-snug"></h3>
+                
+                <button onclick="showFullSentence()" class="mt-4 text-xs bg-[#2563EB] text-white px-3 py-1.5 rounded-lg hover:bg-blue-600 transition">
+                    Understand Entire Sentence
+                </button>
+            </div>
+
+            <!-- Modal Nav -->
+            <div class="flex p-2 gap-2 border-b border-white/5 bg-[#0A101D]">
+                <button onclick="switchModalTab('vocab')" id="tab-vocab" class="flex-1 py-2 text-sm font-medium rounded-xl bg-[#2563EB] text-white transition">Vocabulary</button>
+                <button onclick="switchModalTab('grammar')" id="tab-grammar" class="flex-1 py-2 text-sm font-medium rounded-xl bg-white/5 text-gray-400 border border-white/5 hover:bg-white/10 transition">Grammar</button>
+            </div>
+
+            <!-- Modal Content Area -->
+            <div class="p-5 overflow-y-auto flex-grow custom-scrollbar">
+                
+                <!-- Vocab Tab -->
+                <div id="modal-content-vocab">
+                    <div id="word-detail-view" class="hide bg-[#080D1A] rounded-xl p-4 border border-white/5">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 id="word-title" class="text-lg font-bold text-white capitalize"></h4>
+                            <span id="word-pos" class="text-[10px] uppercase tracking-wide bg-white/10 text-gray-300 px-2 py-1 rounded-md"></span>
+                        </div>
+                        <p id="word-hindi" class="text-blue-400 text-sm font-medium mb-3"></p>
+                        <div class="space-y-2">
+                            <p class="text-xs text-gray-400"><span class="text-gray-300 font-medium">Context:</span> <span id="word-context"></span></p>
+                            <p class="text-xs text-gray-400"><span class="text-gray-300 font-medium">Base/Inflection:</span> <span id="word-base"></span></p>
+                        </div>
+                    </div>
+                    <div id="vocab-prompt" class="text-center py-8 text-gray-500 text-sm">
+                        Tap any word in the phrase above to see its detailed meaning.
+                    </div>
+                </div>
+
+                <!-- Grammar Tab -->
+                <div id="modal-content-grammar" class="hide space-y-4">
+                    <div class="bg-[#080D1A] rounded-xl p-4 border border-white/5">
+                        <h4 class="text-sm font-bold text-white mb-2">Grammar Structure</h4>
+                        <p id="phrase-grammar-text" class="text-sm text-gray-400 leading-relaxed"></p>
+                    </div>
+                </div>
+
+                <!-- Full Sentence View (hidden by default) -->
+                <div id="modal-content-full-sentence" class="hide bg-[#080D1A] rounded-xl p-4 border border-white/5 mt-4">
+                    <h4 class="text-sm font-bold text-white mb-2">Full Sentence Meaning</h4>
+                    <p id="full-sentence-text" class="text-sm text-gray-400 leading-relaxed mb-3"></p>
+                    <p id="full-sentence-hindi" class="text-sm text-blue-300 leading-relaxed font-medium"></p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* =========================================
+           DATA STRUCTURES & DICTIONARY
+           ========================================= */
+        
+        // Comprehensive Dictionary - EVERY word mapped for lower-intermediate ESL in Hinglish
+        const dict = {
+            "iran": { hindi: "ईरान (Ek desh)", pos: "Noun", base: "Iran", context: "Sentence ka subject." },
+            "media": { hindi: "मीडिया / समाचार माध्यम", pos: "Noun", base: "Media", context: "News channels and papers." },
+            "says": { hindi: "कहता है", pos: "Verb", base: "Say (Present Tense)", context: "News ki reporting ke liye present simple ka use." },
+            "no": { hindi: "कोई नहीं", pos: "Determiner", base: "No", context: "Negative meaning add karta hai." },
+            "tangible": { hindi: "ठोस / वास्तविक / जिसे महसूस किया जा सके", pos: "Adjective", base: "Tangible", context: "Aisa concession jo saaf dikhai de." },
+            "concessions": { hindi: "छूट / रियायतें", pos: "Noun", base: "Concession", context: "Negotiation mein di gayi chhoot." },
+            "in": { hindi: "में", pos: "Preposition", base: "In", context: "Location ya sthiti batane ke liye." },
+            "us": { hindi: "अमेरिका (United States)", pos: "Noun", base: "US", context: "Country reference." },
+            "response": { hindi: "जवाब / प्रतिक्रिया", pos: "Noun", base: "Response", context: "Iran ke proposal ka jawab." },
+            "to": { hindi: "को / के प्रति", pos: "Preposition", base: "To", context: "Direction ya target dikhata hai." },
+            "proposal": { hindi: "प्रस्ताव", pos: "Noun", base: "Proposal", context: "Ek suggestion jo discuss kiya jaye." },
+            
+            "mehr": { hindi: "मेहर (Ek news agency ka naam)", pos: "Proper Noun", base: "Mehr", context: "Name." },
+            "news": { hindi: "समाचार", pos: "Noun", base: "News", context: "Information." },
+            "agency": { hindi: "संस्था / एजेंसी", pos: "Noun", base: "Agency", context: "Sanstha jo news deti hai." },
+            "meanwhile": { hindi: "इस दौरान / इसी बीच", pos: "Adverb", base: "Meanwhile", context: "Jab ek cheez ho rahi thi, tabhi dusri baat hui." },
+            "said": { hindi: "कहा", pos: "Verb", base: "Say (Past Tense)", context: "Past reporting verb." },
+            "the": { hindi: "वह / विशिष्ट (Definite Article)", pos: "Article", base: "The", context: "Kisi specific cheez ko point karne ke liye." },
+            "united": { hindi: "संयुक्त", pos: "Adjective", base: "United", context: "Part of US name." },
+            "states": { hindi: "राज्य", pos: "Noun", base: "State", context: "Part of US name." },
+            "offering": { hindi: "पेश करते हुए / देते हुए", pos: "Verb (Participle)", base: "Offer", context: "Present participle - action in progress." },
+            "wants": { hindi: "चाहता है", pos: "Verb", base: "Want", context: "Present tense action." },
+            "obtain": { hindi: "प्राप्त करना / पाना", pos: "Verb", base: "Obtain", context: "Kuch haasil karna." },
+            "that": { hindi: "कि / जो", pos: "Conjunction / Pronoun", base: "That", context: "Relative pronoun jo purani baat ko jodta hai." },
+            "it": { hindi: "यह", pos: "Pronoun", base: "It", context: "US ko refer kar raha hai." },
+            "failed": { hindi: "विफल रहा", pos: "Verb", base: "Fail (Past Tense)", context: "Jo pehle nahi kar paya." },
+            "during": { hindi: "के दौरान", pos: "Preposition", base: "During", context: "Time period dikhane ke liye." },
+            "war": { hindi: "युद्ध", pos: "Noun", base: "War", context: "Conflict period." },
+            "which": { hindi: "जो / जिससे", pos: "Pronoun", base: "Which", context: "Pichli puri situation ko point karta hai." },
+            "will": { hindi: "गा / गे / गी (Future helper)", pos: "Modal Verb", base: "Will", context: "Future prediction ke liye." },
+            "lead": { hindi: "ले जाएगा / नेतृत्व करेगा", pos: "Verb", base: "Lead", context: "Ek result ki taraf le jana." },
+            "an": { hindi: "एक", pos: "Article", base: "An", context: "Vowel sound se pehle lagta hai." },
+            "impasse": { hindi: "गतिरोध / ऐसी स्थिति जहाँ से आगे बढ़ना मुश्किल हो", pos: "Noun", base: "Impasse", context: "Deadlock in talks." },
+            "negotiations": { hindi: "बातचीत / समझौते की प्रक्रिया", pos: "Noun", base: "Negotiation", context: "Formal discussion." },
+            
+            "iranian": { hindi: "ईरानी", pos: "Adjective", base: "Iranian", context: "Belonging to Iran." },
+            "reported": { hindi: "खबर दी / बताया", pos: "Verb", base: "Report (Past)", context: "Reported speech ka verb." },
+            "had": { hindi: "था / चुका था (Past perfect helper)", pos: "Auxiliary Verb", base: "Have (Past)", context: "Past in the past." },
+            "not": { hindi: "नहीं", pos: "Adverb", base: "Not", context: "Negative." },
+            "offered": { hindi: "पेश किया", pos: "Verb", base: "Offer (Past Participle)", context: "Perfect tense verb." },
+            "any": { hindi: "कोई भी", pos: "Determiner", base: "Any", context: "Quantity dikhata hai." },
+            "meaningful": { hindi: "अर्थपूर्ण / जिसका कोई महत्व हो", pos: "Adjective", base: "Meaningful", context: "Important concession." },
+            "its": { hindi: "इसकी / अपने", pos: "Pronoun", base: "It (Possessive)", context: "US ka reply." },
+            "reply": { hindi: "जवाब", pos: "Noun", base: "Reply", context: "Answer." },
+            "tehran’s": { hindi: "तेहरान (ईरान) का", pos: "Noun (Possessive)", base: "Tehran", context: "Capital of Iran." },
+            "for": { hindi: "के लिए", pos: "Preposition", base: "For", context: "Purpose dikhata hai." },
+            "talks": { hindi: "बातचीत", pos: "Noun", base: "Talks", context: "Discussions." },
+            "aimed": { hindi: "के उद्देश्य से", pos: "Verb (Participle)", base: "Aim", context: "Goal dikhata hai." },
+            "at": { hindi: "पर", pos: "Preposition", base: "At", context: "Target." },
+            "ending": { hindi: "समाप्त करना", pos: "Verb (Gerund)", base: "End", context: "-ing form preposition ke baad." },
+
+            "according": { hindi: "के अनुसार", pos: "Preposition", base: "According (to)", context: "Source batane ke liye." },
+            "fars": { hindi: "फ़ार्स (News agency)", pos: "Proper Noun", base: "Fars", context: "Name." },
+            "washington": { hindi: "वाशिंगटन (US Govt)", pos: "Proper Noun", base: "Washington", context: "Capital used as government name." },
+            "presented": { hindi: "सामने रखा / प्रस्तुत किया", pos: "Verb", base: "Present (Past)", context: "Action completed." },
+            "a": { hindi: "एक", pos: "Article", base: "A", context: "Singular count." },
+            "five-point": { hindi: "पांच-सूत्रीय (5 points wala)", pos: "Adjective", base: "Five-point", context: "Describes framework." },
+            "framework": { hindi: "ढांचा / रूपरेखा", pos: "Noun", base: "Framework", context: "Basic structure of a plan." },
+            "included": { hindi: "शामिल था", pos: "Verb", base: "Include (Past)", context: "Past action." },
+            "demands": { hindi: "मांगें", pos: "Noun", base: "Demand", context: "Jo wo chahte hain." },
+            "limit": { hindi: "सीमित करना / पाबंदी लगाना", pos: "Verb", base: "Limit", context: "To stop from growing." },
+            "operations": { hindi: "संचालन / कामकाज", pos: "Noun", base: "Operation", context: "Activities." },
+            "single": { hindi: "एकल / केवल एक", pos: "Adjective", base: "Single", context: "Only one." },
+            "nuclear": { hindi: "परमाणु", pos: "Adjective", base: "Nuclear", context: "Related to atoms/energy." },
+            "facility": { hindi: "सुविधा / केंद्र", pos: "Noun", base: "Facility", context: "Building for a purpose." },
+            "and": { hindi: "और", pos: "Conjunction", base: "And", context: "Joiner." },
+            "transfer": { hindi: "स्थानांतरित करना / सौंपना", pos: "Verb", base: "Transfer", context: "Move from one place to another." },
+            "stockpile": { hindi: "भंडार / जमा किया हुआ सामान", pos: "Noun", base: "Stockpile", context: "Large amount gathered." },
+            "of": { hindi: "का / की", pos: "Preposition", base: "Of", context: "Connection." },
+            "highly": { hindi: "अत्यधिक / बहुत ज्यादा", pos: "Adverb", base: "Highly", context: "Intensity." },
+            "enriched": { hindi: "समृद्ध (जिसकी क्वालिटी बढ़ाई गई हो)", pos: "Adjective (Participle)", base: "Enrich", context: "Processed uranium." },
+            "uranium": { hindi: "यूरेनियम", pos: "Noun", base: "Uranium", context: "A chemical element." }
+        };
+
+        const articles = [
+            {
+                s: "Iran media says 'no tangible concessions' in US response to Iran proposal",
+                fullMeaning: "Iran ki media ka kehna hai ki Iran ke prastaav (proposal) par America ke jawaab mein koi 'thos ya waastavik chhoot' (tangible concessions) nahi di gayi hai.",
+                phrases: [
+                    { t: "Iran media says", g: "Yahan 'says' present simple tense hai. News headlines mein aksar past ki ghatnaon ko bhi present simple mein likhte hain taaki wo taaza (fresh) lagein." },
+                    { t: "'no tangible concessions'", g: "Adjective 'tangible' (thos) Noun 'concessions' (chhoot) ki khasiyat bata raha hai. 'No' yahan negative determiner hai." },
+                    { t: "in US response", g: "Preposition 'in' dikhata hai ki ye concessions kahan nahi mile - US ke jawab mein." },
+                    { t: "to Iran proposal", g: "'To' preposition yahan 'response' ko 'proposal' se jodta hai (Jawab kiske prati tha? Proposal ke prati)." }
+                ]
+            },
+            {
+                s: "Mehr news agency meanwhile said: \"The United States, offering no tangible concessions, wants to obtain concessions that it failed to obtain during the war, which will lead to an impasse in the negotiations.\"",
+                fullMeaning: "Mehr news agency ne is beech kaha: \"America, bina koi thos chhoot diye, aisi chhoot paana chahta hai jo wo yuddh ke dauran paane mein nakam raha, jisse baatcheet mein gatirodh (deadlock) paida ho jayega.\"",
+                phrases: [
+                    { t: "Mehr news agency meanwhile said:", g: "'Meanwhile' ek adverb hai jo batata hai ki isi samay (parallel time mein) ek aur event hua. 'Said' simple past tense hai reporting ke liye." },
+                    { t: "\"The United States, offering no tangible concessions,", g: "Yeh ek Participle Phrase hai. 'Offering' yahan extra information de raha hai United States ke baare mein (Bina koi chhoot diye hue...)." },
+                    { t: "wants to obtain concessions", g: "Main clause: Subject (United States) + wants (verb) + to obtain (infinitive/purpose). 'To obtain' batata hai ki unka irada kya hai." },
+                    { t: "that it failed to obtain during the war,", g: "Yeh ek Relative Clause hai jo 'concessions' ke baare mein aur bata raha hai ('that' = jo). 'During' preposition of time hai." },
+                    { t: "which will lead to an impasse in the negotiations.\"", g: "'Which' yahan pichli puri baat ko refer kar raha hai. Yeh Relative clause future tense (will lead) mein hai, result dikhane ke liye." }
+                ]
+            },
+            {
+                s: "Iranian media reported that the United States had not offered any meaningful concessions in its reply to Tehran’s proposal for talks aimed at ending the war.",
+                fullMeaning: "Irani media ne report kiya ki America ne yuddh samapt karne ke uddeshya se ki ja rahi baatcheet ke liye Tehran ke prastaav ke jawab mein koi arthpoorn chhoot (meaningful concessions) pesh nahi ki thi.",
+                phrases: [
+                    { t: "Iranian media reported", g: "Past simple tense, event ko report karne ke liye. (Reported Speech ki shuruaat)." },
+                    { t: "that the United States had not offered", g: "Reported speech mein tense backshift hota hai. Past Simple ban jata hai Past Perfect ('had not offered'). Yeh batata hai ki action report hone se pehle ho chuka tha." },
+                    { t: "any meaningful concessions", g: "Negative sentences mein 'any' ka use hota hai 'some' ki jagah. Meaningful (Adjective) + Concessions (Noun)." },
+                    { t: "in its reply to Tehran’s proposal", g: "'Its' possessive pronoun hai (US ka). 'Tehran's' possessive noun (Apostrophe s) dikhata hai ki proposal Tehran (Iran) ka tha." },
+                    { t: "for talks aimed at ending the war.", g: "'aimed at' ek reduced relative clause hai (talks which were aimed at). Preposition 'at' ke baad verb humesha 'ing' form (Gerund) mein aati hai ('ending')." }
+                ]
+            },
+            {
+                s: "According to the Fars news agency, Washington presented a five-point framework that included demands for Iran to limit operations to a single nuclear facility and transfer its stockpile of highly enriched uranium to the United States.",
+                fullMeaning: "Fars news agency ke anusar, Washington ne ek paanch-sutriya (five-point) dhancha pesh kiya jisme Iran se yeh maang ki gayi thi ki wo apna kaam sirf ek parmanu kendra tak simit rakhe aur apne highly enriched uranium ka bhandaar America ko saunp de.",
+                phrases: [
+                    { t: "According to the Fars news agency,", g: "Prepositional phrase jo source batata hai ki jankari kahan se aayi." },
+                    { t: "Washington presented a five-point framework", g: "Washington (yahan US government ke roop mein used hai) ne past mein ek dhancha rakha (presented - simple past). 'Five-point' ek compound adjective hai." },
+                    { t: "that included demands for Iran", g: "Relative clause ('that' = jisme) jo 'framework' ko describe kar raha hai." },
+                    { t: "to limit operations to a single nuclear facility", g: "Infinitive of purpose ('to limit'). 'To' (preposition) yahan limit/boundary set kar raha hai ('to a single facility')." },
+                    { t: "and transfer its stockpile of highly enriched uranium to the United States.", g: "'And' yahan 'limit' verb ke sath dusri verb 'transfer' (to transfer) jod raha hai. 'Highly' adverb hai jo adjective 'enriched' ki tivrata (intensity) badhata hai." }
+                ]
+            }
+        ];
+
+        const vocabList = [
+            { word: "Tangible", en: "Real or clear enough to be noticed.", hi: "ठोस / वास्तविक (जिसे महसूस किया जा सके)", ex: "We need tangible results, not just promises." },
+            { word: "Concession", en: "Something you give up to reach an agreement.", hi: "छूट / रियायत / समझौता", ex: "Both sides must make concessions to sign the treaty." },
+            { word: "Impasse", en: "A situation where no progress is possible.", hi: "गतिरोध (ऐसी स्थिति जहाँ से आगे बढ़ना मुश्किल हो)", ex: "The negotiations reached an impasse over money." },
+            { word: "Meaningful", en: "Serious, important, or useful.", hi: "अर्थपूर्ण / महत्व रखने वाला", ex: "They had a meaningful conversation about their future." },
+            { word: "Stockpile", en: "A large supply of goods kept for future use.", hi: "भंडार / जमा किया हुआ सामान", ex: "The country has a stockpile of weapons." },
+            { word: "Framework", en: "A basic structure or set of ideas.", hi: "ढांचा / रूपरेखा", ex: "This agreement provides a framework for peace." }
+        ];
+
+        const grammarConcepts = [
+            {
+                title: "Reported Speech (Tense Shift)",
+                desc: "Jab hum kisi ki kahi hui baat ko apne shabdon mein report karte hain, toh tense past mein shift ho jata hai (agar reporting verb past mein ho).",
+                context: "Article mein: <i>'Iranian media <b>reported</b> that the United States <b>had not offered</b>...'</i>",
+                rule: "Agar direct speech Simple Past mein thi ('The US didn't offer'), toh reported speech mein wo Past Perfect ('had not offered') ban jati hai."
+            },
+            {
+                title: "Participle Phrases (Extra Info)",
+                desc: "Jab verb ki 'ing' form ka use sentence mein extra information dene ke liye kiya jaye, subject ko repeat kiye bina.",
+                context: "Article mein: <i>'The United States, <b>offering no tangible concessions</b>, wants to obtain...'</i>",
+                rule: "Yahan 'offering' US ke action ko bata raha hai jo main action ('wants') ke sath chal raha hai. (America, bina chhoot diye hue...)"
+            },
+            {
+                title: "Relative Clauses (that / which)",
+                desc: "Noun ke baare mein aur detail dene ke liye hum that/which/who ka use karte hain.",
+                context: "Article mein: <i>'...obtain concessions <b>that it failed to obtain</b>...'</i>",
+                rule: "'That' yahan previous noun 'concessions' ko jodta hai. (Wo chhoot 'jo' wo paane mein nakam raha)."
+            },
+            {
+                title: "Preposition + Gerund (-ing)",
+                desc: "Preposition (at, in, for, of etc.) ke turant baad aane wali verb humesha '-ing' form (Gerund) leti hai.",
+                context: "Article mein: <i>'...aimed <b>at ending</b> the war.'</i>",
+                rule: "Yahan 'aimed at' ke baad 'end' nahi aayega, 'ending' aayega."
+            }
+        ];
+
+        // 15 Quiz Questions (Comprehension, Vocab, Grammar) mixed types
+        const quizBank = [
+            { type: 'tf', q: "The United States offered many tangible concessions to Iran.", a: false, exp: "False. The article clearly states the US offered 'no tangible concessions'." },
+            { type: 'mcq', q: "What does the word 'impasse' mean in the text?", opts: ["A fast resolution", "A dead end where progress stops", "A clear set of rules"], a: 1, exp: "'Impasse' means a deadlock or a situation where no progress is possible." },
+            { type: 'mcq', q: "According to Mehr news agency, what does the US want?", opts: ["To start a new war", "To obtain concessions it failed to get during the war", "To give up its uranium"], a: 1, exp: "The US wants to obtain concessions that it failed to obtain during the war." },
+            { type: 'flashcard', front: "Meaning of 'Stockpile'?", back: "भंडार / जमा किया हुआ सामान (A large gathered supply)" },
+            { type: 'mcq', q: "In the phrase '...which will lead to an impasse', what part of speech is 'lead'?", opts: ["Noun", "Adjective", "Verb"], a: 2, exp: "'Lead' is a verb here showing an action (will cause/go towards)." },
+            { type: 'tf', q: "Fars news agency reported that Washington presented a five-point framework.", a: true, exp: "True. The text says 'According to the Fars news agency, Washington presented a five-point framework'." },
+            { type: 'mcq', q: "Why is 'ending' used instead of 'end' in the phrase 'aimed at ending'?", opts: ["Because it's a plural noun", "Because verbs after prepositions (like 'at') take the -ing form", "Because it is in the future tense"], a: 1, exp: "Prepositions are followed by Gerunds (-ing form of the verb)." },
+            { type: 'flashcard', front: "Translate to Hinglish: 'Tangible concessions'", back: "ठोस छूट / वास्तविक रियायतें (Real compromises)" },
+            { type: 'mcq', q: "What did the US demand Iran to do with its nuclear facilities?", opts: ["Build five more", "Limit operations to a single facility", "Transfer them to Washington"], a: 1, exp: "The US demanded Iran 'limit operations to a single nuclear facility'." },
+            { type: 'tf', q: "The talks are aimed at starting a new war.", a: false, exp: "False. The talks are 'aimed at ending the war'." },
+            { type: 'mcq', q: "In 'Iranian media reported that the US had not offered', why is 'had not offered' used?", opts: ["It is present simple", "It is past perfect, used in reported speech for a past event", "It is a spelling error"], a: 1, exp: "Reported speech shifts Simple Past to Past Perfect to show an action happened before it was reported." },
+            { type: 'flashcard', front: "Meaning of 'Framework'?", back: "ढांचा / रूपरेखा (Basic structure or plan)" },
+            { type: 'mcq', q: "What does the US want Iran to transfer to it?", opts: ["Oil reserves", "Its stockpile of highly enriched uranium", "Its nuclear facilities"], a: 1, exp: "The framework demands Iran to 'transfer its stockpile of highly enriched uranium to the United States'." },
+            { type: 'tf', q: "The word 'meanwhile' means two things are happening at completely different years.", a: false, exp: "False. 'Meanwhile' (इस दौरान) means happening at the same time." },
+            { type: 'flashcard', front: "Grammar: Identify the relative pronoun in 'concessions that it failed to obtain'", back: "The word 'that' is the relative pronoun linking to 'concessions'." }
+        ];
+
+        /* =========================================
+           STATE & DOM ELEMENTS
+           ========================================= */
+        let currentSection = 'read';
+        let currentQuizIdx = 0;
+        let quizScore = 0;
+
+        // DOM elements cache
+        const dom = {
+            read: document.getElementById('sec-read'),
+            vocab: document.getElementById('sec-vocab'),
+            grammar: document.getElementById('sec-grammar'),
+            quiz: document.getElementById('sec-quiz'),
+            navs: document.querySelectorAll('.nav-btn'),
+            modal: document.getElementById('phrase-modal'),
+            modalText: document.getElementById('modal-phrase-text'),
+            tabVocab: document.getElementById('tab-vocab'),
+            tabGrammar: document.getElementById('tab-grammar'),
+            contentVocab: document.getElementById('modal-content-vocab'),
+            contentGrammar: document.getElementById('modal-content-grammar'),
+            wordView: document.getElementById('word-detail-view'),
+            vocabPrompt: document.getElementById('vocab-prompt'),
+            grammarText: document.getElementById('phrase-grammar-text'),
+            fullSentContainer: document.getElementById('modal-content-full-sentence'),
+            fullSentText: document.getElementById('full-sentence-text'),
+            fullSentHindi: document.getElementById('full-sentence-hindi'),
+            quizContent: document.getElementById('quiz-content'),
+            quizBar: document.getElementById('quiz-bar'),
+            quizProgress: document.getElementById('quiz-progress')
+        };
+
+        /* =========================================
+           INITIALIZATION & RENDER FUNCTIONS
+           ========================================= */
+        function init() {
+            renderArticle();
+            renderMainVocab();
+            renderMainGrammar();
+            // initialize quiz on first visit
+        }
+
+        function cleanWord(w) {
+            return w.toLowerCase().replace(/[^a-z0-9-]/g, '');
+        }
+
+        function renderArticle() {
+            const container = document.getElementById('article-container');
+            let html = '';
+            articles.forEach((art, sIdx) => {
+                html += `<div class="mb-5">`;
+                art.phrases.forEach((ph, pIdx) => {
+                    html += `<span class="phrase" onclick="openPhrase(${sIdx}, ${pIdx})">${ph.t}</span> `;
+                });
+                html += `</div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        function renderMainVocab() {
+            const container = document.getElementById('main-vocab-list');
+            let html = '';
+            vocabList.forEach(v => {
+                html += `
+                    <div class="bg-[#080D1A] border border-white/5 p-4 rounded-xl hover:bg-white/5 transition">
+                        <div class="flex justify-between items-end mb-2">
+                            <h3 class="text-lg font-bold text-blue-400">${v.word}</h3>
+                            <span class="text-xs text-gray-500">${v.en}</span>
+                        </div>
+                        <p class="text-sm text-white mb-2">${v.hi}</p>
+                        <p class="text-xs text-gray-400 italic">" ${v.ex} "</p>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function renderMainGrammar() {
+            const container = document.getElementById('main-grammar-list');
+            let html = '';
+            grammarConcepts.forEach((g, idx) => {
+                html += `
+                    <div class="bg-[#080D1A] border border-white/5 p-4 rounded-xl cursor-pointer hover:bg-white/5 transition" onclick="toggleGrammarDrop(${idx})">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-base font-bold text-white">${g.title}</h3>
+                            <svg id="g-icon-${idx}" class="w-4 h-4 text-gray-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                        <div id="g-content-${idx}" class="hide mt-4 space-y-3 pt-3 border-t border-white/10">
+                            <p class="text-sm text-gray-300">${g.desc}</p>
+                            <p class="text-sm text-blue-300 bg-[#2563EB]/10 p-2 rounded">${g.context}</p>
+                            <p class="text-xs text-gray-400"><b>Rule:</b> ${g.rule}</p>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function toggleGrammarDrop(idx) {
+            const content = document.getElementById(`g-content-${idx}`);
+            const icon = document.getElementById(`g-icon-${idx}`);
+            if (content.classList.contains('hide')) {
+                content.classList.remove('hide');
+                icon.classList.add('rotate-180');
+            } else {
+                content.classList.add('hide');
+                icon.classList.remove('rotate-180');
+            }
+        }
+
+        /* =========================================
+           NAVIGATION LOGIC
+           ========================================= */
+        function nav(sectionId) {
+            currentSection = sectionId;
+            ['read', 'vocab', 'grammar', 'quiz'].forEach(s => {
+                document.getElementById(`sec-${s}`).classList.add('hide');
+                const btn = document.getElementById(`nav-${s}`);
+                btn.classList.remove('bg-[#2563EB]', 'text-white');
+                btn.classList.add('bg-white/5', 'text-gray-400');
+            });
+            
+            document.getElementById(`sec-${sectionId}`).classList.remove('hide');
+            const activeBtn = document.getElementById(`nav-${sectionId}`);
+            activeBtn.classList.remove('bg-white/5', 'text-gray-400');
+            activeBtn.classList.add('bg-[#2563EB]', 'text-white');
+
+            if(sectionId === 'quiz' && currentQuizIdx === 0 && quizScore === 0) {
+                startQuiz();
+            }
+            window.scrollTo(0,0);
+        }
+
+        function goBack() {
+            if(currentSection !== 'read') nav('read');
+        }
+
+        /* =========================================
+           MODAL INTERACTION LOGIC
+           ========================================= */
+        let activeSentenceObj = null;
+
+        function openPhrase(sIdx, pIdx) {
+            activeSentenceObj = articles[sIdx];
+            const phraseObj = articles[sIdx].phrases[pIdx];
+            
+            // Build clickable words
+            const words = phraseObj.t.split(' ');
+            let wordHtml = '';
+            words.forEach(w => {
+                wordHtml += `<span class="clickable-word" onclick="showWord('${w.replace(/'|"/g, "\\'")}', this)">${w}</span> `;
+            });
+
+            dom.modalText.innerHTML = wordHtml;
+            dom.grammarText.innerHTML = phraseObj.g;
+            
+            // Reset Views
+            dom.wordView.classList.add('hide');
+            dom.vocabPrompt.classList.remove('hide');
+            dom.fullSentContainer.classList.add('hide');
+            
+            switchModalTab('vocab');
+            dom.modal.classList.remove('hide');
+            document.body.style.overflow = 'hidden'; // prevent bg scroll
+        }
+
+        function closeModal() {
+            dom.modal.classList.add('hide');
+            document.body.style.overflow = 'auto';
+        }
+
+        function switchModalTab(tab) {
+            if (tab === 'vocab') {
+                dom.tabVocab.className = 'flex-1 py-2 text-sm font-medium rounded-xl bg-[#2563EB] text-white transition';
+                dom.tabGrammar.className = 'flex-1 py-2 text-sm font-medium rounded-xl bg-white/5 text-gray-400 border border-white/5 hover:bg-white/10 transition';
+                dom.contentVocab.classList.remove('hide');
+                dom.contentGrammar.classList.add('hide');
+            } else {
+                dom.tabGrammar.className = 'flex-1 py-2 text-sm font-medium rounded-xl bg-[#2563EB] text-white transition';
+                dom.tabVocab.className = 'flex-1 py-2 text-sm font-medium rounded-xl bg-white/5 text-gray-400 border border-white/5 hover:bg-white/10 transition';
+                dom.contentGrammar.classList.remove('hide');
+                dom.contentVocab.classList.add('hide');
+            }
+        }
+
+        function showWord(word, el) {
+            // Highlight logic
+            document.querySelectorAll('.clickable-word').forEach(e => e.classList.remove('active'));
+            el.classList.add('active');
+
+            const cw = cleanWord(word);
+            const entry = dict[cw] || { hindi: "शब्दावली में नहीं", pos: "Unknown", base: cw, context: "Not specified." };
+
+            document.getElementById('word-title').innerText = cw;
+            document.getElementById('word-pos').innerText = entry.pos;
+            document.getElementById('word-hindi').innerText = entry.hindi;
+            document.getElementById('word-base').innerText = entry.base;
+            document.getElementById('word-context').innerText = entry.context;
+
+            dom.vocabPrompt.classList.add('hide');
+            dom.wordView.classList.remove('hide');
+        }
+
+        function showFullSentence() {
+            if(!activeSentenceObj) return;
+            dom.fullSentText.innerText = activeSentenceObj.s;
+            dom.fullSentHindi.innerText = activeSentenceObj.fullMeaning;
+            dom.fullSentContainer.classList.remove('hide');
+            // scroll to bottom
+            dom.contentVocab.parentElement.scrollTop = dom.contentVocab.parentElement.scrollHeight;
+        }
+
+        /* =========================================
+           QUIZ ENGINE
+           ========================================= */
+        function startQuiz() {
+            currentQuizIdx = 0;
+            quizScore = 0;
+            renderQuizQuestion();
+        }
+
+        function renderQuizQuestion() {
+            if(currentQuizIdx >= quizBank.length) {
+                showQuizResults();
+                return;
+            }
+
+            const q = quizBank[currentQuizIdx];
+            dom.quizProgress.innerText = `${currentQuizIdx + 1} / ${quizBank.length}`;
+            dom.quizBar.style.width = `${((currentQuizIdx + 1) / quizBank.length) * 100}%`;
+
+            let html = '';
+            
+            if(q.type === 'tf') {
+                html = `
+                    <div class="mb-8 text-center"><h3 class="text-xl font-bold text-white">${q.q}</h3></div>
+                    <div class="flex gap-4 w-full">
+                        <button onclick="handleAns(true)" class="flex-1 py-4 bg-[#080D1A] border border-white/10 rounded-2xl text-white font-medium hover:bg-white/5 transition">True</button>
+                        <button onclick="handleAns(false)" class="flex-1 py-4 bg-[#080D1A] border border-white/10 rounded-2xl text-white font-medium hover:bg-white/5 transition">False</button>
+                    </div>
+                `;
+            } else if (q.type === 'mcq') {
+                html = `
+                    <div class="mb-6"><h3 class="text-lg font-bold text-white">${q.q}</h3></div>
+                    <div class="space-y-3">
+                        ${q.opts.map((opt, i) => `
+                            <button onclick="handleAns(${i})" class="w-full text-left py-3 px-5 bg-[#080D1A] border border-white/10 rounded-xl text-white hover:bg-white/5 transition">${opt}</button>
+                        `).join('')}
+                    </div>
+                `;
+            } else if (q.type === 'flashcard') {
+                html = `
+                    <div class="text-center mb-4"><span class="text-xs uppercase tracking-widest text-[#60A5FA]">Flashcard - Tap to flip</span></div>
+                    <div class="perspective w-full h-48 cursor-pointer group" onclick="this.querySelector('.preserve-3d').classList.toggle('rotate-y-180')">
+                        <div class="preserve-3d relative w-full h-full duration-500">
+                            <!-- Front -->
+                            <div class="backface-hidden absolute inset-0 bg-[#080D1A] border border-[#2563EB]/30 rounded-2xl flex items-center justify-center p-6 text-center">
+                                <h3 class="text-lg font-bold text-white">${q.front}</h3>
+                            </div>
+                            <!-- Back -->
+                            <div class="backface-hidden absolute inset-0 bg-[#2563EB] rounded-2xl flex items-center justify-center p-6 text-center rotate-y-180">
+                                <h3 class="text-lg font-medium text-white">${q.back}</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="handleAns(true)" class="mt-8 w-full py-3 bg-white/10 rounded-xl text-white hover:bg-white/20 transition">Got it! Next</button>
+                `;
+            }
+
+            html += `<div id="quiz-feedback" class="hide mt-6 p-4 rounded-xl text-sm font-medium"></div>`;
+            dom.quizContent.innerHTML = html;
+        }
+
+        function handleAns(userAns) {
+            const q = quizBank[currentQuizIdx];
+            const feedback = document.getElementById('quiz-feedback');
+            
+            // disable buttons
+            dom.quizContent.querySelectorAll('button').forEach(b => b.disabled = true);
+
+            let isCorrect = true;
+            if(q.type !== 'flashcard') {
+                isCorrect = (userAns === q.a);
+                if(isCorrect) quizScore++;
+            }
+
+            if(q.type === 'flashcard') {
+                currentQuizIdx++;
+                renderQuizQuestion();
+            } else {
+                feedback.classList.remove('hide');
+                if(isCorrect) {
+                    feedback.classList.add('bg-green-500/20', 'text-green-300');
+                    feedback.innerHTML = `✅ <b>Correct!</b> <br/> <span class="text-xs opacity-80">${q.exp}</span>`;
+                } else {
+                    feedback.classList.add('bg-red-500/20', 'text-red-300');
+                    feedback.innerHTML = `❌ <b>Incorrect.</b> <br/> <span class="text-xs opacity-80">${q.exp}</span>`;
+                }
+
+                setTimeout(() => {
+                    currentQuizIdx++;
+                    renderQuizQuestion();
+                }, 3500); // Wait 3.5s to read explanation
+            }
+        }
+
+        function showQuizResults() {
+            dom.quizContent.innerHTML = `
+                <div class="text-center">
+                    <h2 class="text-4xl font-bold text-white mb-2">Quiz Complete!</h2>
+                    <p class="text-lg text-gray-400 mb-8">You scored ${quizScore} out of ${quizBank.filter(q=>q.type!=='flashcard').length}.</p>
+                    <button onclick="startQuiz()" class="px-6 py-3 bg-[#2563EB] text-white rounded-xl hover:bg-blue-600 transition shadow-lg shadow-blue-500/30 font-medium">Retake Quiz</button>
+                </div>
+            `;
+        }
+
+        // Run Initialization
+        window.onload = init;
+
+    </script>
+</body>
+</html>
