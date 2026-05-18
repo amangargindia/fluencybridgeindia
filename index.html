@@ -99,10 +99,15 @@
     <nav class="sticky top-0 z-50 w-full bg-fluency-base/80 backdrop-blur-md border-b border-fluency-border">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
             <div class="flex items-center gap-4 sm:gap-6 overflow-x-auto no-scrollbar">
-                <button onclick="setTab('Notes')" id="tab-Notes" class="tab-btn text-brand-400 font-bold transition-colors whitespace-nowrap">Notes</button>
-                <button onclick="setTab('Reader')" id="tab-Reader" class="tab-btn text-slate-400 hover:text-slate-200 transition-colors whitespace-nowrap">Reader</button>
-                <button onclick="setTab('Tools')" id="tab-Tools" class="tab-btn text-slate-400 hover:text-slate-200 transition-colors whitespace-nowrap">Tools</button>
-                <button onclick="setTab('Mistakes')" id="tab-Mistakes" class="tab-btn text-slate-400 hover:text-slate-200 transition-colors whitespace-nowrap">Mistakes</button>
+                <button onclick="setTab('Notes')" id="tab-Notes" class="tab-btn flex items-center gap-2 text-brand-400 font-bold transition-all whitespace-nowrap bg-brand-900/20 px-3 py-1.5 rounded-lg border border-brand-500/30">
+                    <i data-lucide="edit-3" class="w-4 h-4"></i> Notes
+                </button>
+                <button onclick="setTab('Reader')" id="tab-Reader" class="tab-btn flex items-center gap-2 text-slate-400 hover:text-slate-200 transition-all whitespace-nowrap px-3 py-1.5 rounded-lg border border-transparent hover:bg-slate-800/50">
+                    <i data-lucide="book-open" class="w-4 h-4"></i> Reader
+                </button>
+                <div class="w-px h-6 bg-fluency-border mx-2 hidden sm:block"></div>
+                <button onclick="setTab('Tools')" id="tab-Tools" class="tab-btn text-sm text-slate-400 hover:text-slate-200 transition-colors whitespace-nowrap">Tools</button>
+                <button onclick="setTab('Mistakes')" id="tab-Mistakes" class="tab-btn text-sm text-slate-400 hover:text-slate-200 transition-colors whitespace-nowrap">Mistakes</button>
             </div>
             <button onclick="openRandomizer()" class="h-10 px-4 rounded-full bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 shadow-md flex items-center gap-2 text-white transition-all hover:scale-105 active:scale-95 group border border-indigo-400/40 font-bold tracking-wide text-sm shrink-0">
                 <i data-lucide="dices" class="w-4 h-4 group-hover:rotate-[360deg] transition-transform duration-700"></i>
@@ -187,8 +192,8 @@
             <div class="w-16 h-16 bg-brand-900/50 rounded-2xl flex items-center justify-center mb-6 border border-brand-500/30 text-brand-400">
                 <i data-lucide="dices" class="w-8 h-8"></i>
             </div>
-            <h2 class="text-2xl font-black text-white mb-2 text-center">Random Topic</h2>
-            <p class="text-slate-400 text-sm text-center mb-8">Discover a new test from the library. We track your history so you never get repeats!</p>
+            <h2 class="text-2xl font-black text-white mb-2 text-center">Explore a Random Topic</h2>
+            <p class="text-slate-400 text-sm text-center mb-8">Not sure what to practice? Let us pick a new, unseen topic from the library for you to explore today!</p>
 
             <!-- Slot Machine Display -->
             <div class="w-full bg-slate-900/90 border border-slate-700/50 rounded-2xl p-4 mb-8 shadow-inner relative overflow-hidden">
@@ -220,6 +225,17 @@
     <script>
         lucide.createIcons();
 
+        window.addEventListener('load', () => {
+            const today = new Date().toLocaleDateString();
+            const lastShown = localStorage.getItem('fluency_randomizer_date');
+            if (lastShown !== today) {
+                setTimeout(() => {
+                    openRandomizer();
+                    localStorage.setItem('fluency_randomizer_date', today);
+                }, 500);
+            }
+        });
+
         const EXTENSION = ".html";
         const container = document.getElementById("tools");
         const searchInput = document.getElementById("search");
@@ -233,13 +249,20 @@
             
             // Update tab styles
             document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('text-brand-400', 'font-bold');
-                btn.classList.add('text-slate-400');
+                btn.classList.remove('text-brand-400', 'font-bold', 'bg-brand-900/20', 'border-brand-500/30');
+                if (btn.id === 'tab-Notes' || btn.id === 'tab-Reader') {
+                    btn.classList.add('text-slate-400', 'border-transparent');
+                } else {
+                    btn.classList.add('text-slate-400');
+                }
             });
             const activeBtn = document.getElementById('tab-' + tab);
             if (activeBtn) {
-                activeBtn.classList.remove('text-slate-400');
+                activeBtn.classList.remove('text-slate-400', 'border-transparent');
                 activeBtn.classList.add('text-brand-400', 'font-bold');
+                if (tab === 'Notes' || tab === 'Reader') {
+                    activeBtn.classList.add('bg-brand-900/20', 'border-brand-500/30');
+                }
             }
             
             applyFilters();
@@ -409,6 +432,8 @@
                 filtered.sort((a, b) => a.title.localeCompare(b.title));
             } else if (sortSelect.value === "za") {
                 filtered.sort((a, b) => b.title.localeCompare(a.title));
+            } else if (sortSelect.value === "default" && (currentTab === "Reader" || currentTab === "Notes")) {
+                filtered.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
             }
             render(filtered);
         }

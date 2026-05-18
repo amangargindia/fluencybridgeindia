@@ -1,6 +1,16 @@
 // generate-index.js
 const fs = require('fs');
 const path = require('path');
+const { execSync } = require('child_process');
+
+function getGitTimestamp(filePath) {
+    try {
+        const result = execSync(`git log -1 --format="%ct" -- "${filePath}"`, { stdio: 'pipe' }).toString().trim();
+        return result ? parseInt(result) * 1000 : fs.statSync(filePath).mtimeMs;
+    } catch (e) {
+        return fs.statSync(filePath).mtimeMs;
+    }
+}
 
 const BASE_DIR = __dirname;
 // Exclude these hidden or root-level folders
@@ -60,13 +70,15 @@ htmlFiles.forEach(filePath => {
     
     const content = fs.readFileSync(filePath, 'utf-8');
     const title = extractTitle(content);
+    const timestamp = getGitTimestamp(filePath);
     
     indexData.push({
         title,
         slug,
         folder: folderPath,
         category,
-        rootGroup
+        rootGroup,
+        timestamp
     });
 });
 
