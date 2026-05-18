@@ -1,5 +1,12 @@
 [
   {
+    "title": "Learn Adverbs",
+    "slug": "A-rat",
+    "folder": "Reader",
+    "category": "Reader",
+    "rootGroup": "Reader"
+  },
+  {
     "title": "Article Reader",
     "slug": "Google-Storage-Update",
     "folder": "Reader",
