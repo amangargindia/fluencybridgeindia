@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Fluency Bridge - Learn Adverbs</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@1,600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    colors: {
+                        brand: {
+                            bg: '#060B19',
+                            card: '#111A2C',
+                            input: '#080D1A',
+                            accent: '#2563EB',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Scrollbar for hiding but allowing scroll */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Smooth transitions */
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .slide-up { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+        /* Flashcard Flip */
+        .perspective-1000 { perspective: 1000px; }
+        .transform-style-3d { transform-style: preserve-3d; }
+        .backface-hidden { backface-visibility: hidden; }
+        .rotate-y-180 { transform: rotateY(180deg); }
+    </style>
+</head>
+<body class="bg-brand-bg text-white font-sans antialiased overflow-x-hidden relative min-h-screen pb-24 selection:bg-brand-accent selection:text-white">
+
+    <!-- Global Background Blur/Gradient -->
+    <div class="fixed inset-0 pointer-events-none bg-[radial-gradient(circle_at_top_center,_var(--tw-gradient-stops))] from-[#131E3A]/40 via-transparent to-transparent opacity-80 blur-2xl z-0"></div>
+
+    <!-- Header Logo -->
+    <header class="p-6 relative z-10 flex flex-col items-center justify-center cursor-pointer" onclick="window.location.href='http://fluencybridgeedu.online'">
+        <div class="tracking-[0.3em] text-[10px] text-gray-300 uppercase font-semibold mb-1">F L U E N C Y</div>
+        <div class="text-white text-4xl italic font-serif tracking-wide drop-shadow-md">bridge</div>
+    </header>
+
+    <!-- Top Navigation -->
+    <nav class="flex overflow-x-auto gap-3 px-6 pb-6 relative z-10 no-scrollbar sticky top-0 bg-brand-bg/80 backdrop-blur-md border-b border-white/5 pt-4">
+        <button id="nav-article" onclick="switchTab('article')" class="nav-btn px-5 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap transition-all duration-300 bg-brand-accent text-white shadow-lg shadow-brand-accent/20">Read Article</button>
+        <button id="nav-vocab" onclick="switchTab('vocab')" class="nav-btn px-5 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap transition-all duration-300 bg-white/5 text-gray-400 hover:bg-white/10">Vocabulary</button>
+        <button id="nav-grammar" onclick="switchTab('grammar')" class="nav-btn px-5 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap transition-all duration-300 bg-white/5 text-gray-400 hover:bg-white/10">Grammar</button>
+        <button id="nav-quiz" onclick="switchTab('quiz')" class="nav-btn px-5 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap transition-all duration-300 bg-white/5 text-gray-400 hover:bg-white/10">Quiz</button>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="px-4 md:px-6 relative z-10 max-w-2xl mx-auto">
+        
+        <!-- SECTION: ARTICLE -->
+        <div id="section-article" class="tab-content block fade-in">
+            <div class="bg-brand-card border-t border-white/5 shadow-[0_8px_30px_rgb(0,0,0,0.6)] rounded-3xl p-6 mb-6">
+                <h2 class="text-2xl font-bold mb-2">The Missing Pen</h2>
+                <p class="text-brand-accent text-sm font-medium mb-6">Tap any sentence to analyze it.</p>
+                
+                <div id="article-container" class="text-lg leading-loose text-gray-200 space-y-2">
+                    <!-- Sentences injected here via JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION: VOCABULARY -->
+        <div id="section-vocab" class="tab-content hidden fade-in">
+            <div class="bg-brand-card border-t border-white/5 shadow-[0_8px_30px_rgb(0,0,0,0.6)] rounded-3xl p-6 mb-6">
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-brand-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                    Main Vocabulary
+                </h2>
+                <p class="text-gray-400 text-sm mb-6">Important words from the text for lower-intermediate learners.</p>
+                
+                <div id="vocab-container" class="space-y-4">
+                    <!-- Vocab items injected here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION: GRAMMAR -->
+        <div id="section-grammar" class="tab-content hidden fade-in">
+            <div class="bg-brand-card border-t border-white/5 shadow-[0_8px_30px_rgb(0,0,0,0.6)] rounded-3xl p-6 mb-6">
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-brand-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                    Grammar Structures
+                </h2>
+                <p class="text-gray-400 text-sm mb-6">Adverbs of Place & Rules based on today's reading.</p>
+                
+                <div id="grammar-container" class="space-y-4">
+                    <!-- Grammar structures injected here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION: QUIZ -->
+        <div id="section-quiz" class="tab-content hidden fade-in">
+            <div class="bg-brand-card border-t border-white/5 shadow-[0_8px_30px_rgb(0,0,0,0.6)] rounded-3xl p-6 mb-6 min-h-[400px] flex flex-col">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-bold">Knowledge Check</h2>
+                    <span id="quiz-progress" class="text-sm font-semibold text-brand-accent bg-brand-accent/10 px-3 py-1 rounded-full">1/15</span>
+                </div>
+                
+                <!-- Progress Bar -->
+                <div class="w-full bg-white/10 rounded-full h-2 mb-8">
+                    <div id="quiz-progress-bar" class="bg-brand-accent h-2 rounded-full transition-all duration-300" style="width: 6.66%"></div>
+                </div>
+
+                <div id="quiz-container" class="flex-grow flex flex-col justify-center">
+                    <!-- Quiz content injected here -->
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Sentence Analysis Modal (Bottom Sheet) -->
+    <div id="sentence-modal" class="fixed inset-0 z-[100] hidden">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeModal()"></div>
+        
+        <!-- Bottom Sheet Content -->
+        <div class="absolute bottom-0 left-0 right-0 bg-brand-card border-t border-white/10 rounded-t-3xl slide-up max-h-[85vh] flex flex-col shadow-[0_-10px_40px_rgb(0,0,0,0.8)] mx-auto max-w-2xl">
+            <!-- Drag Handle -->
+            <div class="w-full flex justify-center pt-4 pb-2" onclick="closeModal()">
+                <div class="w-12 h-1.5 bg-white/20 rounded-full"></div>
+            </div>
+            
+            <div class="px-6 pb-6 overflow-y-auto no-scrollbar flex-grow">
+                <!-- Sentence Header -->
+                <h3 id="modal-sentence-text" class="text-2xl font-bold text-white mb-2 leading-snug"></h3>
+                <p id="modal-sentence-meaning" class="text-brand-accent font-medium mb-6 text-sm"></p>
+                
+                <!-- Interactive Words -->
+                <div class="mb-8">
+                    <p class="text-xs text-gray-400 uppercase tracking-wider font-bold mb-3">Click any word for its meaning</p>
+                    <div id="modal-words-container" class="flex flex-wrap gap-2">
+                        <!-- Words injected here -->
+                    </div>
+                </div>
+
+                <!-- Word Detail Box (Shows when a word is clicked) -->
+                <div id="word-detail-box" class="bg-brand-input border border-white/5 rounded-2xl p-5 mb-8 hidden fade-in">
+                    <div class="flex justify-between items-start mb-2">
+                        <h4 id="detail-word" class="text-xl font-bold text-white"></h4>
+                        <span id="detail-pos" class="text-[10px] uppercase tracking-wider bg-brand-accent/20 text-brand-accent px-2 py-1 rounded-lg font-bold"></span>
+                    </div>
+                    <p id="detail-meaning" class="text-gray-200 text-sm mb-3 font-medium"></p>
+                    <div class="bg-white/5 rounded-xl p-3 border border-white/5">
+                        <p class="text-xs text-gray-400 mb-1">Context / Grammar:</p>
+                        <p id="detail-context" class="text-sm text-gray-300"></p>
+                    </div>
+                </div>
+
+                <!-- Sentence Level Grammar Context -->
+                <div class="bg-[#1a2540] rounded-2xl p-5 border-l-4 border-brand-accent">
+                    <h4 class="text-sm font-bold text-white mb-2 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-brand-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Sentence Grammar Structure
+                    </h4>
+                    <p id="modal-grammar-expl" class="text-sm text-gray-300 leading-relaxed"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fixed Bottom Footer -->
+    <footer class="fixed bottom-0 left-0 right-0 w-full bg-[#060B19]/90 backdrop-blur-xl border-t border-white/5 p-4 z-50 flex justify-center gap-12 max-w-2xl mx-auto">
+        <button onclick="goBack()" class="flex flex-col items-center justify-center text-gray-400 hover:text-white transition-colors gap-1">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            <span class="text-[10px] uppercase tracking-widest font-bold">Back</span>
+        </button>
+        <button onclick="window.location.href='http://fluencybridgeedu.online'" class="flex flex-col items-center justify-center text-gray-400 hover:text-white transition-colors gap-1">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+            <span class="text-[10px] uppercase tracking-widest font-bold">Home</span>
+        </button>
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // --- 1. DATA LAYER ---
+        
+        const articleData = [
+            {
+                text: "Yesterday, I went to the market.",
+                meaning: "Kal main bazaar gaya tha.",
+                grammar: "Is sentence mein 'Yesterday' Adverb of Time hai kyunki ye batata hai kaam 'kab' hua (kal ki thi). 'to the market' direction batata hai, ye Adverb of Place nahi hai, prepositional phrase hai.",
+                words: [
+                    { word: "Yesterday,", clean: "Yesterday", meaning: "Beeta hua kal (Past day)", pos: "Adverb of Time", context: "Shows WHEN the action happened." },
+                    { word: "I", clean: "I", meaning: "Main", pos: "Pronoun", context: "Subject of the sentence." },
+                    { word: "went", clean: "went", meaning: "Gaya (Go ka past tense)", pos: "Verb", context: "Main action in past tense." },
+                    { word: "to", clean: "to", meaning: "Ki taraf / Ko", pos: "Preposition", context: "Shows direction towards the market." },
+                    { word: "the", clean: "the", meaning: "Ek specific cheez ke liye", pos: "Article", context: "Used before market to specify which one." },
+                    { word: "market.", clean: "market", meaning: "Bazaar", pos: "Noun", context: "The place where the person went." }
+                ]
+            },
+            {
+                text: "My pen was missing, so I looked everywhere.",
+                meaning: "Mera pen kho gaya tha, isliye maine har jagah dekha.",
+                grammar: "'everywhere' ek Adverb of Place hai. Dhyan de, ye '-ly' se end nahi hota. Ye batata hai ki action (dekhna) kis jagah hua (har jagah).",
+                words: [
+                    { word: "My", clean: "My", meaning: "Mera", pos: "Pronoun", context: "Shows ownership." },
+                    { word: "pen", clean: "pen", meaning: "Kalam / Pen", pos: "Noun", context: "The object that is lost." },
+                    { word: "was", clean: "was", meaning: "Tha", pos: "Helping Verb", context: "Past continuous state." },
+                    { word: "missing,", clean: "missing", meaning: "Kho gaya / Gayab", pos: "Adjective", context: "Describes the state of the pen." },
+                    { word: "so", clean: "so", meaning: "Isliye", pos: "Conjunction", context: "Joins two sentences, showing reason." },
+                    { word: "I", clean: "I", meaning: "Maine", pos: "Pronoun", context: "Subject." },
+                    { word: "looked", clean: "looked", meaning: "Dekha / Dhoondha", pos: "Verb", context: "Action of searching." },
+                    { word: "everywhere.", clean: "everywhere", meaning: "Har jagah", pos: "Adverb of Place", context: "Tells WHERE the looking happened." }
+                ]
+            },
+            {
+                text: "I thought it was inside the almirah, but it was nowhere.",
+                meaning: "Mujhe laga ki wo almirah ke andar tha, par wo kahi bhi nahi tha.",
+                grammar: "'inside' (andar) aur 'nowhere' (kahi nahi) dono Adverb of Place hain. Adverbs of place ya toh sentence ke end mein aate hain ya beech mein, jaise yahan 'nowhere' end mein aaya hai.",
+                words: [
+                    { word: "I", clean: "I", meaning: "Mujhe / Maine", pos: "Pronoun", context: "Subject." },
+                    { word: "thought", clean: "thought", meaning: "Laga / Socha", pos: "Verb", context: "Past tense of think." },
+                    { word: "it", clean: "it", meaning: "Wo (Pen ke liye)", pos: "Pronoun", context: "Refers to the pen." },
+                    { word: "was", clean: "was", meaning: "Tha", pos: "Verb", context: "State of being." },
+                    { word: "inside", clean: "inside", meaning: "Ke andar", pos: "Adverb of Place / Preposition", context: "Shows location inside an object." },
+                    { word: "the", clean: "the", meaning: "Specific almirah", pos: "Article", context: "Points to a particular almirah." },
+                    { word: "almirah,", clean: "almirah", meaning: "Almaari", pos: "Noun", context: "Furniture piece." },
+                    { word: "but", clean: "but", meaning: "Par / Lekin", pos: "Conjunction", context: "Shows contrast." },
+                    { word: "it", clean: "it", meaning: "Wo", pos: "Pronoun", context: "Refers to pen." },
+                    { word: "was", clean: "was", meaning: "Tha", pos: "Verb", context: "State of being." },
+                    { word: "nowhere.", clean: "nowhere", meaning: "Kahi bhi nahi", pos: "Adverb of Place", context: "Indicates absence in any place." }
+                ]
+            },
+            {
+                text: "Suddenly, a rat came outside from within the box.",
+                meaning: "Achanak, ek chuha box ke andar se baahar aaya.",
+                grammar: "Yahan 'outside' aur 'within' use hue hain. 'from within' ka matlab hai kisi cheez ke bilkul andar se nikalna. Chuha direction change kar raha hai.",
+                words: [
+                    { word: "Suddenly,", clean: "Suddenly", meaning: "Achanak", pos: "Adverb of Manner/Time", context: "Shows how the action happened quickly." },
+                    { word: "a", clean: "a", meaning: "Ek", pos: "Article", context: "Any general rat." },
+                    { word: "rat", clean: "rat", meaning: "Chuha", pos: "Noun", context: "The animal." },
+                    { word: "came", clean: "came", meaning: "Aaya", pos: "Verb", context: "Past tense of come." },
+                    { word: "outside", clean: "outside", meaning: "Baahar", pos: "Adverb of Place", context: "Shows the direction of movement." },
+                    { word: "from", clean: "from", meaning: "Se", pos: "Preposition", context: "Shows origin of movement." },
+                    { word: "within", clean: "within", meaning: "Kisi cheez ke andar se", pos: "Adverb / Preposition", context: "Emphasizes being deep inside the box." },
+                    { word: "the", clean: "the", meaning: "Specific box", pos: "Article", context: "Points to the box." },
+                    { word: "box.", clean: "box", meaning: "Dabba", pos: "Noun", context: "The container." }
+                ]
+            },
+            {
+                text: "The rat was here, looking around, and then went upwards.",
+                meaning: "Chuha yahan tha, aas paas dekh raha tha, aur fir upar ki taraf gaya.",
+                grammar: "'here' (yaha par), 'around' (aas paas/chaaro taraf), aur 'upwards' (upar ki taraf) teeno Adverb of Place hain. 'upwards' direction batata hai.",
+                words: [
+                    { word: "The", clean: "The", meaning: "Specific", pos: "Article", context: "The rat we just mentioned." },
+                    { word: "rat", clean: "rat", meaning: "Chuha", pos: "Noun", context: "Subject." },
+                    { word: "was", clean: "was", meaning: "Tha", pos: "Verb", context: "State." },
+                    { word: "here,", clean: "here", meaning: "Yaha par", pos: "Adverb of Place", context: "Current location." },
+                    { word: "looking", clean: "looking", meaning: "Dekh raha", pos: "Verb", context: "Continuous action." },
+                    { word: "around,", clean: "around", meaning: "Aas paas / Chaaro taraf", pos: "Adverb of Place", context: "Direction of looking." },
+                    { word: "and", clean: "and", meaning: "Aur", pos: "Conjunction", context: "Joins actions." },
+                    { word: "then", clean: "then", meaning: "Fir", pos: "Adverb of Time", context: "Sequence of events." },
+                    { word: "went", clean: "went", meaning: "Gaya", pos: "Verb", context: "Action." },
+                    { word: "upwards.", clean: "upwards", meaning: "Upar ki taraf", pos: "Adverb of Place", context: "Shows vertical direction of movement." }
+                ]
+            },
+            {
+                text: "Finally, I went downstairs and found my pen there.",
+                meaning: "Aakhir kaar, main neeche gaya aur wahan apna pen dhoondh liya.",
+                grammar: "'downstairs' (neeche waali manzil par) aur 'there' (waha) Adverb of Place hain. Dhyan rakhein, 'I am going outside' (direction) aur 'I am outside' (location) dono mein 'outside' adverb of place hota hai.",
+                words: [
+                    { word: "Finally,", clean: "Finally", meaning: "Aakhir kaar", pos: "Adverb", context: "Conclusion." },
+                    { word: "I", clean: "I", meaning: "Main", pos: "Pronoun", context: "Subject." },
+                    { word: "went", clean: "went", meaning: "Gaya", pos: "Verb", context: "Action." },
+                    { word: "downstairs", clean: "downstairs", meaning: "Neeche (sidhiyo se)", pos: "Adverb of Place", context: "Direction/Location below." },
+                    { word: "and", clean: "and", meaning: "Aur", pos: "Conjunction", context: "Joining." },
+                    { word: "found", clean: "found", meaning: "Mil gaya / Dhoondh liya", pos: "Verb", context: "Past tense of find." },
+                    { word: "my", clean: "my", meaning: "Mera", pos: "Pronoun", context: "Ownership." },
+                    { word: "pen", clean: "pen", meaning: "Kalam", pos: "Noun", context: "Object." },
+                    { word: "there.", clean: "there", meaning: "Waha", pos: "Adverb of Place", context: "Location at a distance." }
+                ]
+            }
+        ];
+
+        const vocabList = [
+            { word: "Everywhere", meaning: "Har jagah", example: "Air is everywhere. (Hawa har jagah hai)" },
+            { word: "Nowhere", meaning: "Kahi bhi nahi", example: "My earphones are nowhere. (Mere earphones kahi nahi mil rahe)" },
+            { word: "Within", meaning: "Kisi cheez ke andar se", example: "Water is coming from within the tank. (Pani tank ke bilkul andar se aa raha hai)" },
+            { word: "Around", meaning: "Aas paas / Chaaro taraf", example: "Look around you. (Apne aas paas dekho)" },
+            { word: "Upwards", meaning: "Upar ki taraf", example: "The pot is facing upwards. (Matka upar ki taraf rakha hai)" },
+            { word: "Downstairs", meaning: "Neeche wali manzil / Sidhiyo ke neeche", example: "My pen is on the table downstairs. (Mera pen neeche table par hai)" }
+        ];
+
+        const grammarTopics = [
+            {
+                title: "Adverb of Place vs Adverb of Time",
+                content: "Adverb of Time batata hai 'KAB' (Yesterday = Kal ki thi). Adverb of Place batata hai 'KAHAN' (Here = Yaha par). Do not confuse 'Yesterday' with a place.",
+                example: "I went to the market <b>yesterday</b>. (Time)"
+            },
+            {
+                title: "No '-ly' ending Rule",
+                content: "Zyadatar adverbs '-ly' se end hote hain (jaise slowly, quickly), lekin <b>Adverb of Place me generally '-ly' nahi lagta</b>. (eg. here, there, outside).",
+                example: "Wrong: He went outsidely.<br>Right: He went <b>outside</b>."
+            },
+            {
+                title: "Position in a sentence",
+                content: "Adverb of Place ya toh sentence ke <b>End me</b> aate hain, ya <b>Beech me</b> aate hain.",
+                example: "The rat is <b>here</b>. (End)<br>Water is <b>everywhere</b>. (End)"
+            },
+            {
+                title: "Direction vs Location",
+                content: "Adverb of Place direction aur current location dono ke liye use ho sakta hai.",
+                example: "1. I am going <b>outside</b>. (Direction batata hai - movement)<br>2. I am <b>outside</b>. (Location batata hai - state)"
+            }
+        ];
+
+        const quizData = [
+            // Reading Comprehension (T/F & MCQ)
+            { type: "mcq", q: "Where was the pen finally found?", options: ["Upwards", "Inside the box", "Downstairs", "Nowhere"], ans: 2 },
+            { type: "tf", q: "True or False: The rat came from nowhere.", ans: false, expl: "It came outside from within the box." },
+            { type: "mcq", q: "What did the person do when the pen was missing?", options: ["Went to the market", "Looked everywhere", "Bought a new one"], ans: 1 },
+            
+            // Vocab (Flashcards & MCQ)
+            { type: "flashcard", front: "Nowhere", back: "Kahi bhi nahi" },
+            { type: "flashcard", front: "Within", back: "Kisi cheez ke andar se" },
+            { type: "mcq", q: "What is the meaning of 'Around'?", options: ["Upar ki taraf", "Neeche", "Aas paas / Chaaro taraf"], ans: 2 },
+            { type: "mcq", q: "If something is on the lower floor, it is...", options: ["Upwards", "Everywhere", "Downstairs"], ans: 2 },
+            
+            // Grammar (T/F & MCQ)
+            { type: "tf", q: "True or False: Adverbs of Place usually end with '-ly'.", ans: false, expl: "Adverbs of place usually do NOT end in -ly (e.g., here, there, outside)." },
+            { type: "mcq", q: "Identify the Adverb of Place: 'My pencil is outside the almirah.'", options: ["pencil", "is", "outside", "almirah"], ans: 2 },
+            { type: "tf", q: "True or False: In 'I went yesterday', 'yesterday' is an Adverb of Place.", ans: false, expl: "'Yesterday' tells WHEN, so it is an Adverb of Time." },
+            { type: "mcq", q: "Which sentence shows DIRECTION?", options: ["I am outside.", "The rat is here.", "I am going outside.", "My pen is on the table."], ans: 2 },
+            { type: "mcq", q: "Fill in the blank: 'Air is _______.'", options: ["yesterday", "everywhere", "nowherely"], ans: 1 },
+            
+            // Mixed
+            { type: "flashcard", front: "Upwards", back: "Upar ki taraf" },
+            { type: "tf", q: "True or False: Adverbs of place can come at the end of a sentence.", ans: true, expl: "Yes, they usually come at the end or in the middle." },
+            { type: "mcq", q: "Select the group that only has Adverbs of Place:", options: ["Here, There, Slowly", "Inside, Outside, Yesterday", "Here, There, Inside, Nowhere"], ans: 2 }
+        ];
+
+        // --- 2. RENDER LOGIC ---
+
+        function initApp() {
+            renderArticle();
+            renderVocab();
+            renderGrammar();
+            // Start Quiz is handled on tab switch
+        }
+
+        // TAB SWITCHING
+        function switchTab(tabId) {
+            // Update buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.className = "nav-btn px-5 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap transition-all duration-300 bg-white/5 text-gray-400 hover:bg-white/10";
+            });
+            const activeBtn = document.getElementById(`nav-${tabId}`);
+            activeBtn.className = "nav-btn px-5 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap transition-all duration-300 bg-brand-accent text-white shadow-lg shadow-brand-accent/20";
+            
+            // Update content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+                content.classList.remove('block');
+            });
+            document.getElementById(`section-${tabId}`).classList.remove('hidden');
+            document.getElementById(`section-${tabId}`).classList.add('block');
+
+            if(tabId === 'quiz' && currentQuizIndex === 0) {
+                renderQuizQuestion();
+            }
+        }
+
+        // RENDER ARTICLE
+        function renderArticle() {
+            const container = document.getElementById('article-container');
+            articleData.forEach((sentenceObj, index) => {
+                const span = document.createElement('span');
+                span.className = "inline-block mr-2 cursor-pointer border-b-2 border-dashed border-gray-500 hover:border-brand-accent hover:text-brand-accent transition-colors duration-200 py-1";
+                span.textContent = sentenceObj.text;
+                span.onclick = () => openSentenceModal(index);
+                container.appendChild(span);
+            });
+        }
+
+        // RENDER VOCAB
+        function renderVocab() {
+            const container = document.getElementById('vocab-container');
+            vocabList.forEach(item => {
+                const div = document.createElement('div');
+                div.className = "bg-brand-input border border-white/5 rounded-2xl p-4 hover:bg-white/5 transition-colors cursor-default";
+                div.innerHTML = `
+                    <div class="flex justify-between items-end mb-2">
+                        <h3 class="text-lg font-bold text-white">${item.word}</h3>
+                        <span class="text-sm font-medium text-brand-accent">${item.meaning}</span>
+                    </div>
+                    <p class="text-sm text-gray-400 italic">"${item.example}"</p>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // RENDER GRAMMAR
+        function renderGrammar() {
+            const container = document.getElementById('grammar-container');
+            grammarTopics.forEach((topic, idx) => {
+                const details = document.createElement('details');
+                details.className = "group bg-brand-input border border-white/5 rounded-2xl overflow-hidden";
+                details.innerHTML = `
+                    <summary class="p-4 cursor-pointer font-bold text-white flex justify-between items-center outline-none list-none group-open:bg-white/5">
+                        ${topic.title}
+                        <svg class="w-5 h-5 text-gray-400 transform group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </summary>
+                    <div class="p-4 pt-0 text-sm text-gray-300 border-t border-white/5 mt-2">
+                        <p class="mb-3 leading-relaxed">${topic.content}</p>
+                        <div class="bg-white/5 p-3 rounded-xl border-l-2 border-brand-accent text-gray-400">
+                            Eg: ${topic.example}
+                        </div>
+                    </div>
+                `;
+                container.appendChild(details);
+            });
+        }
+
+        // --- 3. MODAL / INTERACTION LOGIC ---
+
+        function openSentenceModal(index) {
+            const data = articleData[index];
+            document.getElementById('modal-sentence-text').textContent = data.text;
+            document.getElementById('modal-sentence-meaning').textContent = data.meaning;
+            document.getElementById('modal-grammar-expl').textContent = data.grammar;
+            
+            const wordsContainer = document.getElementById('modal-words-container');
+            wordsContainer.innerHTML = ''; // clear previous
+            
+            data.words.forEach((wordObj, wIdx) => {
+                const btn = document.createElement('button');
+                btn.className = "bg-white/5 border border-white/10 text-white px-3 py-1.5 rounded-lg text-sm hover:bg-brand-accent hover:border-brand-accent transition-colors font-medium";
+                btn.textContent = wordObj.clean;
+                btn.onclick = () => showWordDetail(wordObj, btn);
+                wordsContainer.appendChild(btn);
+            });
+
+            // Hide detail box initially
+            document.getElementById('word-detail-box').classList.add('hidden');
+            
+            // Show Modal
+            const modal = document.getElementById('sentence-modal');
+            modal.classList.remove('hidden');
+        }
+
+        function showWordDetail(wordObj, btnElement) {
+            // Reset active states on words
+            const wordsContainer = document.getElementById('modal-words-container');
+            Array.from(wordsContainer.children).forEach(child => {
+                child.classList.remove('bg-brand-accent', 'border-brand-accent');
+                child.classList.add('bg-white/5', 'border-white/10');
+            });
+            // Set active state on clicked word
+            btnElement.classList.remove('bg-white/5', 'border-white/10');
+            btnElement.classList.add('bg-brand-accent', 'border-brand-accent');
+
+            // Populate details
+            document.getElementById('detail-word').textContent = wordObj.clean;
+            document.getElementById('detail-pos').textContent = wordObj.pos;
+            document.getElementById('detail-meaning').textContent = wordObj.meaning;
+            document.getElementById('detail-context').textContent = wordObj.context;
+            
+            // Show box
+            const detailBox = document.getElementById('word-detail-box');
+            detailBox.classList.remove('hidden');
+            // Re-trigger animation
+            detailBox.style.animation = 'none';
+            detailBox.offsetHeight; /* trigger reflow */
+            detailBox.style.animation = null; 
+        }
+
+        function closeModal() {
+            document.getElementById('sentence-modal').classList.add('hidden');
+        }
+
+        function goBack() {
+            // Simple logic: if in a tab other than article, go to article. If in article, alert (or go home)
+            const activeNav = document.querySelector('.nav-btn.bg-brand-accent');
+            if(activeNav.id !== 'nav-article') {
+                switchTab('article');
+            } else {
+                // If already on article, emulate browser back behavior or go to main page
+                window.location.href = 'http://fluencybridgeedu.online';
+            }
+        }
+
+        // --- 4. QUIZ LOGIC ---
+        
+        let currentQuizIndex = 0;
+        let score = 0;
+
+        function renderQuizQuestion() {
+            const container = document.getElementById('quiz-container');
+            const progress = document.getElementById('quiz-progress');
+            const progressBar = document.getElementById('quiz-progress-bar');
+            
+            container.innerHTML = ''; // clear
+
+            if (currentQuizIndex >= quizData.length) {
+                // Quiz Over
+                container.innerHTML = `
+                    <div class="text-center fade-in">
+                        <div class="w-24 h-24 rounded-full bg-brand-accent/20 flex items-center justify-center mx-auto mb-6">
+                            <span class="text-4xl">🎉</span>
+                        </div>
+                        <h3 class="text-3xl font-bold mb-2">Quiz Complete!</h3>
+                        <p class="text-gray-400 mb-8">You scored ${score} out of ${quizData.filter(q => q.type !== 'flashcard').length}</p>
+                        <button onclick="resetQuiz()" class="bg-brand-accent text-white px-8 py-3 rounded-xl font-bold w-full max-w-xs hover:bg-blue-600 transition-colors">Retake Quiz</button>
+                    </div>
+                `;
+                return;
+            }
+
+            const q = quizData[currentQuizIndex];
+            progress.textContent = `${currentQuizIndex + 1}/${quizData.length}`;
+            progressBar.style.width = `${((currentQuizIndex + 1) / quizData.length) * 100}%`;
+
+            if (q.type === 'flashcard') {
+                container.innerHTML = `
+                    <div class="fade-in w-full h-64 perspective-1000 cursor-pointer group" onclick="this.querySelector('.f-inner').classList.toggle('rotate-y-180')">
+                        <div class="f-inner relative w-full h-full transition-transform duration-500 transform-style-3d">
+                            <!-- Front -->
+                            <div class="absolute w-full h-full backface-hidden bg-brand-input border border-brand-accent/30 rounded-2xl flex flex-col items-center justify-center p-6 shadow-lg shadow-brand-accent/10">
+                                <span class="text-[10px] text-brand-accent uppercase tracking-widest font-bold mb-4">Tap to flip (Free points)</span>
+                                <h3 class="text-4xl font-bold">${q.front}</h3>
+                            </div>
+                            <!-- Back -->
+                            <div class="absolute w-full h-full backface-hidden bg-brand-accent rounded-2xl flex flex-col items-center justify-center p-6 rotate-y-180 text-center">
+                                <span class="text-[10px] text-white/70 uppercase tracking-widest font-bold mb-4">Meaning</span>
+                                <h3 class="text-3xl font-bold text-white mb-2">${q.back}</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="nextQuestion(true)" class="mt-8 bg-white/10 text-white px-6 py-3 rounded-xl font-bold w-full hover:bg-white/20 transition-colors">Got it, Next</button>
+                `;
+            } 
+            else if (q.type === 'tf') {
+                container.innerHTML = `
+                    <div class="fade-in">
+                        <span class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2 block">True or False</span>
+                        <h3 class="text-xl font-bold mb-8 leading-snug">${q.q}</h3>
+                        <div class="flex gap-4">
+                            <button onclick="handleAnswer(${true}, ${q.ans}, '${q.expl}')" class="flex-1 bg-brand-input border border-white/10 py-4 rounded-xl font-bold hover:bg-brand-accent hover:border-brand-accent transition-colors">True</button>
+                            <button onclick="handleAnswer(${false}, ${q.ans}, '${q.expl}')" class="flex-1 bg-brand-input border border-white/10 py-4 rounded-xl font-bold hover:bg-brand-accent hover:border-brand-accent transition-colors">False</button>
+                        </div>
+                        <div id="quiz-feedback" class="mt-6 hidden rounded-xl p-4 text-sm font-medium"></div>
+                    </div>
+                `;
+            }
+            else if (q.type === 'mcq') {
+                let optionsHtml = q.options.map((opt, idx) => `
+                    <button onclick="handleAnswer(${idx}, ${q.ans})" class="w-full text-left bg-brand-input border border-white/5 py-4 px-5 rounded-xl font-medium hover:bg-white/10 transition-colors mb-3">
+                        ${opt}
+                    </button>
+                `).join('');
+                
+                container.innerHTML = `
+                    <div class="fade-in">
+                        <span class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2 block">Choose correct</span>
+                        <h3 class="text-xl font-bold mb-6 leading-snug">${q.q}</h3>
+                        <div class="flex flex-col">
+                            ${optionsHtml}
+                        </div>
+                        <div id="quiz-feedback" class="mt-4 hidden rounded-xl p-4 text-sm font-medium"></div>
+                    </div>
+                `;
+            }
+        }
+
+        function handleAnswer(selected, correct, explanation = "") {
+            // Disable all buttons in quiz area
+            const buttons = document.querySelectorAll('#quiz-container button');
+            buttons.forEach(b => b.disabled = true);
+
+            const feedback = document.getElementById('quiz-feedback');
+            feedback.classList.remove('hidden');
+            
+            const isCorrect = selected === correct;
+            if (isCorrect) score++;
+
+            if (isCorrect) {
+                feedback.className = "mt-6 rounded-xl p-4 text-sm font-medium bg-green-500/20 text-green-400 border border-green-500/30 slide-up";
+                feedback.innerHTML = `✅ <b>Correct!</b> ${explanation ? '<br><span class="text-green-300/80 mt-1 block">'+explanation+'</span>' : ''}`;
+            } else {
+                feedback.className = "mt-6 rounded-xl p-4 text-sm font-medium bg-red-500/20 text-red-400 border border-red-500/30 slide-up";
+                feedback.innerHTML = `❌ <b>Incorrect.</b> ${explanation ? '<br><span class="text-red-300/80 mt-1 block">'+explanation+'</span>' : ''}`;
+            }
+
+            // Append next button
+            const nextBtn = document.createElement('button');
+            nextBtn.className = "mt-6 bg-brand-accent text-white px-6 py-3 rounded-xl font-bold w-full hover:bg-blue-600 transition-colors slide-up";
+            nextBtn.textContent = "Continue";
+            nextBtn.onclick = () => nextQuestion(false); // flashcards skip scoring naturally via UI flow
+            document.getElementById('quiz-container').appendChild(nextBtn);
+        }
+
+        function nextQuestion(isFlashcard = false) {
+            currentQuizIndex++;
+            renderQuizQuestion();
+        }
+
+        function resetQuiz() {
+            currentQuizIndex = 0;
+            score = 0;
+            renderQuizQuestion();
+        }
+
+        // Initialize on load
+        window.onload = initApp;
+
+    </script>
+</body>
+</html>
