@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fluency - Adverbs of Time & Frequency</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:ital,wght@1,600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    colors: {
+                        midnight: '#060B19',
+                        navy: '#111A2C',
+                        inputbg: '#080D1A',
+                        royal: '#2563EB',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom scrollbar and utilities */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #060B19; }
+        ::-webkit-scrollbar-thumb { background: #2563EB; border-radius: 10px; }
+        .glass-panel { background: rgba(17, 26, 44, 0.85); backdrop-filter: blur(12px); }
+        .text-glow { text-shadow: 0 0 10px rgba(37, 99, 235, 0.5); }
+        .hidden-section { display: none; }
+        
+        @media print {
+            body { 
+                background: #060B19 !important; 
+                color: white !important; 
+                -webkit-print-color-adjust: exact; 
+                print-color-adjust: exact;
+            }
+            .no-print { display: none !important; }
+            #section-notes { display: block !important; }
+            .glass-panel { background: #111A2C !important; }
+        }
+    </style>
+</head>
+<body class="bg-midnight text-white font-sans min-h-screen relative overflow-x-hidden pb-24">
+    <!-- Ambient Background -->
+    <div class="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#131E3A] via-midnight to-midnight -z-10 pointer-events-none opacity-80"></div>
+
+    <!-- Header / Logo -->
+    <header class="w-full p-4 md:p-6 flex flex-col items-center justify-center pt-8 no-print">
+        <div class="tracking-[0.3em] text-[10px] text-gray-300 font-semibold uppercase mb-1">F L U E N C Y</div>
+        <div class="text-white text-4xl italic font-serif text-glow">bridge</div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="w-full max-w-3xl mx-auto p-4 flex gap-2 overflow-x-auto no-scrollbar no-print">
+        <button onclick="switchTab('notes')" class="tab-btn bg-royal text-white px-5 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap transition-all shadow-lg shadow-royal/20">Revise Notes</button>
+        <button onclick="switchTab('story')" class="tab-btn bg-white/5 border border-white/5 text-gray-400 hover:text-white hover:bg-white/10 px-5 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap transition-all">Story Mode</button>
+        <button onclick="switchTab('reallife')" class="tab-btn bg-white/5 border border-white/5 text-gray-400 hover:text-white hover:bg-white/10 px-5 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap transition-all">Real Life</button>
+        <button onclick="switchTab('quiz')" class="tab-btn bg-white/5 border border-white/5 text-gray-400 hover:text-white hover:bg-white/10 px-5 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap transition-all">Take Quiz</button>
+    </nav>
+
+    <!-- Main Content Container -->
+    <main class="w-full max-w-3xl mx-auto p-4 md:p-6">
+        
+        <!-- ================= NOTES SECTION ================= -->
+        <section id="section-notes" class="glass-panel border-t border-white/5 rounded-2xl md:rounded-3xl shadow-2xl p-6 md:p-8">
+            <div class="flex justify-between items-start mb-6 no-print">
+                <h1 class="text-2xl md:text-3xl font-bold text-white">Adverbs of Time & Frequency</h1>
+                <div class="flex gap-2">
+                    <button onclick="window.print()" class="bg-inputbg border border-white/5 hover:bg-white/10 text-gray-300 px-3 py-2 rounded-lg text-xs transition-all">Print</button>
+                    <button onclick="switchTab('quiz')" class="bg-royal text-white px-3 py-2 rounded-lg text-xs font-semibold shadow-lg shadow-royal/20">Go to Quiz</button>
+                </div>
+            </div>
+
+            <!-- TOC -->
+            <div class="bg-inputbg border border-white/5 rounded-xl p-4 mb-8 no-print">
+                <h3 class="text-sm font-semibold text-gray-400 mb-2 uppercase tracking-wider">Table of Contents</h3>
+                <ul class="flex flex-col gap-2 text-sm">
+                    <li><a href="#prereq" class="text-royal hover:underline">1. Prerequisites & Basics</a></li>
+                    <li><a href="#adv-time" class="text-royal hover:underline">2. Adverbs of Time (Waqt)</a></li>
+                    <li><a href="#adv-freq" class="text-royal hover:underline">3. Adverbs of Frequency (Kitni Baar)</a></li>
+                    <li><a href="#mistakes" class="text-royal hover:underline">4. Top Mistakes (Zaroori Dhyan Dein)</a></li>
+                    <li><a href="#mindmap" class="text-royal hover:underline">5. Concept Mind Map</a></li>
+                </ul>
+            </div>
+
+            <div class="space-y-8 text-gray-300 leading-relaxed text-sm md:text-base">
+                
+                <!-- Prerequisites -->
+                <div id="prereq">
+                    <h2 class="text-xl font-bold text-white mb-2">1. Prerequisites & Basics</h2>
+                    <p>Is topic ko samajhne se pehle aapko <a href="https://www.google.com/search?q=what+is+a+verb+in+english+grammar" target="_blank" class="text-royal underline">Verbs (Kriya)</a> ka basic idea hona chahiye. Verb woh word hota hai jo koi action dikhata hai (jaise play eat sleep). <strong>Adverb</strong> woh word hota hai jo Verb ke baare mein aur extra information deta hai. Aaj hum do specific types padhenge: Time aur Frequency.</p>
+                </div>
+
+                <!-- Adverbs of Time -->
+                <div id="adv-time">
+                    <h2 class="text-xl font-bold text-white mb-2">2. Adverbs of Time (Waqt)</h2>
+                    <p>Yeh adverbs humein batate hain ki koi action <strong>KAB (When)</strong> hua. Inhe pehchanne ka sabse aasan tarika hai sentence se "Kab?" poochna.</p>
+                    <ul class="list-disc pl-5 mt-3 space-y-2 text-gray-400">
+                        <li><strong class="text-gray-200">Examples:</strong> today tomorrow yesterday now then soon later tonight.</li>
+                        <li><strong class="text-gray-200">Rule of Placement:</strong> Adverbs of time zyadatar sentence ke <strong>end</strong> mein aate hain.</li>
+                        <li><strong class="text-gray-200">Logical Example:</strong> "I will call you <em>tomorrow</em>." (Main tumhe kal call karunga). Yahan 'tomorrow' end mein aaya hai.</li>
+                        <li><strong class="text-gray-200">Why at the end?</strong> English mein pehle hum batate hain 'Kaun kya kar raha hai' (Subject + Verb + Object), uske baad hum batate hain ki woh kab ho raha hai.</li>
+                    </ul>
+                </div>
+
+                <!-- Adverbs of Frequency -->
+                <div id="adv-freq">
+                    <h2 class="text-xl font-bold text-white mb-2">3. Adverbs of Frequency (Kitni Baar)</h2>
+                    <p>Yeh adverbs humein batate hain ki koi action <strong>KITNI BAAR (How often)</strong> hota hai. Kya woh roz hota hai kabhi kabhi hota hai ya kabhi nahi hota?</p>
+                    <ul class="list-disc pl-5 mt-3 space-y-2 text-gray-400">
+                        <li><strong class="text-gray-200">Examples:</strong> always (hamesha) usually (aksar) sometimes (kabhi kabhi) rarely (shayad hi kabhi) never (kabhi nahi).</li>
+                        <li><strong class="text-gray-200">Rule of Placement (Very Important):</strong> 
+                            <br>1. Main verb se <strong>pehle</strong> aate hain. (I <em>always</em> eat apples).
+                            <br>2. Agar sentence mein 'to be' verb (is/am/are/was/were) hai toh uske <strong>baad</strong> aate hain. (I am <em>always</em> late).
+                        </li>
+                        <li><strong class="text-gray-200">Why this placement?</strong> Frequency dikhane wale words action se itne jude hote hain ki woh action word (verb) ke bilkul saath aana pasand karte hain.</li>
+                    </ul>
+                </div>
+
+                <!-- Top Mistakes -->
+                <div id="mistakes" class="bg-inputbg border border-red-500/20 rounded-xl p-5">
+                    <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                        <span class="text-red-400">⚠️</span> 4. Top Mistakes People Make
+                    </h2>
+                    <div class="space-y-4">
+                        <div>
+                            <p class="font-semibold text-gray-200">Mistake 1: Placing Frequency at the end.</p>
+                            <p class="text-red-400 line-through">Wrong: I go to the gym always.</p>
+                            <p class="text-green-400">Right: I always go to the gym.</p>
+                            <p class="text-xs text-gray-500 mt-1">Reason: Always frequency batata hai isliye main verb (go) se pehle aayega.</p>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-gray-200">Mistake 2: Messing up with "is/am/are".</p>
+                            <p class="text-red-400 line-through">Wrong: He always is late.</p>
+                            <p class="text-green-400">Right: He is always late.</p>
+                            <p class="text-xs text-gray-500 mt-1">Reason: Helping verb (is) humesha frequency adverb ko apne baad rakhta hai.</p>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-gray-200">Mistake 3: Putting Time between Subject and Verb.</p>
+                            <p class="text-red-400 line-through">Wrong: I today will buy a car.</p>
+                            <p class="text-green-400">Right: I will buy a car today.</p>
+                            <p class="text-xs text-gray-500 mt-1">Reason: Time adverbs usually sentence ke end mein set hote hain.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mind Map -->
+                <div id="mindmap">
+                    <h2 class="text-xl font-bold text-white mb-2">5. Concept Mind Map</h2>
+                    <div class="pl-4 border-l-2 border-royal/30 space-y-2 mt-4">
+                        <div class="font-semibold text-gray-200">Adverbs</div>
+                        <div class="pl-6 border-l-2 border-white/10 space-y-1">
+                            <div class="text-gray-300">↳ Time (Kab?) -> End of sentence</div>
+                            <div class="pl-6 text-gray-400 text-sm">- Past: yesterday previously</div>
+                            <div class="pl-6 text-gray-400 text-sm">- Present: now today</div>
+                            <div class="pl-6 text-gray-400 text-sm">- Future: tomorrow soon</div>
+                        </div>
+                        <div class="pl-6 border-l-2 border-white/10 space-y-1 mt-2">
+                            <div class="text-gray-300">↳ Frequency (Kitni baar?)</div>
+                            <div class="pl-6 text-gray-400 text-sm">- Before Main Verb: I <em>never</em> lie.</div>
+                            <div class="pl-6 text-gray-400 text-sm">- After 'Be' Verb: I am <em>never</em> late.</div>
+                            <div class="pl-6 text-gray-400 text-sm">- Words: always usually often sometimes rarely never.</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ================= STORY SECTION ================= -->
+        <section id="section-story" class="hidden-section glass-panel border-t border-white/5 rounded-2xl md:rounded-3xl shadow-2xl p-6 md:p-8">
+            <h1 class="text-2xl md:text-3xl font-bold text-white mb-6">A Day in Rohan's Life</h1>
+            <p class="text-sm text-gray-400 mb-6">Notice how adverbs of time (yellow) and frequency (blue) are used naturally in this simple story.</p>
+            
+            <div class="bg-inputbg rounded-xl p-5 md:p-6 text-gray-300 leading-relaxed text-sm md:text-base border border-white/5 space-y-4">
+                <p>Rohan <span class="text-blue-400 font-semibold">always</span> wakes up early. <span class="text-yellow-400 font-semibold">Today</span> he woke up at 6 AM. He <span class="text-blue-400 font-semibold">usually</span> drinks a cup of chai <span class="text-blue-400 font-semibold">first</span>. He is <span class="text-blue-400 font-semibold">never</span> lazy in the morning.</p>
+                
+                <p>He will go to the office <span class="text-yellow-400 font-semibold">later</span>. He <span class="text-blue-400 font-semibold">often</span> takes the metro because it is fast. He <span class="text-blue-400 font-semibold">rarely</span> takes a bus because the bus is <span class="text-blue-400 font-semibold">always</span> crowded.</p>
+                
+                <p><span class="text-yellow-400 font-semibold">Yesterday</span> it rained heavily. Rohan was late for his meeting. His boss is <span class="text-blue-400 font-semibold">sometimes</span> strict but he understood the situation <span class="text-yellow-400 font-semibold">then</span>.</p>
+
+                <p><span class="text-yellow-400 font-semibold">Now</span> Rohan is working on his laptop. He will finish his project <span class="text-yellow-400 font-semibold">soon</span>. He <span class="text-blue-400 font-semibold">always</span> feels happy when he goes home.</p>
+            </div>
+            
+            <div class="mt-6 flex justify-end">
+                <button onclick="switchTab('quiz')" class="bg-royal text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all">Test what you read</button>
+            </div>
+        </section>
+
+        <!-- ================= REAL LIFE USAGE ================= -->
+        <section id="section-reallife" class="hidden-section glass-panel border-t border-white/5 rounded-2xl md:rounded-3xl shadow-2xl p-6 md:p-8">
+            <h1 class="text-2xl md:text-3xl font-bold text-white mb-2">Real Life Usage</h1>
+            <p class="text-sm text-gray-400 mb-6">Practical scenarios for everyday Indian life. Try to guess the English sentence before revealing it.</p>
+            
+            <div id="rl-container" class="space-y-4">
+                <!-- Dynamically populated -->
+            </div>
+            
+            <div class="mt-6 flex justify-between items-center">
+                <span id="rl-counter" class="text-xs text-gray-500">Showing 1-5 of 50</span>
+                <button onclick="loadNextRealLife()" class="bg-inputbg border border-white/5 hover:bg-white/10 text-white px-4 py-2 rounded-xl text-sm transition-all shadow-md">Load Next 5 Scenarios</button>
+            </div>
+        </section>
+
+        <!-- ================= QUIZ SECTION ================= -->
+        <section id="section-quiz" class="hidden-section glass-panel border-t border-white/5 rounded-2xl md:rounded-3xl shadow-2xl p-6 md:p-8 relative min-h-[400px]">
+            
+            <!-- Quiz Start Screen -->
+            <div id="quiz-start" class="flex flex-col items-center justify-center text-center h-full py-10">
+                <div class="w-16 h-16 bg-royal/20 rounded-full flex items-center justify-center mb-4 border border-royal/50">
+                    <svg class="w-8 h-8 text-royal" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                </div>
+                <h2 class="text-2xl font-bold text-white mb-2">Assessment Ready</h2>
+                <p class="text-gray-400 text-sm mb-6 max-w-sm">You will get 10 random questions from a pool of 100. Questions are shuffled to prevent guessing.</p>
+                <div class="flex gap-3">
+                    <button onclick="startQuiz()" class="bg-royal text-white px-6 py-3 rounded-xl text-sm font-bold shadow-lg shadow-royal/20 transition-all hover:scale-105">Start Assessment</button>
+                    <button onclick="downloadAnki()" class="bg-inputbg border border-white/5 hover:bg-white/10 text-gray-300 px-4 py-3 rounded-xl text-sm font-semibold transition-all">Download Anki Deck</button>
+                </div>
+            </div>
+
+            <!-- Quiz Question Screen -->
+            <div id="quiz-active" class="hidden-section">
+                <div class="flex justify-between items-center mb-6">
+                    <span class="text-xs font-semibold text-gray-500 uppercase tracking-widest" id="quiz-progress-text">Question 1/10</span>
+                    <div class="w-1/2 bg-white/10 h-1.5 rounded-full overflow-hidden">
+                        <div id="quiz-progress-bar" class="bg-royal h-full w-10 transition-all duration-300 rounded-full"></div>
+                    </div>
+                </div>
+
+                <h3 id="quiz-question-text" class="text-lg md:text-xl font-semibold text-white mb-6 min-h-[60px]">Loading question...</h3>
+                
+                <div id="quiz-options" class="flex flex-col gap-3 mb-6">
+                    <!-- Options injected here -->
+                </div>
+
+                <div id="quiz-feedback" class="hidden bg-inputbg border border-white/10 rounded-xl p-4 mb-6">
+                    <p id="quiz-feedback-title" class="font-bold text-sm mb-1"></p>
+                    <p id="quiz-feedback-reason" class="text-xs text-gray-400"></p>
+                </div>
+
+                <div class="flex justify-between mt-4">
+                    <button onclick="switchTab('notes')" class="text-xs text-gray-500 hover:text-royal transition-colors">Peek at Notes</button>
+                    <button id="quiz-next-btn" onclick="nextQuestion()" class="hidden bg-royal text-white px-6 py-2.5 rounded-xl text-sm font-bold transition-all">Next Question</button>
+                </div>
+            </div>
+
+            <!-- Quiz Result Screen -->
+            <div id="quiz-result" class="hidden-section flex flex-col items-center justify-center text-center py-10">
+                <h2 class="text-3xl font-bold text-white mb-2">Assessment Complete</h2>
+                <div class="text-6xl font-serif italic text-royal my-6" id="quiz-final-score">8/10</div>
+                <div class="flex gap-6 mb-8 w-full max-w-sm justify-center">
+                    <div class="bg-inputbg border border-white/5 p-4 rounded-xl flex-1">
+                        <p class="text-xs text-gray-500 uppercase">Efficiency</p>
+                        <p class="text-xl font-bold text-white mt-1" id="quiz-efficiency">80%</p>
+                    </div>
+                    <div class="bg-inputbg border border-white/5 p-4 rounded-xl flex-1">
+                        <p class="text-xs text-gray-500 uppercase">Time Taken</p>
+                        <p class="text-xl font-bold text-white mt-1" id="quiz-time-taken">02:15</p>
+                    </div>
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="resetQuizView()" class="bg-royal text-white px-6 py-3 rounded-xl text-sm font-bold shadow-lg shadow-royal/20 transition-all">Practice More</button>
+                    <button onclick="switchTab('notes')" class="bg-inputbg border border-white/5 hover:bg-white/10 text-gray-300 px-6 py-3 rounded-xl text-sm font-semibold transition-all">Revise Notes</button>
+                </div>
+                <p class="text-xs text-gray-500 mt-6">Starting a new quiz will draw 10 new random questions from the pool of 100.</p>
+            </div>
+            
+        </section>
+
+    </main>
+
+    <!-- Sticky Footer -->
+    <footer class="fixed bottom-0 left-0 w-full bg-midnight/90 backdrop-blur-md border-t border-white/5 p-3 md:p-4 z-50 no-print">
+        <div class="max-w-3xl mx-auto flex justify-between items-center">
+            <div class="flex gap-4">
+                <button onclick="switchTab('notes')" class="text-gray-400 hover:text-white transition-colors flex items-center gap-1 text-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                    Home
+                </button>
+                <button onclick="history.back()" class="text-gray-400 hover:text-white transition-colors flex items-center gap-1 text-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    Back
+                </button>
+            </div>
+            <div class="bg-inputbg border border-white/5 px-3 py-1.5 rounded-lg text-xs font-mono text-gray-400 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                <span id="timer-display">00:00</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- INLINE JAVASCRIPT FOR LOGIC AND DATA -->
+    <script>
+        // Global Timer Logic
+        let startTime = Date.now();
+        function updateTimer() {
+            let diff = Math.floor((Date.now() - startTime) / 1000);
+            let m = Math.floor(diff / 60).toString().padStart(2, '0');
+            let s = (diff % 60).toString().padStart(2, '0');
+            const timerEl = document.getElementById('timer-display');
+            if(timerEl) timerEl.innerText = `${m}:${s}`;
+        }
+        setInterval(updateTimer, 1000);
+
+        // Tab Navigation Logic
+        function switchTab(tabId) {
+            // Hide all sections
+            document.getElementById('section-notes').style.display = 'none';
+            document.getElementById('section-story').style.display = 'none';
+            document.getElementById('section-reallife').style.display = 'none';
+            document.getElementById('section-quiz').style.display = 'none';
+            
+            // Show target section
+            document.getElementById(`section-${tabId}`).style.display = 'block';
+            
+            // Update button styles
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.className = "tab-btn bg-white/5 border border-white/5 text-gray-400 hover:text-white hover:bg-white/10 px-5 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap transition-all";
+            });
+            
+            // Highlight active button (finding it based on onclick attribute string matching)
+            const activeBtn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('onclick').includes(tabId));
+            if(activeBtn) {
+                activeBtn.className = "tab-btn bg-royal text-white px-5 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap transition-all shadow-lg shadow-royal/20";
+            }
+            window.scrollTo(0, 0);
+        }
+
+        // ================= COMPRESSED DATA SETS =================
+
+        // 1. REAL LIFE DATA (50 Items) Format: Context|Sentence|Explanation
+        const rawRealLife = `Buying vegetables|I always bargain with the sabziwala|Always comes before the main verb bargain
+Taking auto|I rarely find an auto on time|Rarely is frequency before find
+Office timing|I am usually late for the 9 AM meeting|Usually is after the to-be verb am
+Drinking tea|I drink chai twice daily|Daily is time usually placed at the end
+Watching TV|My mother watches serials everyday|Everyday is time placed at the end
+Traffic|Traffic is always terrible in the evening|Always is frequency after is
+Power cut|Power goes off sometimes|Sometimes can be at the end or before verb
+Train journey|I always prefer the lower berth|Always is frequency before prefer
+Wedding|Indian weddings usually start late|Usually is frequency before start
+Spicy food|I never eat extra spicy food|Never is frequency before eat
+Online shopping|I often check Amazon for discounts|Often is frequency before check
+Mobile battery|My phone battery always dies fast|Always is frequency before dies
+Monsoon|It rains heavily today|Today is time placed at the end
+Guest arrival|Relatives come home unannounced sometimes|Sometimes is frequency
+Exam preparation|I study late at night usually|Usually can be placed at the end for emphasis
+Visiting temple|We go to the temple weekly|Weekly is frequency/time at the end
+Waking up|I wake up early tomorrow|Tomorrow is time at the end
+Gym routine|He goes to the gym daily|Daily is time at the end
+Fast food|I rarely eat momos now|Rarely is frequency before eat
+Salary day|Salary always comes late|Always is frequency before comes
+Saving money|I never save enough money|Never is frequency before save
+Calling mom|I call my mom daily|Daily is time at the end
+Weekend plan|We usually stay home on Sundays|Usually is frequency before stay
+Paying bills|I pay the electricity bill monthly|Monthly is time at the end
+Maid timing|The maid is always late|Always is after the verb is
+Washing clothes|I will wash clothes tomorrow|Tomorrow is time at the end
+Doctor visit|I rarely visit the doctor|Rarely is frequency before visit
+Movie plan|We watch a movie sometimes|Sometimes is frequency at the end
+Using AC|We always use AC in summer|Always is frequency before use
+Bargaining|She never buys without bargaining|Never is frequency before buys
+Ordering food|We order pizza often|Often is frequency at the end
+Finding keys|I always lose my keys|Always is frequency before lose
+Taking loans|He never takes a loan|Never is frequency before takes
+Attending calls|I am always busy on calls|Always is frequency after am
+Social media|I check Instagram constantly|Constantly is frequency at the end
+Reading news|My dad reads newspaper daily|Daily is time at the end
+Sleeping late|I sleep late often|Often is frequency at the end
+Water supply|Water comes early today|Today is time at the end
+Street food|I rarely eat golgappe now|Rarely is frequency before eat
+Homework|Kids never do homework on time|Never is frequency before do
+Festival|We always clean the house before Diwali|Always is frequency before clean
+Train delay|Indian trains are often delayed|Often is frequency after are
+Bus ride|I usually get a seat in the bus|Usually is frequency before get
+Finding parking|Finding parking is always hard|Always is frequency after is
+Wifi issue|Internet is down currently|Currently is time at the end
+Office gossip|They always talk in the pantry|Always is frequency before talk
+Taking medicine|Take this medicine twice daily|Daily is time at the end
+Morning walk|He goes for a walk everyday|Everyday is time at the end
+Cooking dinner|Mom is cooking now|Now is time at the end
+Family time|We always eat dinner together|Always is frequency before eat`;
+
+        const realLifeData = rawRealLife.split('\n').filter(l => l.trim()).map(line => {
+            const parts = line.split('|');
+            return { context: parts[0], sentence: parts[1], explanation: parts[2] };
+        });
+
+        let rlCurrentIndex = 0;
+        function loadNextRealLife() {
+            const container = document.getElementById('rl-container');
+            if(rlCurrentIndex >= realLifeData.length) rlCurrentIndex = 0; // Loop back
+            
+            const batch = realLifeData.slice(rlCurrentIndex, rlCurrentIndex + 5);
+            container.innerHTML = '';
+            
+            batch.forEach((item, index) => {
+                const uniqueId = `rl-${rlCurrentIndex + index}`;
+                container.innerHTML += `
+                    <div class="bg-inputbg border border-white/5 rounded-xl p-4 flex flex-col gap-3 transition-all hover:bg-white/5">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-semibold text-royal uppercase">${item.context}</span>
+                            <button onclick="toggleRlAnswer('${uniqueId}')" class="text-gray-400 hover:text-white">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                            </button>
+                        </div>
+                        <div id="${uniqueId}-ans" class="hidden flex flex-col gap-2 border-t border-white/5 pt-2 mt-1">
+                            <p class="text-white font-medium text-lg">${item.sentence}</p>
+                            <p class="text-xs text-gray-400">${item.explanation}</p>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            rlCurrentIndex += 5;
+            document.getElementById('rl-counter').innerText = `Showing ${rlCurrentIndex-4}-${rlCurrentIndex > 50 ? 50 : rlCurrentIndex} of 50`;
+        }
+
+        function toggleRlAnswer(id) {
+            const el = document.getElementById(`${id}-ans`);
+            if(el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+            } else {
+                el.classList.add('hidden');
+            }
+        }
+
+        // Initialize Real Life tab
+        loadNextRealLife();
+
+
+        // 2. QUIZ DATA (100 Items compressed) Format: Question|Opt1|Opt2|Opt3|Opt4|CorrectIndex|Reasoning
+        // To maintain strict Anki rule compliance (no commas), no commas are used in these strings.
+        const rawQuiz = `I will go to the market tomorrow. What type of adverb is tomorrow?|Time|Frequency|Manner|Place|0|Tomorrow tells us when the action happens so it is Time
+He always speaks the truth. What type of adverb is always?|Time|Frequency|Degree|Manner|1|Always tells us how often he speaks so it is Frequency
+I have never visited London. What is never?|Adverb of Time|Adverb of Frequency|Verb|Noun|1|Never tells us frequency zero times
+She usually arrives early. Where is the frequency adverb placed?|Before main verb|After main verb|At the end|At the beginning|0|Usually is placed before the main verb arrives
+He is always late. Why is always placed after is?|Because is is a main verb|Because is is a to-be verb|Because always is time|It is incorrect|1|Frequency adverbs come after to-be verbs like is am are
+I will finish this project soon. What is soon?|Adverb of Time|Adverb of Frequency|Adjective|Pronoun|0|Soon tells us when it will happen
+We go to the gym daily. What is daily?|Adverb of Frequency|Adverb of Time|Both can be correct|None|2|Daily acts as frequency and time often placed at the end
+Choose correct sentence|I always am happy|I am always happy|I am happy always|Always I am happy|1|Frequency adverb always comes after am
+Choose correct sentence|I go usually to park|I usually go to park|I go to park usually|Usually I to park go|1|Usually comes before main verb go
+I will call you later. What is later?|Time|Frequency|Noun|Verb|0|Later answers the question when
+They often play cricket on Sundays. What is often?|Time|Frequency|Subject|Object|1|Often answers how often
+She rarely eats junk food. What is rarely?|Time|Frequency|Action|Name|1|Rarely answers how often
+My father reads newspaper everyday. What is everyday?|Time|Frequency|Action|Subject|0|Everyday answers when and how often usually placed at end
+I am currently working on a project. What is currently?|Time|Frequency|Place|Manner|0|Currently tells us when right now
+He previously worked in a bank. What is previously?|Time|Frequency|Noun|Verb|0|Previously tells us when in the past
+True or False I go to the gym always is correct format|True|False|Maybe|None|1|Always should be before the main verb go
+True or False I always go to the gym is correct format|True|False|Maybe|None|0|Always is correctly placed before go
+Find the adverb I will meet him today|meet|him|I|today|3|Today tells us when
+Find the adverb She never lies|She|never|lies|None|1|Never tells us how often
+Which is an adverb of frequency?|Yesterday|Soon|Often|Now|2|Often tells how many times
+Which is an adverb of time?|Always|Usually|Never|Tonight|3|Tonight tells us when
+Where does today usually go in a sentence?|Beginning|Middle|End|Before verb|2|Time adverbs mostly go at the end
+Where does never usually go?|End|Before main verb|After object|Before subject|1|Frequency adverbs go before the main verb
+I sometimes eat chocolate. What is sometimes?|Frequency|Time|Verb|Noun|0|Sometimes tells us how often
+It is raining now. What is now?|Time|Frequency|Place|Degree|0|Now tells us when
+We will leave shortly. What is shortly?|Frequency|Time|Verb|Adjective|1|Shortly tells us when
+She regularly visits her grandma. What is regularly?|Time|Frequency|Noun|Verb|1|Regularly tells how often
+Choose the correct one|He comes never here|He never comes here|Never he comes here|He comes here never|1|Never must be before main verb comes
+Choose the correct one|I am late never|I never am late|I am never late|Never am I late|2|Never must come after am
+The train arrives hourly. What is hourly?|Frequency|Time|Both|None|2|Hourly tells how often and when
+I will do it eventually. What is eventually?|Time|Frequency|Noun|Verb|0|Eventually tells when in the future
+He seldom gets angry. What is seldom?|Time|Frequency|Manner|Place|1|Seldom means rarely which is frequency
+They constantly argue. What is constantly?|Time|Frequency|Place|Degree|1|Constantly means all the time frequency
+I have seen this movie before. What is before?|Time|Frequency|Verb|Pronoun|0|Before tells when in the past
+Let us go out tonight. What is tonight?|Frequency|Time|Place|Manner|1|Tonight tells when
+I normally wake up at 6. What is normally?|Time|Frequency|Action|Subject|1|Normally tells how often
+He frequently asks questions. What is frequently?|Time|Frequency|Verb|Object|1|Frequently tells how often
+She occasionally bakes cakes. What is occasionally?|Time|Frequency|Noun|Adjective|1|Occasionally means sometimes frequency
+We finally reached home. What is finally?|Time|Frequency|Place|Manner|0|Finally tells when at the end
+The doctor will see you presently. What is presently?|Time|Frequency|Action|Name|0|Presently means soon time
+I go there twice a week. What is twice a week?|Frequency phrase|Time phrase|Verb|Noun|0|It answers how often
+He visited us recently. What is recently?|Time|Frequency|Subject|Object|0|Recently tells when in the near past
+I already ate dinner. What is already?|Time|Frequency|Verb|Noun|0|Already tells when it happened earlier
+I have not finished yet. What is yet?|Time|Frequency|Place|Manner|0|Yet is related to time up to now
+She is still sleeping. What is still?|Time|Frequency|Noun|Verb|0|Still relates to time continuing
+I work out periodically. What is periodically?|Time|Frequency|Action|Person|1|Periodically answers how often
+We rarely see each other. What is rarely?|Frequency|Time|Adjective|Pronoun|0|Rarely tells how often
+I will be there in a minute. Is in a minute a time adverbial?|Yes|No|Maybe|None|0|It functions as time telling when
+She always forgets her keys. Find the frequency adverb|She|always|forgets|keys|1|Always tells how often
+I visit my hometown annually. What is annually?|Frequency|Time|Both|None|2|Annually acts as both how often and when
+He is often tired. Find the adverb|He|is|often|tired|2|Often is frequency
+I am currently busy. Find the time adverb|I|am|currently|busy|2|Currently tells when right now
+Will you come tomorrow? Find the time adverb|Will|you|come|tomorrow|3|Tomorrow tells when
+They never complain. Find the frequency adverb|They|never|complain|None|1|Never tells how often
+I sometimes wonder about space. Find the frequency adverb|I|sometimes|wonder|space|1|Sometimes tells how often
+Let us meet later. Find the time adverb|Let|us|meet|later|3|Later tells when
+I usually take the bus. Find the frequency adverb|I|usually|take|bus|1|Usually tells how often
+We rarely go out. Find the adverb|We|rarely|go|out|1|Rarely tells how often
+I am going now. Find the time adverb|I|am|going|now|3|Now tells when
+He always smiles. Find the adverb|He|always|smiles|None|1|Always is frequency
+She normally works late. Find the frequency adverb|She|normally|works|late|1|Normally tells how often
+I will reply soon. Find the time adverb|I|will|reply|soon|3|Soon tells when
+They constantly text me. Find the frequency adverb|They|constantly|text|me|1|Constantly tells how often
+I recently bought a car. Find the time adverb|I|recently|bought|car|1|Recently tells when
+He occasionally calls me. Find the adverb|He|occasionally|calls|me|1|Occasionally tells how often
+We finally won the match. Find the time adverb|We|finally|won|match|1|Finally tells when
+The magazine is published monthly. What is monthly?|Frequency|Time|Both|None|2|Monthly tells when and how often
+I have already seen it. Find the time adverb|I|have|already|seen|2|Already tells when
+She has not arrived yet. Find the time adverb|She|has|not|yet|3|Yet tells when
+He is still working. Find the time adverb|He|is|still|working|2|Still tells when
+I frequently check my phone. Find the frequency adverb|I|frequently|check|phone|1|Frequently tells how often
+We seldom eat out. Find the adverb|We|seldom|eat|out|1|Seldom tells how often
+I will do it today. Find the time adverb|I|will|do|today|3|Today tells when
+She never drinks coffee. Find the frequency adverb|She|never|drinks|coffee|1|Never tells how often
+He always helps me. Find the adverb|He|always|helps|me|1|Always tells how often
+I am usually at home on Sundays. Find the frequency adverb|I|usually|home|Sundays|1|Usually tells how often
+We often travel in summer. Find the adverb|We|often|travel|summer|1|Often tells how often
+I rarely watch TV. Find the frequency adverb|I|rarely|watch|TV|1|Rarely tells how often
+I am busy today. Find the time adverb|I|am|busy|today|3|Today tells when
+He will arrive tomorrow. Find the time adverb|He|will|arrive|tomorrow|3|Tomorrow tells when
+They are always late. Find the frequency adverb|They|are|always|late|2|Always tells how often
+I sometimes read books. Find the adverb|I|sometimes|read|books|1|Sometimes tells how often
+Let us talk later. Find the time adverb|Let|us|talk|later|3|Later tells when
+I usually wake up at 7. Find the frequency adverb|I|usually|wake|up|1|Usually tells how often
+We rarely see them. Find the adverb|We|rarely|see|them|1|Rarely tells how often
+I am eating now. Find the time adverb|I|am|eating|now|3|Now tells when
+She always studies hard. Find the adverb|She|always|studies|hard|1|Always tells how often
+He normally drives fast. Find the frequency adverb|He|normally|drives|fast|1|Normally tells how often
+I will leave soon. Find the time adverb|I|will|leave|soon|3|Soon tells when
+They constantly talk. Find the frequency adverb|They|constantly|talk|None|1|Constantly tells how often
+I recently met him. Find the time adverb|I|recently|met|him|1|Recently tells when
+She occasionally sings. Find the adverb|She|occasionally|sings|None|1|Occasionally tells how often
+We finally agreed. Find the time adverb|We|finally|agreed|None|1|Finally tells when
+The bill is paid yearly. What is yearly?|Frequency|Time|Both|None|2|Yearly tells when and how often
+I have already finished. Find the time adverb|I|have|already|finished|2|Already tells when
+He has not started yet. Find the time adverb|He|has|not|yet|3|Yet tells when
+She is still waiting. Find the time adverb|She|is|still|waiting|2|Still tells when
+I frequently visit the library. Find the frequency adverb|I|frequently|visit|library|1|Frequently tells how often
+We seldom argue. Find the adverb|We|seldom|argue|None|1|Seldom tells how often
+I will call today. Find the time adverb|I|will|call|today|3|Today tells when`;
+
+        const quizDatabase = rawQuiz.split('\n').filter(l => l.trim()).map(line => {
+            const p = line.split('|');
+            return {
+                q: p[0],
+                options: [p[1], p[2], p[3], p[4]],
+                a: parseInt(p[5]),
+                reason: p[6]
+            };
+        });
+
+        // Quiz State
+        let currentSessionQs = [];
+        let currentQIdx = 0;
+        let currentScore = 0;
+        let quizStartTime = 0;
+
+        function startQuiz() {
+            // Pick 10 random distinct questions
+            let shuffled = [...quizDatabase].sort(() => 0.5 - Math.random());
+            currentSessionQs = shuffled.slice(0, 10);
+            currentQIdx = 0;
+            currentScore = 0;
+            quizStartTime = Date.now();
+            
+            document.getElementById('quiz-start').style.display = 'none';
+            document.getElementById('quiz-result').style.display = 'none';
+            document.getElementById('quiz-active').style.display = 'block';
+            
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const qData = currentSessionQs[currentQIdx];
+            document.getElementById('quiz-progress-text').innerText = `Question ${currentQIdx + 1}/10`;
+            document.getElementById('quiz-progress-bar').style.width = `${((currentQIdx) / 10) * 100}%`;
+            
+            document.getElementById('quiz-question-text').innerText = qData.q;
+            
+            const optContainer = document.getElementById('quiz-options');
+            optContainer.innerHTML = '';
+            
+            qData.options.forEach((opt, idx) => {
+                if(!opt || opt === "None" && idx > 1 && qData.options[2]==="None") return; // Skip empty options if any
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-4 bg-inputbg border border-white/5 rounded-xl hover:bg-white/10 transition-all font-medium text-gray-200 focus:outline-none focus:ring-2 focus:ring-royal/50 option-btn";
+                btn.innerText = opt;
+                btn.onclick = () => selectOption(idx, btn);
+                optContainer.appendChild(btn);
+            });
+            
+            document.getElementById('quiz-feedback').classList.add('hidden');
+            document.getElementById('quiz-next-btn').classList.add('hidden');
+        }
+
+        function selectOption(selectedIdx, btnElement) {
+            // Disable all buttons
+            const buttons = document.querySelectorAll('.option-btn');
+            buttons.forEach(b => {
+                b.onclick = null;
+                b.classList.remove('hover:bg-white/10');
+            });
+            
+            const qData = currentSessionQs[currentQIdx];
+            const isCorrect = (selectedIdx === qData.a);
+            
+            if(isCorrect) {
+                currentScore++;
+                btnElement.classList.replace('bg-inputbg', 'bg-green-500/20');
+                btnElement.classList.replace('border-white/5', 'border-green-500/50');
+                btnElement.classList.add('text-green-400');
+            } else {
+                btnElement.classList.replace('bg-inputbg', 'bg-red-500/20');
+                btnElement.classList.replace('border-white/5', 'border-red-500/50');
+                btnElement.classList.add('text-red-400');
+                
+                // Highlight correct
+                buttons[qData.a].classList.replace('bg-inputbg', 'bg-green-500/20');
+                buttons[qData.a].classList.replace('border-white/5', 'border-green-500/50');
+            }
+            
+            const feedback = document.getElementById('quiz-feedback');
+            const title = document.getElementById('quiz-feedback-title');
+            const reason = document.getElementById('quiz-feedback-reason');
+            
+            title.innerText = isCorrect ? "Correct!" : "Incorrect";
+            title.className = isCorrect ? "font-bold text-sm mb-1 text-green-400" : "font-bold text-sm mb-1 text-red-400";
+            reason.innerText = qData.reason;
+            
+            feedback.classList.remove('hidden');
+            document.getElementById('quiz-next-btn').classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            currentQIdx++;
+            if(currentQIdx < 10) {
+                renderQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        function showResult() {
+            document.getElementById('quiz-active').style.display = 'none';
+            document.getElementById('quiz-result').style.display = 'flex';
+            
+            document.getElementById('quiz-final-score').innerText = `${currentScore}/10`;
+            document.getElementById('quiz-efficiency').innerText = `${(currentScore/10)*100}%`;
+            
+            let diff = Math.floor((Date.now() - quizStartTime) / 1000);
+            let m = Math.floor(diff / 60).toString().padStart(2, '0');
+            let s = (diff % 60).toString().padStart(2, '0');
+            document.getElementById('quiz-time-taken').innerText = `${m}:${s}`;
+            
+            document.getElementById('quiz-progress-bar').style.width = `100%`;
+        }
+
+        function resetQuizView() {
+            startQuiz(); // Automatically starts a new one
+        }
+
+        // ================= ANKI DOWNLOAD LOGIC =================
+        function downloadAnki() {
+            // Format strictly: Question,Answer with exactly one comma.
+            // Data has no commas in strings to prevent breaking the rule.
+            const ankiLines = quizDatabase.map(q => {
+                const answerText = q.options[q.a];
+                return `${q.q},${answerText}`;
+            });
+            
+            const csvContent = ankiLines.join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Adverb_Time_Frequency_Anki.csv';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Init default tab
+        switchTab('notes');
+
+    </script>
+</body>
+</html>
